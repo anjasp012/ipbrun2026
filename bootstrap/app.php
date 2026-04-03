@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\CheckSiteStatus::class,
         ]);
         $middleware->validateCsrfTokens(except: [
-            '/payments/midtrans-callback',
+            'payments/midtrans-callback',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

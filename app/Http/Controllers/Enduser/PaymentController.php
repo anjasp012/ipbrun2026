@@ -26,8 +26,8 @@ class PaymentController extends Controller
 
     public function callback(Request $request)
     {
-        if (!$request->isMethod('POST')) {
-            return response()->json(['message' => 'Method not allowed'], 405);
+        if ($request->isMethod('GET')) {
+            return response()->json(['message' => 'Payment callback endpoint is ready.'], 200);
         }
 
         try {
