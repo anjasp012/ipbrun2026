@@ -1,5 +1,5 @@
 <x-layouts.app title="Payment - IPB RUN 2026">
-    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+    <script type="text/javascript" src="https://app.{{ config('midtrans.is_production') ? '' : 'sandbox.' }}midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
     
     <div class="fixed inset-0 bg-[#f1f5f9] z-[-2]"></div>
     <div class="fixed inset-0 z-[-1] bg-cover bg-center bg-fixed opacity-100"

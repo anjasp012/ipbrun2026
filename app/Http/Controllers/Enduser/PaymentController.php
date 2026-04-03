@@ -24,11 +24,15 @@ class PaymentController extends Controller
         Config::$is3ds = config('midtrans.is_3ds');
     }
 
-    public function callback()
+    public function callback(Request $request)
     {
+        if (!$request->isMethod('POST')) {
+            return response()->json(['message' => 'Method not allowed'], 405);
+        }
+
         try {
             $notification = new Notification();
-            
+
             $transactionStatus = $notification->transaction_status;
             $orderCode = $notification->order_id;
             $fraudStatus = $notification->fraud_status;
@@ -54,7 +58,6 @@ class PaymentController extends Controller
             }
 
             return response()->json(['status' => 'success']);
-
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -72,13 +75,13 @@ class PaymentController extends Controller
 
         // 2. Create User Account
         $randomPassword = Str::random(8);
-        
+
         $user = User::create([
             'name' => $participant->name,
             'email' => $participant->email,
             'username' => $participant->email,
             'password' => Hash::make($randomPassword),
-            'role' => 'user' // Default role
+            'role' => 'participant' // Default role
         ]);
 
         // 3. Link Participant to User
