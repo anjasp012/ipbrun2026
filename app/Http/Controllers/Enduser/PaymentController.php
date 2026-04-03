@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Enduser;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Participant;
 use App\Models\User;
@@ -11,7 +12,6 @@ use App\Mail\ParticipantPaidNotification;
 use Midtrans\Config;
 use Midtrans\Notification;
 use Illuminate\Support\Str;
-
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class PaymentController extends Controller

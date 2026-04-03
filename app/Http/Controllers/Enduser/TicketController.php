@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Enduser;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
 use App\Models\Ticket;
 use App\Models\Participant;
 use App\Models\Setting;
@@ -18,12 +18,6 @@ class TicketController extends Controller
         Config::$isProduction = config('midtrans.is_production');
         Config::$isSanitized = config('midtrans.is_sanitized');
         Config::$is3ds = config('midtrans.is_3ds');
-    }
-
-    public function index()
-    {
-        $tickets = Ticket::with(['category', 'period'])->get();
-        return view('pages.admin.tickets.index', compact('tickets'));
     }
 
     public function home()
@@ -56,14 +50,12 @@ class TicketController extends Controller
     {
         $ticket = Ticket::findOrFail($request->ticket_id);
         
-        // 1. Validation Logic for Unique Pending/Paid
+        // Validation and creation code truncated for brevity but assuming you want it here
+        // (Copying entirety for completeness)
         $duplicateCheck = Participant::where(function ($query) use ($request) {
                 $query->where('email', $request->email)
                     ->orWhere('nik', $request->nik);
-                
-                if ($request->filled('nim_nrp')) {
-                    $query->orWhere('nim_nrp', $request->nim_nrp);
-                }
+                if ($request->filled('nim_nrp')) { $query->orWhere('nim_nrp', $request->nim_nrp); }
             })
             ->whereIn('status', ['pending', 'paid'])
             ->first();
@@ -79,7 +71,6 @@ class TicketController extends Controller
             ]);
         }
 
-        // 2. Data Validation
         $validated = $request->validate([
             'ticket_id' => 'required',
             'name' => 'required|string|max:255',
@@ -105,28 +96,18 @@ class TicketController extends Controller
             'digits' => ':attribute harus berjumlah :digits digit.',
             'in' => 'Pilihan :attribute tidak valid.',
         ], [
-            'name' => 'Nama Lengkap',
-            'email' => 'Alamat Email',
-            'email_confirmation' => 'Konfirmasi Email',
-            'phone_number' => 'Nomor WhatsApp',
-            'nik' => 'NIK KTP',
-            'date_birth' => 'Tanggal Lahir',
-            'sex' => 'Jenis Kelamin',
-            'blood_type' => 'Golongan Darah',
-            'jersey_size' => 'Ukuran Jersey',
-            'address' => 'Alamat Lengkap',
-            'emergency_contact_name' => 'Nama Kontak Darurat',
-            'emergency_contact_phone_number' => 'Nomor HP Darurat',
-            'emergency_contact_relationship' => 'Hubungan Kontak',
+            'name' => 'Nama Lengkap', 'email' => 'Alamat Email', 'email_confirmation' => 'Konfirmasi Email',
+            'phone_number' => 'Nomor WhatsApp', 'nik' => 'NIK KTP', 'date_birth' => 'Tanggal Lahir',
+            'sex' => 'Jenis Kelamin', 'blood_type' => 'Golongan Darah', 'jersey_size' => 'Ukuran Jersey',
+            'address' => 'Alamat Lengkap', 'emergency_contact_name' => 'Nama Kontak Darurat',
+            'emergency_contact_phone_number' => 'Nomor HP Darurat', 'emergency_contact_relationship' => 'Hubungan Kontak',
         ]);
 
-        // 3. Calculation
         $adminFee = 4500;
         $donationEvent = (int) $request->input('donation_event', 0);
         $donationScholarship = (int) $request->input('donation_scholarship', 0);
         $totalPrice = $ticket->price + $adminFee + $donationEvent + $donationScholarship;
 
-        // 4. Create Participant
         $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
         $participantData = \Illuminate\Support\Arr::except($validated, ['email_confirmation']);
         $participant = Participant::create(array_merge($participantData, [
@@ -137,61 +118,23 @@ class TicketController extends Controller
             'status' => 'pending'
         ]));
 
-        // 5. Generate Midtrans Snap Token
         $params = [
-            'transaction_details' => [
-                'order_id' => $participant->order_code,
-                'gross_amount' => $totalPrice,
-            ],
-            'customer_details' => [
-                'first_name' => $participant->name,
-                'email' => $participant->email,
-                'phone' => $participant->phone_number,
-            ],
+            'transaction_details' => ['order_id' => $participant->order_code, 'gross_amount' => $totalPrice],
+            'customer_details' => ['first_name' => $participant->name, 'email' => $participant->email, 'phone' => $participant->phone_number],
             'item_details' => [
-                [
-                    'id' => $ticket->id,
-                    'price' => $ticket->price,
-                    'quantity' => 1,
-                    'name' => 'Tiket IPB Run 2026 - ' . $ticket->category->name,
-                ],
-                [
-                    'id' => 'ADMIN_FEE',
-                    'price' => $adminFee,
-                    'quantity' => 1,
-                    'name' => 'Biaya Layanan',
-                ]
+                ['id' => $ticket->id, 'price' => $ticket->price, 'quantity' => 1, 'name' => 'Tiket IPB Run 2026 - ' . $ticket->category->name],
+                ['id' => 'ADMIN_FEE', 'price' => $adminFee, 'quantity' => 1, 'name' => 'Biaya Layanan']
             ]
         ];
 
-        if ($donationEvent > 0) {
-            $params['item_details'][] = [
-                'id' => 'DONATION_EVENT',
-                'price' => $donationEvent,
-                'quantity' => 1,
-                'name' => 'Donasi Event',
-            ];
-        }
-
-        if ($donationScholarship > 0) {
-            $params['item_details'][] = [
-                'id' => 'DONATION_SCHOLARSHIP',
-                'price' => $donationScholarship,
-                'quantity' => 1,
-                'name' => 'Donasi Beasiswa',
-            ];
-        }
+        if ($donationEvent > 0) $params['item_details'][] = ['id' => 'DONATION_EVENT', 'price' => $donationEvent, 'quantity' => 1, 'name' => 'Donasi Event'];
+        if ($donationScholarship > 0) $params['item_details'][] = ['id' => 'DONATION_SCHOLARSHIP', 'price' => $donationScholarship, 'quantity' => 1, 'name' => 'Donasi Beasiswa'];
 
         try {
             $snapResponse = Snap::createTransaction($params);
-            $participant->update([
-                'snap_token' => $snapResponse->token,
-                'payment_url' => $snapResponse->redirect_url,
-            ]);
-
+            $participant->update(['snap_token' => $snapResponse->token, 'payment_url' => $snapResponse->redirect_url]);
             return redirect($snapResponse->redirect_url);
         } catch (\Exception $e) {
-            // Handle error, maybe returning error message
             return back()->withInput()->withErrors(['midtrans' => 'Terjadi gangguan koneksi ke sistem pembayaran. Silakan coba beberapa saat lagi.']);
         }
     }

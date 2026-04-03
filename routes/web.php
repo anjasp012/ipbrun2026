@@ -2,26 +2,33 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\TicketController;
+use App\Http\Controllers\Enduser\TicketController as EnduserTicket;
+use App\Http\Controllers\Admin\TicketController as AdminTicket;
+use App\Http\Controllers\Admin\AdminController as AdminDashboard;
+use App\Http\Controllers\Enduser\PaymentController;
+use App\Http\Controllers\Enduser\TestController;
 
-Route::get('/', [TicketController::class, 'home']);
-Route::get('/checkout/{ticket}', [TicketController::class, 'checkout'])->name('checkout');
-Route::post('/register', [TicketController::class, 'register'])->name('register');
+// Enduser Routes
+Route::get('/', [EnduserTicket::class, 'home']);
+Route::get('/checkout/{ticket}', [EnduserTicket::class, 'checkout'])->name('checkout');
+Route::post('/register', [EnduserTicket::class, 'register'])->name('register');
 Route::get('/payment/{participant}', function (\App\Models\Participant $participant) {
     return view('pages.enduser.payment', compact('participant'));
 })->name('payment.show');
-Route::post('/payments/midtrans-callback', [\App\Http\Controllers\PaymentController::class, 'callback'])->name('midtrans.callback');
+Route::post('/payments/midtrans-callback', [PaymentController::class, 'callback'])->name('midtrans.callback');
 
-Route::get('/test-email', [\App\Http\Controllers\TestController::class, 'emailForm']);
-Route::post('/test-email', [\App\Http\Controllers\TestController::class, 'sendEmail']);
+// Utilities / Test
+Route::get('/test-email', [TestController::class, 'emailForm']);
+Route::post('/test-email', [TestController::class, 'sendEmail']);
 
 // Admin Routes
 Route::prefix('admin')->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\AdminController::class, 'dashboard']);
-    Route::post('/toggle-running', [\App\Http\Controllers\AdminController::class, 'toggleRunning']);
-    Route::get('/participants', [\App\Http\Controllers\AdminController::class, 'participants']);
-    Route::get('/participants/{participant}', [\App\Http\Controllers\AdminController::class, 'participantShow']);
-    Route::get('/tickets', [TicketController::class, 'index']);
+    Route::get('/dashboard', [AdminDashboard::class, 'dashboard']);
+    Route::post('/toggle-running', [AdminDashboard::class, 'toggleRunning']);
+    Route::get('/participants', [AdminDashboard::class, 'participants']);
+    Route::get('/participants/{participant}', [AdminDashboard::class, 'participantShow']);
+    Route::get('/tickets', [AdminTicket::class, 'index']);
+    Route::post('/periods/{period}/toggle', [AdminTicket::class, 'togglePeriod'])->name('periods.toggle');
 });
 
 Route::get('/test-tailwind', function () {
