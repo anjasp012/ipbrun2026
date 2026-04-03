@@ -1,0 +1,14 @@
+@props(['disabled' => false, 'placeholder' => null, 'options' => [], 'selected' => null])
+
+<select {{ $disabled ? 'disabled' : '' }} {!! $attributes->merge([
+    'class' =>
+        'border-1 border-slate-400/30 bg-white focus:border-[#003366] focus:ring-0 rounded-lg h-12 px-4 w-full transition-all duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed appearance-none bg-[url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%236b7280%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E")] bg-[position:right_0.75rem_center] bg-[size:1.5em_1.5em] bg-no-repeat font-medium',
+]) !!}>
+    @if ($placeholder)
+        <option value="" disabled {{ is_null($selected) ? 'selected' : '' }}>{{ $placeholder }}</option>
+    @endif
+    @foreach ($options as $value => $label)
+        <option value="{{ $value }}" {{ (string) $selected === (string) $value ? 'selected' : '' }}>{{ $label }}</option>
+    @endforeach
+    {{ $slot }}
+</select>
