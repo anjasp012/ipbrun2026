@@ -27,4 +27,19 @@ class TicketController extends Controller
 
         return back()->with('success', "Periode {$period->name} sekarang aktif!");
     }
+
+    public function update(Request $request, Ticket $ticket)
+    {
+        $validated = $request->validate([
+            'price' => 'required|numeric|min:0',
+            'qty' => 'required|numeric|min:0'
+        ]);
+
+        $ticket->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tiket berhasil diperbarui!'
+        ]);
+    }
 }

@@ -21,7 +21,32 @@
         @endif
 
         <!-- Accordion Table -->
-        <div class="space-y-4" x-data="{ activeAccordion: null }">
+        <div class="space-y-4" x-data="{ 
+            activeAccordion: '{{ $periods->firstWhere('is_active', true)->id ?? null }}',
+            loading: false,
+            async updateTicket(ticketId, data) {
+                this.loading = true;
+                try {
+                    const response = await fetch(`/admin/tickets/${ticketId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    const res = await response.json();
+                    if (res.success) {
+                        // Optional: Show toast or feedback
+                        console.log('Updated');
+                    }
+                } catch (e) {
+                    console.error('Update failed');
+                } finally {
+                    this.loading = false;
+                }
+            }
+        }">
             @foreach($periods as $period)
             <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden transition-all duration-300" 
                  :class="{ 'ring-2 ring-blue-100 border-blue-200': activeAccordion === '{{ $period->id }}' }">
@@ -85,15 +110,26 @@
                                     <tr class="bg-slate-50 uppercase tracking-widest text-[9px] font-black text-slate-400 border-b border-slate-100">
                                         <th class="px-6 py-4">Nama Tiket</th>
                                         <th class="px-6 py-4 text-center">Kategori</th>
-                                        <th class="px-6 py-4 text-center">Harga</th>
-                                        <th class="px-6 py-4 text-center">Stok</th>
-                                        <th class="px-6 py-4 text-right">Aksi</th>
+                                        <th class="px-6 py-4 text-center">Harga (Inline Edit)</th>
+                                        <th class="px-6 py-4 text-center">Stok (Inline Edit)</th>
+                                        <th class="px-6 py-4 text-right">Status Simpan</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-50">
                                     @php $periodTickets = $tickets->where('period_id', $period->id); @endphp
                                     @forelse ($periodTickets as $ticket)
-                                    <tr class="hover:bg-slate-50/30 transition-colors">
+                                    <tr class="hover:bg-slate-50/30 transition-colors group" x-data="{ 
+                                        price: '{{ $ticket->price }}', 
+                                        qty: '{{ $ticket->qty }}',
+                                        isDirty: false,
+                                        isSaving: false,
+                                        async save() {
+                                            this.isSaving = true;
+                                            await updateTicket('{{ $ticket->id }}', { price: this.price, qty: this.qty });
+                                            this.isSaving = false;
+                                            this.isDirty = false;
+                                        }
+                                    }">
                                         <td class="px-6 py-4">
                                             <div class="font-bold text-slate-800 uppercase tracking-tight">{{ $ticket->name }}</div>
                                             <div class="text-[9px] text-slate-400 font-bold uppercase tracking-[2px] mt-0.5 opacity-60 italic">UID: #{{ $ticket->id }}</div>
@@ -104,24 +140,27 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 text-center">
-                                            <div class="text-xs font-black text-slate-800 tracking-tighter">Rp{{ number_format($ticket->price, 0, ',', '.') }}</div>
+                                            <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-50 transition-all">
+                                                <span class="text-[10px] font-black text-slate-300">Rp</span>
+                                                <input type="number" x-model="price" @input="isDirty = true" @keyup.enter="save()"
+                                                    class="w-24 bg-transparent border-none p-0 text-xs font-black text-slate-800 focus:ring-0">
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 text-center">
-                                            <div class="flex flex-col items-center">
-                                                <span class="text-[10px] font-bold text-slate-700">{{ $ticket->qty }} Units</span>
-                                                <div class="w-12 h-1 bg-slate-100 rounded-full mt-1.5 overflow-hidden">
-                                                    <div class="h-full bg-gradient-to-r from-blue-600 to-indigo-600" style="width: 70%"></div>
-                                                </div>
+                                            <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-50 transition-all">
+                                                <input type="number" x-model="qty" @input="isDirty = true" @keyup.enter="save()"
+                                                    class="w-16 bg-transparent border-none p-0 text-xs font-black text-slate-800 focus:ring-0 text-center">
+                                                <span class="text-[9px] font-black text-slate-300 uppercase">Qty</span>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 text-right">
-                                            <div class="flex justify-end gap-1">
-                                                <button class="p-2 text-slate-300 hover:text-blue-600 transition-colors">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                                </button>
-                                                <button class="p-2 text-slate-300 hover:text-rose-600 transition-colors">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                                </button>
+                                            <button @click="save()" x-show="isDirty" x-cloak
+                                                class="px-4 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2 ml-auto shadow-sm shadow-blue-100">
+                                                <span x-show="!isSaving">Simpan</span>
+                                                <span x-show="isSaving" class="flex"><svg class="animate-spin h-3 w-3 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></span>
+                                            </button>
+                                            <div x-show="!isDirty" class="text-[9px] font-bold text-slate-300 uppercase italic">
+                                                Saved
                                             </div>
                                         </td>
                                     </tr>

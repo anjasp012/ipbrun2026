@@ -28,6 +28,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/participants', [AdminDashboard::class, 'participants']);
     Route::get('/participants/{participant}', [AdminDashboard::class, 'participantShow']);
     Route::get('/tickets', [AdminTicket::class, 'index']);
+    Route::put('/tickets/{ticket}', [AdminTicket::class, 'update'])->name('tickets.update');
     Route::post('/periods/{period}/toggle', [AdminTicket::class, 'togglePeriod'])->name('periods.toggle');
 });
 
