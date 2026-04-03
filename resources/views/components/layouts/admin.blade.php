@@ -17,6 +17,7 @@
         .sidebar-item:hover { background: rgba(255, 255, 255, 0.1); color: white; }
         .sidebar-item.active { background: rgba(255, 255, 255, 0.15); color: white; border-left: 4px solid #E8630A; }
     </style>
+    @stack('styles')
 </head>
 <body class="antialiased text-slate-800">
     <div class="flex min-h-screen">
@@ -76,5 +77,6 @@
             </main>
         </div>
     </div>
+    @stack('scripts')
 </body>
 </html>
