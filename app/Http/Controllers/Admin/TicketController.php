@@ -32,6 +32,7 @@ class TicketController extends Controller
     {
         $validated = $request->validate([
             'price' => 'required|numeric|min:0',
+            'discount' => 'nullable|numeric|min:0',
             'qty' => 'required|numeric|min:0'
         ]);
 

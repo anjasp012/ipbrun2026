@@ -109,10 +109,10 @@
                                 <thead>
                                     <tr class="bg-slate-50 uppercase tracking-widest text-[9px] font-black text-slate-400 border-b border-slate-100">
                                         <th class="px-6 py-4">Nama Tiket</th>
-                                        <th class="px-6 py-4 text-center">Kategori</th>
-                                        <th class="px-6 py-4 text-center">Harga (Inline Edit)</th>
-                                        <th class="px-6 py-4 text-center">Stok (Inline Edit)</th>
-                                        <th class="px-6 py-4 text-right">Status Simpan</th>
+                                        <th class="px-6 py-4 text-center">Harga</th>
+                                        <th class="px-6 py-4 text-center">Diskon (Nominal)</th>
+                                        <th class="px-6 py-4 text-center">Stok</th>
+                                        <th class="px-6 py-4 text-right">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-50">
@@ -120,37 +120,39 @@
                                     @forelse ($periodTickets as $ticket)
                                     <tr class="hover:bg-slate-50/30 transition-colors group" x-data="{ 
                                         price: '{{ $ticket->price }}', 
+                                        discount: '{{ $ticket->discount ?? 0 }}',
                                         qty: '{{ $ticket->qty }}',
                                         isDirty: false,
                                         isSaving: false,
                                         async save() {
                                             this.isSaving = true;
-                                            await updateTicket('{{ $ticket->id }}', { price: this.price, qty: this.qty });
+                                            await updateTicket('{{ $ticket->id }}', { price: this.price, discount: this.discount, qty: this.qty });
                                             this.isSaving = false;
                                             this.isDirty = false;
                                         }
                                     }">
                                         <td class="px-6 py-4">
                                             <div class="font-bold text-slate-800 uppercase tracking-tight">{{ $ticket->name }}</div>
-                                            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-[2px] mt-0.5 opacity-60 italic">UID: #{{ $ticket->id }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 text-center">
-                                            <span class="inline-flex px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest bg-blue-50 text-blue-600 border border-blue-100">
-                                                {{ $ticket->category->name ?? '-' }}
-                                            </span>
+                                            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-[2px] mt-0.5 opacity-60 italic">Kategori: {{ $ticket->category->name ?? '-' }}</div>
                                         </td>
                                         <td class="px-6 py-4 text-center">
                                             <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-50 transition-all">
-                                                <span class="text-[10px] font-black text-slate-300">Rp</span>
+                                                <span class="text-[9px] font-black text-slate-300">Rp</span>
                                                 <input type="number" x-model="price" @input="isDirty = true" @keyup.enter="save()"
                                                     class="w-24 bg-transparent border-none p-0 text-xs font-black text-slate-800 focus:ring-0">
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-center">
+                                            <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-rose-50/50 rounded-xl border border-rose-100 focus-within:border-rose-300 focus-within:ring-2 focus-within:ring-rose-50 transition-all">
+                                                <span @class(['text-[9px] font-black text-rose-300'])>Rp</span>
+                                                <input type="number" x-model="discount" @input="isDirty = true" @keyup.enter="save()"
+                                                    class="w-20 bg-transparent border-none p-0 text-xs font-black text-rose-600 focus:ring-0">
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 text-center">
                                             <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-50 transition-all">
                                                 <input type="number" x-model="qty" @input="isDirty = true" @keyup.enter="save()"
                                                     class="w-16 bg-transparent border-none p-0 text-xs font-black text-slate-800 focus:ring-0 text-center">
-                                                <span class="text-[9px] font-black text-slate-300 uppercase">Qty</span>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 text-right">
@@ -160,7 +162,7 @@
                                                 <span x-show="isSaving" class="flex"><svg class="animate-spin h-3 w-3 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></span>
                                             </button>
                                             <div x-show="!isDirty" class="text-[9px] font-bold text-slate-300 uppercase italic">
-                                                Saved
+                                                Sudah Terupdate
                                             </div>
                                         </td>
                                     </tr>
