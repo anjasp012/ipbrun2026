@@ -15,7 +15,7 @@ Route::post('/register', [EnduserTicket::class, 'register'])->name('register');
 Route::get('/payment/{participant}', function (\App\Models\Participant $participant) {
     return view('pages.enduser.payment', compact('participant'));
 })->name('payment.show');
-Route::post('/payments/midtrans-callback', [PaymentController::class, 'callback'])->name('midtrans.callback');
+Route::match(['GET', 'POST'], '/payments/midtrans-callback', [PaymentController::class, 'callback'])->name('midtrans.callback');
 
 // Utilities / Test
 Route::get('/test-email', [TestController::class, 'emailForm']);
