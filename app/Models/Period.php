@@ -11,4 +11,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 class Period extends Model
 {
     use HasUuids;
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
+    }
 }

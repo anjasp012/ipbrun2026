@@ -20,4 +20,9 @@ class Ticket extends Model
     {
         return $this->belongsTo(Period::class);
     }
+
+    public function participants()
+    {
+        return $this->hasMany(Participant::class);
+    }
 }
