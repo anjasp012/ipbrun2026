@@ -13,21 +13,47 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
+        // 1. Ringkasan Data
+        $totalPaidParticipants = Participant::where('status', 'paid')->count();
+        $totalTicketsSold = $totalPaidParticipants; 
+        $totalCapacity = \App\Models\Ticket::sum('qty');
+
         $stats = [
-            'total_participants' => Participant::where('status', 'paid')->count(),
-            'pending_payments' => Participant::where('status', 'pending')->count(),
             'total_revenue' => Participant::where('status', 'paid')->sum('total_price'),
-            'registrations_by_category' => DB::table('participants')
-                ->join('tickets', 'participants.ticket_id', '=', 'tickets.id')
-                ->join('categories', 'tickets.category_id', '=', 'categories.id')
-                ->select('categories.name', DB::raw('count(*) as count'))
-                ->where('participants.status', 'paid')
-                ->groupBy('categories.name')
-                ->get(),
+            'total_order' => Participant::count(),
+            'total_participants' => $totalPaidParticipants,
+            'total_remaining_tickets' => $totalCapacity - $totalTicketsSold,
             'is_running' => Setting::getValue('is_running', '0') === '1'
         ];
 
-        return view('pages.admin.dashboard', compact('stats'));
+        // 2. Periods & Tickets Breakdown
+        $periods = \App\Models\Period::with(['tickets.category', 'tickets.participants' => function($q) {
+            $q->where('status', 'paid');
+        }])->get();
+
+        $periodsData = $periods->map(function($period) {
+            $tickets = $period->tickets->map(function($ticket) {
+                $terjual = $ticket->participants->count();
+                return (object) [
+                    'kategori' => $ticket->category->name ?? '-',
+                    'name' => $ticket->name,
+                    'price' => $ticket->price,
+                    'kapasitas' => $ticket->qty,
+                    'terjual' => $terjual,
+                    'sisa_stok' => $ticket->qty - $terjual
+                ];
+            });
+
+            return (object) [
+                'name' => $period->name,
+                'total_kapasitas' => $tickets->sum('kapasitas'),
+                'total_terjual' => $tickets->sum('terjual'),
+                'total_sisa_stok' => $tickets->sum('sisa_stok'),
+                'tickets' => $tickets
+            ];
+        });
+
+        return view('pages.admin.dashboard', compact('stats', 'periodsData'));
     }
 
     public function toggleRunning()
