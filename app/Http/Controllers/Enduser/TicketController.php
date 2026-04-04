@@ -104,9 +104,12 @@ class TicketController extends Controller
                 ->first();
 
             if ($duplicateCheck) {
-                $field = $duplicateCheck->email === $request->email ? "Email" : ($duplicateCheck->nik === $request->nik ? "NIK" : "NIM/NRP");
+                $fieldKey = $duplicateCheck->email === $request->email ? 'email' : ($duplicateCheck->nik === $request->nik ? 'nik' : 'nim_nrp');
+                $fieldName = $fieldKey === 'email' ? 'Email' : ($fieldKey === 'nik' ? 'NIK' : 'NIM/NRP');
+                
                 return back()->withInput()->withErrors([
-                    'duplicate' => "$field sudah terdaftar dalam sistem dan sedang dalam status Pending/Paid. Silakan gunakan data lain atau selesaikan pembayaran sebelumnya."
+                    $fieldKey => "Field ini sudah terdaftar dalam sistem.",
+                    'duplicate' => "$fieldName sudah terdaftar dalam sistem dan sedang dalam status Pending/Paid. Silakan gunakan data lain atau selesaikan pembayaran sebelumnya."
                 ]);
             }
 
