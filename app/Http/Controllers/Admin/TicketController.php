@@ -11,7 +11,10 @@ class TicketController extends Controller
 {
     public function index()
     {
-        $tickets = Ticket::with(['category', 'period'])->get();
+        $tickets = Ticket::with(['category', 'period'])
+            ->withCount(['participants' => function($q) {
+                $q->whereIn('status', ['pending', 'paid']);
+            }])->get();
         $periods = Period::all();
         $categories = \App\Models\Category::all();
         return view('pages.admin.tickets.index', compact('tickets', 'periods', 'categories'));

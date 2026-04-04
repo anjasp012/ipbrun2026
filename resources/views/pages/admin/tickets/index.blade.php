@@ -112,6 +112,7 @@
                                         <th class="px-6 py-4 text-center">Harga</th>
                                         <th class="px-6 py-4 text-center">Diskon (Nominal)</th>
                                         <th class="px-6 py-4 text-center">Stok</th>
+                                        <th class="px-6 py-4 text-center">Terjual</th>
                                         <th class="px-6 py-4 text-right">Aksi</th>
                                     </tr>
                                 </thead>
@@ -159,6 +160,15 @@
                                                     class="w-16 bg-transparent border-none p-0 text-xs font-black text-slate-800 focus:ring-0 text-center">
                                             </div>
                                         </td>
+                                        <td class="px-6 py-4 text-center">
+                                            <span @class([
+                                                'inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider',
+                                                'bg-emerald-50 text-emerald-600' => $ticket->participants_count > 0,
+                                                'bg-slate-50 text-slate-300' => $ticket->participants_count == 0
+                                            ])>
+                                                {{ $ticket->participants_count }}
+                                            </span>
+                                        </td>
                                         <td class="px-6 py-4 text-right flex items-center justify-end gap-3">
                                             <button @click="save()" x-show="isDirty" x-cloak
                                                 class="px-4 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2 shadow-sm shadow-blue-100">
@@ -179,7 +189,7 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="5" class="px-6 py-10 text-center text-slate-400 italic text-[10px] font-bold uppercase tracking-widest">Tidak ada tiket di periode ini.</td>
+                                        <td colspan="6" class="px-6 py-10 text-center text-slate-400 italic text-[10px] font-bold uppercase tracking-widest">Tidak ada tiket di periode ini.</td>
                                     </tr>
                                     @endforelse
                                 </tbody>
