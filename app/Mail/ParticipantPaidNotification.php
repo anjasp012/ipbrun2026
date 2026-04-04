@@ -16,16 +16,14 @@ class ParticipantPaidNotification extends Mailable implements ShouldQueue
 
     public $participant;
     public $password;
-    public $invoicePdf;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($participant, $password, $invoicePdf = null)
+    public function __construct($participant, $password)
     {
         $this->participant = $participant;
         $this->password = $password;
-        $this->invoicePdf = $invoicePdf;
     }
 
     /**
@@ -55,10 +53,22 @@ class ParticipantPaidNotification extends Mailable implements ShouldQueue
      */
     public function attachments(): array
     {
-        $attachments = [];
-        if ($this->invoicePdf) {
-            $attachments[] = \Illuminate\Mail\Mailables\Attachment::fromData(fn() => $this->invoicePdf, 'E-Invoice-IPB-RUN-2026.pdf');
+        // Generate PDF inside the worker to avoid serialization issues
+        $bgPath = public_path('assets/images/bg_invoice.jpg');
+        if (file_exists($bgPath)) {
+            $bgData = base64_encode(file_get_contents($bgPath));
+            $bgBase64 = 'data:image/jpeg;base64,' . $bgData;
+        } else {
+            $bgBase64 = '';
         }
-        return $attachments;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('emails.invoice', [
+            'participant' => $this->participant,
+            'bg_base64' => $bgBase64,
+        ])->setPaper('a4', 'portrait');
+
+        return [
+            \Illuminate\Mail\Mailables\Attachment::fromData(fn() => $pdf->output(), 'E-Invoice-IPB-RUN-2026.pdf')
+        ];
     }
 }

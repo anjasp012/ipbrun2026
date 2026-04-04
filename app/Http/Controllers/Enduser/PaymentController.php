@@ -99,25 +99,9 @@ class PaymentController extends Controller
 
         // 3. Link Participant to User
         $participant->update(['user_id' => $user->id]);
-
-        // 4. Generate PDF Invoice
-        $bgPath = public_path('assets/images/bg_invoice.jpg');
-        if (file_exists($bgPath)) {
-            $bgData = base64_encode(file_get_contents($bgPath));
-            $bgBase64 = 'data:image/jpeg;base64,' . $bgData;
-        } else {
-            $bgBase64 = '';
-        }
-
-        $pdf = Pdf::loadView('emails.invoice', [
-            'participant' => $participant,
-            'bg_base64' => $bgBase64,
-        ])->setPaper('a4', 'portrait');
-
-        $pdfOutput = $pdf->output();
-
+        // 4. Send Notification Email with Credentials and Invoice PDF
         try {
-            Mail::to($participant->email)->send(new ParticipantPaidNotification($participant, $randomPassword, $pdfOutput));
+            Mail::to($participant->email)->send(new ParticipantPaidNotification($participant, $randomPassword));
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Email Sending Failed', [
                 'order_code' => $participant->order_code,
