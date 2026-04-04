@@ -14,8 +14,9 @@ class AdminController extends Controller
     public function dashboard()
     {
         // 1. Ringkasan Data
+        $totalSoldTickets = Participant::whereIn('status', ['pending', 'paid'])->count();
         $totalPaidParticipants = Participant::where('status', 'paid')->count();
-        $totalTicketsSold = $totalPaidParticipants; 
+        $totalTicketsSold = $totalSoldTickets; 
         $totalCapacity = \App\Models\Ticket::sum('qty');
 
         $stats = [
@@ -28,7 +29,7 @@ class AdminController extends Controller
 
         // 2. Periods & Tickets Breakdown
         $periods = \App\Models\Period::with(['tickets.category', 'tickets.participants' => function($q) {
-            $q->where('status', 'paid');
+            $q->whereIn('status', ['pending', 'paid']);
         }])->get();
 
         $periodsData = $periods->map(function($period) {

@@ -29,7 +29,7 @@
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                 @foreach ($group['data'] as $ticket)
-                                    @php $qty = $ticket->qty; @endphp
+                                    @php $qty = $ticket->qty - $ticket->participants_count; @endphp
                                     <div
                                         class="relative bg-white border border-slate-100 rounded-2xl flex flex-col transition-all duration-300 overflow-hidden">
                                         <!-- Card Content -->

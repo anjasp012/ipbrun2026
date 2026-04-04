@@ -29,7 +29,10 @@ class TicketController extends Controller
         // Fetch tickets only from the active period
         $tickets = Ticket::whereHas('period', function($query) {
             $query->where('is_active', true);
-        })->with(['category', 'period'])->get();
+        })->with(['category', 'period'])
+        ->withCount(['participants' => function($query) {
+            $query->whereIn('status', ['pending', 'paid']);
+        }])->get();
 
         $tickets_ipb = $tickets->filter(fn($t) => str_contains(strtolower($t->name), 'ipb'));
         $tickets_public = $tickets->filter(fn($t) => !str_contains(strtolower($t->name), 'ipb'));
