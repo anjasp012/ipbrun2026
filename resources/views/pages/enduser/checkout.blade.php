@@ -111,9 +111,9 @@
                         <x-select id="jersey_size" name="jersey_size" required :options="['S' => 'S', 'M' => 'M', 'L' => 'L', 'XL' => 'XL', 'XXL' => 'XXL']" :selected="old('jersey_size')" class="{{ $errors->has('jersey_size') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
                         @error('jersey_size')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
                     </div>
-                    <div>
+                    <div id="nimSection" class="hidden">
                         <x-label for="nim_nrp">NIM/NRP (Optional)</x-label>
-                        <x-input id="nim_nrp" name="nim_nrp" placeholder="Untuk kategori IPB" value="{{ old('nim_nrp') }}" class="{{ $errors->has('nim_nrp') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        <x-input id="nim_nrp" name="nim_nrp" placeholder="Khusus Mahasiswa/Alumni IPB" value="{{ old('nim_nrp') }}" class="{{ $errors->has('nim_nrp') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
                         @error('nim_nrp')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
                     </div>
                     <div>
@@ -288,6 +288,9 @@
 
             if (isIPB) {
                 document.getElementById('donateSection').classList.remove('hidden');
+                document.getElementById('nimSection').classList.remove('hidden');
+            } else {
+                document.getElementById('nim_nrp').value = ''; // Clear if hidden
             }
 
             function updateTotal() {

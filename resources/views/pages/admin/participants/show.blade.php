@@ -19,7 +19,10 @@
                         </div>
                     </div>
                     <div class="hidden md:flex gap-2">
-                        <button class="h-10 px-6 bg-slate-50 hover:bg-slate-100 text-slate-800 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all border border-slate-100">Resend Invoice</button>
+                        <a href="{{ route('participants.resend-invoice', $participant) }}" 
+                           class="h-10 px-6 bg-slate-50 hover:bg-slate-100 text-slate-800 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all border border-slate-100 flex items-center">
+                           Resend Invoice
+                        </a>
                     </div>
                 </div>
 

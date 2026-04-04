@@ -91,4 +91,14 @@ class AdminController extends Controller
     {
         return view('pages.admin.participants.show', compact('participant'));
     }
+
+    public function resendInvoice(Participant $participant)
+    {
+        try {
+            \Illuminate\Support\Facades\Mail::to($participant->email)->send(new \App\Mail\ParticipantInvoiceResend($participant));
+            return back()->with('success', 'E-Invoice has been resent to ' . $participant->email);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to send email: ' . $e->getMessage());
+        }
+    }
 }
