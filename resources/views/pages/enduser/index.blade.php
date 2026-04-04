@@ -6,9 +6,9 @@
 
     <div class="h-screen overflow-hidden flex items-center justify-center p-4">
         <div
-            class="max-w-[1000px] w-full max-h-[98vh] bg-white rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 relative flex flex-col p-10 md:p-16 overflow-hidden">
+            class="max-w-auto w-full max-h-[98vh] bg-white rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 relative flex flex-col p-10 md:p-12 overflow-hidden">
             <!-- Content Area -->
-            <div class="relative space-y-10 overflow-hidden">
+            <div class="relative space-y-10 overflow-y-auto pr-2 custom-scrollbar">
                 @php
                     $ticketGroups = [
                         ['data' => $tickets_ipb, 'title' => 'Mahasiswa & Alumni IPB'],
@@ -27,7 +27,7 @@
                                 <div class="mx-auto w-12 h-1 mt-2 bg-[#E8630A] rounded-full"></div>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                 @foreach ($group['data'] as $ticket)
                                     @php $qty = $ticket->qty; @endphp
                                     <div
@@ -127,6 +127,24 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </x-layouts.app>
