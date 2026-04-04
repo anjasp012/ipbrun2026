@@ -1,5 +1,12 @@
 <x-layouts.admin title="Dashboard Summary">
-    <div class="space-y-10">
+    <div class="space-y-6">
+        @if(session('success'))
+            <div class="bg-emerald-50 text-emerald-700 px-6 py-4 rounded-2xl border border-emerald-100 text-sm font-bold flex items-center gap-3 animate-slide-in shadow-sm">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                {{ session('success') }}
+            </div>
+        @endif
+
         <!-- Website Status Section (Maintained) -->
         <div class="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 overflow-hidden relative">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
@@ -57,7 +64,7 @@
                     </div>
                 </div>
                 
-                <form action="{{ url('/admin/toggle-running') }}" method="POST">
+                <form action="{{ url('/admin/toggle-running') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mengubah status operasional website?')">
                     @csrf
                     <x-button type="submit" variant="{{ $stats['is_running'] ? 'danger' : 'success' }}" class="px-6 py-2.5 rounded-xl">
                         {{ $stats['is_running'] ? 'Set to Maintenance' : 'Open Registration' }}

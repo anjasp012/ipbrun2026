@@ -59,10 +59,15 @@ class AdminController extends Controller
     public function toggleRunning()
     {
         $setting = Setting::firstOrCreate(['key' => 'is_running']);
-        $setting->value = $setting->value === '1' ? '0' : '1';
+        $isActive = $setting->value === '1';
+        $setting->value = $isActive ? '0' : '1';
         $setting->save();
 
-        return back()->with('success', 'Site status updated successfully!');
+        $statusMessage = $setting->value === '1' 
+            ? 'Registration is now OPEN and Live!' 
+            : 'Website has been set to MAINTENANCE mode.';
+
+        return back()->with('success', $statusMessage);
     }
 
     public function participants(Request $request)
