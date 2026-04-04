@@ -64,15 +64,55 @@
                     </div>
                 </div>
                 
-                <form action="{{ url('/admin/toggle-running') }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mengubah status operasional website?')">
+                <form action="{{ url('/admin/toggle-running') }}" method="POST" id="toggle-running-form">
                     @csrf
-                    <x-button type="submit" variant="{{ $stats['is_running'] ? 'danger' : 'success' }}" class="px-6 py-2.5 rounded-xl">
+                    <x-button type="button" 
+                              onclick="confirmToggle()"
+                              variant="{{ $stats['is_running'] ? 'danger' : 'success' }}" 
+                              class="px-6 py-2.5 rounded-xl">
                         {{ $stats['is_running'] ? 'Set to Maintenance' : 'Open Registration' }}
                     </x-button>
                 </form>
             </div>
             <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-slate-50/50 rounded-full"></div>
         </div>
+
+        @push('scripts')
+        <script>
+            function confirmToggle() {
+                const isRunning = {{ $stats['is_running'] ? 'true' : 'false' }};
+                const title = isRunning ? 'Set to Maintenance?' : 'Open Registration?';
+                const text = isRunning 
+                    ? 'This will close registration for all participants.' 
+                    : 'This will make the registration form live for participants.';
+                const confirmButtonText = isRunning ? 'Yes, Close it' : 'Yes, Open it';
+                const confirmButtonColor = isRunning ? '#e11d48' : '#10b981';
+
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: confirmButtonColor,
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: confirmButtonText,
+                    cancelButtonText: 'Cancel',
+                    padding: '2rem',
+                    borderRadius: '1.5rem',
+                    customClass: {
+                        popup: 'rounded-3xl border border-slate-100 shadow-2xl',
+                        title: 'font-black text-[#003366] uppercase tracking-tight',
+                        confirmButton: 'rounded-xl px-6 py-3 font-bold uppercase tracking-widest text-xs',
+                        cancelButton: 'rounded-xl px-6 py-3 font-bold uppercase tracking-widest text-xs'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        document.getElementById('toggle-running-form').submit();
+                    }
+                });
+            }
+        </script>
+        @endpush
 
         <section class="space-y-6">
             <h3 class="text-2xl font-black text-[#003366] uppercase tracking-tight">Ringkasan Data</h3>
