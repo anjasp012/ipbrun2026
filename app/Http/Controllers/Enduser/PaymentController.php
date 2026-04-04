@@ -65,6 +65,16 @@ class PaymentController extends Controller
                     $this->handleSuccessPayment($participant);
                 } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
                     $participant->update(['status' => 'failed']);
+                    
+                    // Send WhatsApp notification for failure
+                    try {
+                        $fonnte = new \App\Services\FonnteService();
+                        $statusText = ($transactionStatus == 'expire') ? 'Telah Kadaluarsa' : 'Gagal';
+                        $message = "Halo *{$participant->name}*!\n\nPembayaran untuk kode order *{$participant->order_code}* dinyatakan *{$statusText}*.\n\nJika ini adalah kesalahan, Anda dapat mencoba mendaftar kembali. Terima kasih!";
+                        $fonnte->sendMessage($participant->phone_number, $message);
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('Fonnte failure notification failed: ' . $e->getMessage());
+                    }
                 } else if ($transactionStatus == 'pending') {
                     $participant->update(['status' => 'pending']);
                 }
@@ -99,7 +109,6 @@ class PaymentController extends Controller
 
         // 3. Link Participant to User
         $participant->update(['user_id' => $user->id]);
-        // 4. Send Notification Email with Credentials and Invoice PDF
         try {
             Mail::to($participant->email)->send(new ParticipantPaidNotification($participant, $randomPassword));
         } catch (\Exception $e) {
@@ -108,6 +117,15 @@ class PaymentController extends Controller
                 'email' => $participant->email,
                 'error' => $e->getMessage()
             ]);
+        }
+
+        // 5. Send WhatsApp notification for success
+        try {
+            $fonnte = new \App\Services\FonnteService();
+            $message = "Halo *{$participant->name}*!\n\nPembayaran untuk kode order *{$participant->order_code}* BERHASIL dikonfirmasi. Selamat! Anda telah terdaftar sebagai peserta IPB Run 2026.\n\nDetail akun login Anda:\nEmail: *{$participant->email}*\nPassword: *{$randomPassword}*\n\nSimpan detail ini untuk login ke dashboard peserta. Terima kasih!";
+            $fonnte->sendMessage($participant->phone_number, $message);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Fonnte success notification failed: ' . $e->getMessage());
         }
     }
 

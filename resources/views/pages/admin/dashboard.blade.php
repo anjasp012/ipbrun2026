@@ -6,6 +6,33 @@
                 <div class="flex items-center gap-4">
                     <div @class([
                         'w-12 h-12 rounded-2xl flex items-center justify-center transition-colors',
+                        'bg-emerald-50 text-emerald-600' => \App\Models\Setting::getValue('wa_notification_active', '0') === '1',
+                        'bg-rose-50 text-rose-600' => \App\Models\Setting::getValue('wa_notification_active', '0') !== '1'
+                    ])>
+                        @if(\App\Models\Setting::getValue('wa_notification_active', '0') === '1')
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                        @else
+                            <svg class="w-6 h-6 opacity-40 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                        @endif
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-black text-slate-800 uppercase tracking-widest">WA Notifications</h2>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                            Fonnte Engine: 
+                            <span @class([
+                                'px-2 py-0.5 rounded-full',
+                                'bg-emerald-100 text-emerald-700' => \App\Models\Setting::getValue('wa_notification_active', '0') === '1',
+                                'bg-rose-100 text-rose-700' => \App\Models\Setting::getValue('wa_notification_active', '0') !== '1'
+                            ])>
+                                {{ \App\Models\Setting::getValue('wa_notification_active', '0') === '1' ? 'CONNECTED / ACTIVE' : 'DISABLED' }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div @class([
+                        'w-12 h-12 rounded-2xl flex items-center justify-center transition-colors',
                         'bg-emerald-50 text-emerald-600' => $stats['is_running'],
                         'bg-rose-50 text-rose-600' => !$stats['is_running']
                     ])>

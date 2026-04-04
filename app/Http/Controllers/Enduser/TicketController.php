@@ -147,6 +147,16 @@ class TicketController extends Controller
             try {
                 $snapResponse = Snap::createTransaction($params);
                 $participant->update(['snap_token' => $snapResponse->token, 'payment_url' => $snapResponse->redirect_url]);
+                
+                // Send WhatsApp notification
+                try {
+                    $fonnte = new \App\Services\FonnteService();
+                    $message = "Halo *{$participant->name}*!\n\nRegistrasi IPB Run 2026 Anda berhasil dengan kode order *{$participant->order_code}*.\n\nSilakan lakukan pembayaran melalui link berikut:\n{$snapResponse->redirect_url}\n\nMohon segera selesaikan pembayaran agar registrasi Anda tidak kadaluarsa. Terima kasih!";
+                    $fonnte->sendMessage($participant->phone_number, $message);
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Fonnte registration notification failed: ' . $e->getMessage());
+                }
+
                 return redirect($snapResponse->redirect_url);
             } catch (\Exception $e) {
                 // Transaction will rollback if an exception is thrown here

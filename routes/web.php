@@ -40,6 +40,9 @@ Route::prefix('admin')->group(function () {
     Route::post('/categories', [AdminCategory::class, 'store'])->name('categories.store');
     Route::put('/categories/{category}', [AdminCategory::class, 'update'])->name('categories.update');
     Route::delete('/categories/{category}', [AdminCategory::class, 'destroy'])->name('categories.destroy');
+
+    Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('admin.settings');
+    Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update');
 });
 
 Route::get('/test-tailwind', function () {
