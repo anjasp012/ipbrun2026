@@ -46,6 +46,20 @@ class TicketController extends Controller
             return redirect('/');
         }
 
+        // 1. Check if the ticket's period is active
+        if (!$ticket->period || !$ticket->period->is_active) {
+            return redirect('/')->with('error', 'Maaf, periode pendaftaran untuk tiket ini tidak aktif.');
+        }
+
+        // 2. Check current stock accurately (capacity - pending/paid)
+        $usedQty = Participant::where('ticket_id', $ticket->id)
+            ->whereIn('status', ['pending', 'paid'])
+            ->count();
+
+        if ($usedQty >= $ticket->qty) {
+            return redirect('/')->with('error', 'Maaf, tiket untuk kategori ini baru saja habis terjual.');
+        }
+
         return view('pages.enduser.checkout', compact('ticket'));
     }
 
@@ -93,7 +107,7 @@ class TicketController extends Controller
                 ->count();
 
             if ($usedQty >= $ticket->qty) {
-                return redirect('/')->withErrors(['sold_out' => 'Maaf, tiket untuk kategori ini baru saja habis terjual.']);
+                return redirect('/')->with('error', 'Maaf, tiket untuk kategori ini baru saja habis terjual.');
             }
 
             // 3. Duplicate check for participant

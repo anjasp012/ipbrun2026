@@ -147,4 +147,36 @@
             background: #94a3b8;
         }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Waduh, Maaf!',
+                    text: "{{ session('error') }}",
+                    confirmButtonColor: '#003366',
+                    confirmButtonText: 'OKE, SAYA MENGERTI',
+                    customClass: {
+                        popup: 'rounded-3xl border border-slate-100 shadow-2xl',
+                        title: 'font-black text-[#003366] uppercase tracking-tight',
+                        confirmButton: 'rounded-xl px-10 py-3 font-bold uppercase tracking-widest text-xs'
+                    }
+                });
+            @endif
+
+            @if(session('success'))
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: "{{ session('success') }}"
+                });
+            @endif
+        });
+    </script>
 </x-layouts.app>
