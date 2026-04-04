@@ -13,7 +13,8 @@ class TicketController extends Controller
     {
         $tickets = Ticket::with(['category', 'period'])->get();
         $periods = Period::all();
-        return view('pages.admin.tickets.index', compact('tickets', 'periods'));
+        $categories = \App\Models\Category::all();
+        return view('pages.admin.tickets.index', compact('tickets', 'periods', 'categories'));
     }
 
     public function togglePeriod(Period $period)
@@ -42,5 +43,27 @@ class TicketController extends Controller
             'success' => true,
             'message' => 'Tiket berhasil diperbarui!'
         ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'qty' => 'required|numeric|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'period_id' => 'required|exists:periods,id'
+        ]);
+
+        Ticket::create($validated);
+
+        return back()->with('success', 'Tiket berhasil ditambahkan!');
+    }
+
+    public function destroy(Ticket $ticket)
+    {
+        $ticket->delete();
+
+        return back()->with('success', 'Tiket berhasil dihapus!');
     }
 }

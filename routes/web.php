@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Enduser\TicketController as EnduserTicket;
 use App\Http\Controllers\Admin\TicketController as AdminTicket;
+use App\Http\Controllers\Admin\CategoryController as AdminCategory;
 use App\Http\Controllers\Admin\AdminController as AdminDashboard;
 use App\Http\Controllers\Enduser\PaymentController;
 use App\Http\Controllers\Enduser\TestController;
@@ -29,8 +30,15 @@ Route::prefix('admin')->group(function () {
     Route::get('/participants', [AdminDashboard::class, 'participants']);
     Route::get('/participants/{participant}', [AdminDashboard::class, 'participantShow']);
     Route::get('/tickets', [AdminTicket::class, 'index']);
+    Route::post('/tickets', [AdminTicket::class, 'store'])->name('tickets.store');
     Route::put('/tickets/{ticket}', [AdminTicket::class, 'update'])->name('tickets.update');
+    Route::delete('/tickets/{ticket}', [AdminTicket::class, 'destroy'])->name('tickets.destroy');
     Route::post('/periods/{period}/toggle', [AdminTicket::class, 'togglePeriod'])->name('periods.toggle');
+
+    Route::get('/categories', [AdminCategory::class, 'index']);
+    Route::post('/categories', [AdminCategory::class, 'store'])->name('categories.store');
+    Route::put('/categories/{category}', [AdminCategory::class, 'update'])->name('categories.update');
+    Route::delete('/categories/{category}', [AdminCategory::class, 'destroy'])->name('categories.destroy');
 });
 
 Route::get('/test-tailwind', function () {
