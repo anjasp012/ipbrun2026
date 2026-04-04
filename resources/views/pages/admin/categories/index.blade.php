@@ -51,7 +51,7 @@
                 <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-50 border-b border-slate-100 uppercase tracking-[2px] text-[10px] font-black text-slate-400">
+                            <tr class="bg-slate-50 border-b border-slate-100 uppercase tracking-[2px] text-[9px] font-black text-slate-400">
                                 <th class="px-8 py-5">Nama Kategori</th>
                                 <th class="px-8 py-5 text-center">Total Tiket</th>
                                 <th class="px-8 py-5 text-right">Aksi</th>
@@ -61,24 +61,26 @@
                             @forelse($categories as $category)
                             <tr class="group hover:bg-slate-50/50 transition-colors" x-data="{ editing: false, name: '{{ $category->name }}' }">
                                 <td class="px-8 py-5">
-                                    <div x-show="!editing" class="text-sm font-bold text-slate-700 uppercase tracking-tight">
-                                        {{ $category->name }}
+                                    <div x-show="!editing">
+                                        <span class="text-sm font-bold text-slate-700 uppercase tracking-tight">{{ $category->name }}</span>
                                     </div>
-                                    <div x-show="editing" x-cloak class="flex items-center gap-2">
-                                        <input type="text" x-model="name"
-                                            class="flex-1 bg-white border border-blue-200 rounded-lg px-3 py-1.5 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-50 outline-none transition-all">
-                                        <button @click="
-                                            fetch('{{ route('categories.update', $category) }}', {
-                                                method: 'PUT',
-                                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                                                body: JSON.stringify({ name: name })
-                                            }).then(() => window.location.reload())
-                                        " class="p-1.5 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors shadow-sm shadow-emerald-100">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                        </button>
-                                        <button @click="editing = false" class="p-1.5 bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 transition-colors">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                        </button>
+                                    <div x-show="editing" x-cloak>
+                                        <div class="flex items-center gap-2">
+                                            <input type="text" x-model="name"
+                                                class="flex-1 bg-white border border-blue-200 rounded-lg px-3 py-1.5 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-blue-50 outline-none">
+                                            <button @click="
+                                                fetch('{{ route('categories.update', $category) }}', {
+                                                    method: 'PUT',
+                                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                                                    body: JSON.stringify({ name: name })
+                                                }).then(() => window.location.reload())
+                                            " class="p-1.5 bg-emerald-100 text-emerald-600 rounded-lg hover:bg-emerald-200">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                            </button>
+                                            <button @click="editing = false" class="p-1.5 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 </td>
                                 <td class="px-8 py-5 text-center">
