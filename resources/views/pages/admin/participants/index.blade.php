@@ -29,7 +29,7 @@
                         <tr class="bg-slate-50/50 border-b border-slate-100 uppercase tracking-widest text-[10px] font-black text-slate-400">
                             <th class="px-8 py-6">Order Code</th>
                             <th class="px-6 py-6">Participant Info</th>
-                            <th class="px-6 py-6">Category</th>
+                            <th class="px-6 py-6">Ticket Details</th>
                             <th class="px-6 py-6">Payment</th>
                             <th class="px-6 py-6">Status</th>
                             <th class="px-8 py-6 text-right">Actions</th>
@@ -47,8 +47,11 @@
                                 <div class="text-[10px] font-medium text-slate-400 lowercase">{{ $p->email }}</div>
                             </td>
                             <td class="px-6 py-6">
-                                <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-wider">{{ $p->ticket->category->name }}</span>
-                                <p class="text-[9px] font-bold text-slate-400 mt-1 uppercase">{{ $p->ticket->name }} - {{ $p->jersey_size }}</p>
+                                <div class="text-xs font-black text-slate-800 uppercase tracking-tighter">{{ $p->ticket->name }}</div>
+                                <div class="text-[10px] font-bold text-[#E8630A] uppercase tracking-wider mt-0.5">
+                                    {{ $p->ticket->category->name }} • {{ $p->ticket->period->name ?? 'Standard' }}
+                                </div>
+                                <div class="text-[9px] font-bold text-slate-400 mt-1 uppercase italic opacity-60">Size: {{ $p->jersey_size }}</div>
                             </td>
                             <td class="px-6 py-6">
                                 <div class="text-xs font-black text-slate-800 tracking-tighter">Rp {{ number_format($p->total_price, 0, ',', '.') }}</div>
