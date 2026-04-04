@@ -119,6 +119,7 @@
                                     @php $periodTickets = $tickets->where('period_id', $period->id); @endphp
                                     @forelse ($periodTickets as $ticket)
                                     <tr class="hover:bg-slate-50/30 transition-colors group" x-data="{ 
+                                        name: '{{ $ticket->name }}',
                                         price: '{{ $ticket->price }}', 
                                         discount: '{{ $ticket->discount ?? 0 }}',
                                         qty: '{{ $ticket->qty }}',
@@ -126,14 +127,17 @@
                                         isSaving: false,
                                         async save() {
                                             this.isSaving = true;
-                                            await updateTicket('{{ $ticket->id }}', { price: this.price, discount: this.discount, qty: this.qty });
+                                            await updateTicket('{{ $ticket->id }}', { name: this.name, price: this.price, discount: this.discount, qty: this.qty });
                                             this.isSaving = false;
                                             this.isDirty = false;
                                         }
                                     }">
                                         <td class="px-6 py-4">
-                                            <div class="font-bold text-slate-800 uppercase tracking-tight">{{ $ticket->name }}</div>
-                                            <div class="text-[9px] text-slate-400 font-bold uppercase tracking-[2px] mt-0.5 opacity-60 italic">Kategori: {{ $ticket->category->name ?? '-' }}</div>
+                                            <div class="inline-flex flex-col w-full">
+                                                <input type="text" x-model="name" @input="isDirty = true" @keyup.enter="save()"
+                                                    class="bg-transparent border-none p-0 text-sm font-bold text-slate-800 uppercase tracking-tight focus:ring-0 w-full mb-0.5">
+                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-[2px] opacity-60 italic">Kategori: {{ $ticket->category->name ?? '-' }}</div>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 text-center">
                                             <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-50 transition-all">

@@ -31,8 +31,8 @@ class TicketController extends Controller
             $query->where('is_active', true);
         })->with(['category', 'period'])->get();
 
-        $tickets_ipb = $tickets->filter(fn($t) => strtolower($t->name) === 'ipb');
-        $tickets_public = $tickets->filter(fn($t) => strtolower($t->name) === 'umum');
+        $tickets_ipb = $tickets->filter(fn($t) => str_contains(strtolower($t->name), 'ipb'));
+        $tickets_public = $tickets->filter(fn($t) => !str_contains(strtolower($t->name), 'ipb'));
 
         return view('pages.enduser.index', compact('tickets_ipb', 'tickets_public'));
     }

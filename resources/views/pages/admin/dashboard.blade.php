@@ -97,7 +97,7 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead>
-                            <tr class="bg-slate-50 uppercase tracking-widest text-[9px] font-black text-slate-400 border-b border-slate-100">
+                            <tr class="bg-slate-50 uppercase tracking-widest text-[11px] font-black text-slate-400 border-b border-slate-100">
                                 <th class="px-6 py-4">KATEGORI</th>
                                 <th class="px-6 py-4">NAMA TIKET</th>
                                 <th class="px-6 py-4 text-center">HARGA</th>
@@ -109,17 +109,17 @@
                         <tbody class="divide-y divide-slate-50">
                             @foreach($period->tickets as $ticket)
                             <tr class="hover:bg-slate-50/10 transition-colors">
-                                <td class="px-6 py-4 text-[10px] font-bold text-slate-600 uppercase">{{ $ticket->kategori }}</td>
-                                <td class="px-6 py-4 text-[10px] font-bold text-slate-800 uppercase">{{ $ticket->name }}</td>
-                                <td class="px-6 py-4 text-center font-black text-slate-800 text-[10px]">Rp {{ number_format($ticket->price, 0, ',', '.') }}</td>
-                                <td class="px-6 py-4 text-center text-[10px] font-bold text-slate-500">{{ $ticket->kapasitas }}</td>
+                                <td class="px-6 py-4 text-[13px] font-bold text-slate-600 uppercase">{{ $ticket->kategori }}</td>
+                                <td class="px-6 py-4 text-[13px] font-black text-slate-800 uppercase">{{ $ticket->name }}</td>
+                                <td class="px-6 py-4 text-center font-black text-slate-800 text-[13px]">Rp {{ number_format($ticket->price, 0, ',', '.') }}</td>
+                                <td class="px-6 py-4 text-center text-[13px] font-bold text-slate-500">{{ $ticket->kapasitas }}</td>
                                 <td @class([
-                                    'px-6 py-4 text-center text-[10px] font-bold',
+                                    'px-6 py-4 text-center text-[13px] font-bold',
                                     'text-yellow-600' => $ticket->terjual > 0,
                                     'text-slate-300' => $ticket->terjual == 0
                                 ])>{{ $ticket->terjual }}</td>
                                 <td @class([
-                                    'px-6 py-4 text-center text-[10px] font-black',
+                                    'px-6 py-4 text-center text-[13px] font-black',
                                     'text-emerald-600' => $ticket->sisa_stok > 0,
                                     'text-rose-500' => $ticket->sisa_stok == 0
                                 ])>{{ $ticket->sisa_stok }}</td>
