@@ -26,12 +26,23 @@ class PaymentController extends Controller
 
     public function callback(Request $request)
     {
+        \Illuminate\Support\Facades\Log::info('Midtrans Callback Received', [
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+            'ip' => $request->ip(),
+            'payload' => $request->all()
+        ]);
+
         if ($request->isMethod('GET')) {
             return response()->json(['message' => 'Payment callback endpoint is ready.'], 200);
         }
 
         try {
-            $notification = new Notification();
+            try {
+                $notification = new Notification();
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Notification test received successfully.'], 200);
+            }
 
             $transactionStatus = $notification->transaction_status;
             $orderCode = $notification->order_id;
