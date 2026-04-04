@@ -49,6 +49,18 @@
                 @csrf
                 <input type="hidden" name="ticket_id" value="{{ $ticket->id }}">
 
+                <!-- General Error Alert (Duplicate, etc) -->
+                @if($errors->has('duplicate') || $errors->has('midtrans'))
+                    <div class="mb-8 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <p class="text-xs font-bold text-red-700 uppercase tracking-tight">
+                                {{ $errors->first('duplicate') ?: $errors->first('midtrans') }}
+                            </p>
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Form Fields -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
@@ -242,12 +254,23 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             @if ($errors->any())
+                @php
+                    $allErrors = $errors->all();
+                    $errorMsg = 'Silakan periksa kembali isian formulir Anda yang berwarna merah.';
+                    if(count($allErrors) == 1) {
+                        $errorMsg = $allErrors[0];
+                    }
+                @endphp
                 Swal.fire({
                     icon: 'error',
                     title: 'Pendaftaran Gagal',
-                    text: 'Silakan periksa kembali isian formulir Anda yang berwarna merah.',
+                    text: '{!! $errorMsg !!}',
                     confirmButtonColor: '#003366',
                     confirmButtonText: 'OKE, SAYA MENGERTI'
+                }).then(() => {
+                    // Scroll to first error
+                    const firstError = document.querySelector('.text-red-500, .border-red-500');
+                    if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 });
             @endif
 
