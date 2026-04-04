@@ -132,6 +132,9 @@ class TicketController extends Controller
                 'item_details' => [
                     ['id' => $ticket->id, 'price' => $ticket->price, 'quantity' => 1, 'name' => 'Tiket IPB Run 2026 - ' . $ticket->category->name],
                     ['id' => 'ADMIN_FEE', 'price' => $adminFee, 'quantity' => 1, 'name' => 'Biaya Layanan']
+                ],
+                'callbacks' => [
+                    'finish' => route('payment.finish')
                 ]
             ];
 

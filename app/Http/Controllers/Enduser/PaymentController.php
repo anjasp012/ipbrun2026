@@ -110,4 +110,19 @@ class PaymentController extends Controller
             ]);
         }
     }
+
+    public function finish(Request $request)
+    {
+        $order_id = $request->query('order_id');
+        $status = $request->query('transaction_status');
+        
+        $participant = Participant::where('order_code', $order_id)->first();
+        $email = $participant ? $participant->email : null;
+
+        return view('pages.enduser.payment_finish', [
+            'order_id' => $order_id,
+            'status' => $status,
+            'email' => $email
+        ]);
+    }
 }
