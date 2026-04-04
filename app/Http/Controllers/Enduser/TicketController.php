@@ -48,29 +48,6 @@ class TicketController extends Controller
 
     public function register(Request $request)
     {
-        $ticket = Ticket::findOrFail($request->ticket_id);
-        
-        // Validation and creation code truncated for brevity but assuming you want it here
-        // (Copying entirety for completeness)
-        $duplicateCheck = Participant::where(function ($query) use ($request) {
-                $query->where('email', $request->email)
-                    ->orWhere('nik', $request->nik);
-                if ($request->filled('nim_nrp')) { $query->orWhere('nim_nrp', $request->nim_nrp); }
-            })
-            ->whereIn('status', ['pending', 'paid'])
-            ->first();
-
-        if ($duplicateCheck) {
-            $field = "";
-            if ($duplicateCheck->email === $request->email) $field = "Email";
-            elseif ($duplicateCheck->nik === $request->nik) $field = "NIK";
-            else $field = "NIM/NRP";
-
-            return back()->withInput()->withErrors([
-                'duplicate' => "$field sudah terdaftar dalam sistem dan sedang dalam status Pending/Paid. Silakan gunakan data lain atau selesaikan pembayaran sebelumnya."
-            ]);
-        }
-
         $validated = $request->validate([
             'ticket_id' => 'required',
             'name' => 'required|string|max:255',
@@ -103,39 +80,72 @@ class TicketController extends Controller
             'emergency_contact_phone_number' => 'Nomor HP Darurat', 'emergency_contact_relationship' => 'Hubungan Kontak',
         ]);
 
-        $adminFee = 4500;
-        $donationEvent = (int) $request->input('donation_event', 0);
-        $donationScholarship = (int) $request->input('donation_scholarship', 0);
-        $totalPrice = $ticket->price + $adminFee + $donationEvent + $donationScholarship;
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($request, $validated) {
+            // 1. Lock the ticket record to prevent race conditions
+            $ticket = Ticket::where('id', $request->ticket_id)->lockForUpdate()->firstOrFail();
+            
+            // 2. Check current stock accurately
+            $usedQty = Participant::where('ticket_id', $ticket->id)
+                ->whereIn('status', ['pending', 'paid'])
+                ->count();
 
-        $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
-        $participantData = \Illuminate\Support\Arr::except($validated, ['email_confirmation']);
-        $participant = Participant::create(array_merge($participantData, [
-            'order_code' => $orderCode,
-            'donation_event' => $donationEvent,
-            'donation_scholarship' => $donationScholarship,
-            'total_price' => $totalPrice,
-            'status' => 'pending'
-        ]));
+            if ($usedQty >= $ticket->qty) {
+                return redirect('/')->withErrors(['sold_out' => 'Maaf, tiket untuk kategori ini baru saja habis terjual.']);
+            }
 
-        $params = [
-            'transaction_details' => ['order_id' => $participant->order_code, 'gross_amount' => $totalPrice],
-            'customer_details' => ['first_name' => $participant->name, 'email' => $participant->email, 'phone' => $participant->phone_number],
-            'item_details' => [
-                ['id' => $ticket->id, 'price' => $ticket->price, 'quantity' => 1, 'name' => 'Tiket IPB Run 2026 - ' . $ticket->category->name],
-                ['id' => 'ADMIN_FEE', 'price' => $adminFee, 'quantity' => 1, 'name' => 'Biaya Layanan']
-            ]
-        ];
+            // 3. Duplicate check for participant
+            $duplicateCheck = Participant::where(function ($query) use ($request) {
+                    $query->where('email', $request->email)
+                        ->orWhere('nik', $request->nik);
+                    if ($request->filled('nim_nrp')) { $query->orWhere('nim_nrp', $request->nim_nrp); }
+                })
+                ->whereIn('status', ['pending', 'paid'])
+                ->lockForUpdate() // Lock existing participant records if found
+                ->first();
 
-        if ($donationEvent > 0) $params['item_details'][] = ['id' => 'DONATION_EVENT', 'price' => $donationEvent, 'quantity' => 1, 'name' => 'Donasi Event'];
-        if ($donationScholarship > 0) $params['item_details'][] = ['id' => 'DONATION_SCHOLARSHIP', 'price' => $donationScholarship, 'quantity' => 1, 'name' => 'Donasi Beasiswa'];
+            if ($duplicateCheck) {
+                $field = $duplicateCheck->email === $request->email ? "Email" : ($duplicateCheck->nik === $request->nik ? "NIK" : "NIM/NRP");
+                return back()->withInput()->withErrors([
+                    'duplicate' => "$field sudah terdaftar dalam sistem dan sedang dalam status Pending/Paid. Silakan gunakan data lain atau selesaikan pembayaran sebelumnya."
+                ]);
+            }
 
-        try {
-            $snapResponse = Snap::createTransaction($params);
-            $participant->update(['snap_token' => $snapResponse->token, 'payment_url' => $snapResponse->redirect_url]);
-            return redirect($snapResponse->redirect_url);
-        } catch (\Exception $e) {
-            return back()->withInput()->withErrors(['midtrans' => 'Terjadi gangguan koneksi ke sistem pembayaran. Silakan coba beberapa saat lagi.']);
-        }
+            $adminFee = 4500;
+            $donationEvent = (int) $request->input('donation_event', 0);
+            $donationScholarship = (int) $request->input('donation_scholarship', 0);
+            $totalPrice = $ticket->price + $adminFee + $donationEvent + $donationScholarship;
+
+            $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
+            $participantData = \Illuminate\Support\Arr::except($validated, ['email_confirmation']);
+            
+            $participant = Participant::create(array_merge($participantData, [
+                'order_code' => $orderCode,
+                'donation_event' => $donationEvent,
+                'donation_scholarship' => $donationScholarship,
+                'total_price' => $totalPrice,
+                'status' => 'pending'
+            ]));
+
+            $params = [
+                'transaction_details' => ['order_id' => $participant->order_code, 'gross_amount' => $totalPrice],
+                'customer_details' => ['first_name' => $participant->name, 'email' => $participant->email, 'phone' => $participant->phone_number],
+                'item_details' => [
+                    ['id' => $ticket->id, 'price' => $ticket->price, 'quantity' => 1, 'name' => 'Tiket IPB Run 2026 - ' . $ticket->category->name],
+                    ['id' => 'ADMIN_FEE', 'price' => $adminFee, 'quantity' => 1, 'name' => 'Biaya Layanan']
+                ]
+            ];
+
+            if ($donationEvent > 0) $params['item_details'][] = ['id' => 'DONATION_EVENT', 'price' => $donationEvent, 'quantity' => 1, 'name' => 'Donasi Event'];
+            if ($donationScholarship > 0) $params['item_details'][] = ['id' => 'DONATION_SCHOLARSHIP', 'price' => $donationScholarship, 'quantity' => 1, 'name' => 'Donasi Beasiswa'];
+
+            try {
+                $snapResponse = Snap::createTransaction($params);
+                $participant->update(['snap_token' => $snapResponse->token, 'payment_url' => $snapResponse->redirect_url]);
+                return redirect($snapResponse->redirect_url);
+            } catch (\Exception $e) {
+                // Transaction will rollback if an exception is thrown here
+                throw new \Exception('Midtrans integration failed: ' . $e->getMessage());
+            }
+        });
     }
 }

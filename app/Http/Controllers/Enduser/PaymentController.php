@@ -48,27 +48,29 @@ class PaymentController extends Controller
             $orderCode = $notification->order_id;
             $fraudStatus = $notification->fraud_status;
 
-            $participant = Participant::where('order_code', $orderCode)->first();
+            return \Illuminate\Support\Facades\DB::transaction(function() use ($orderCode, $transactionStatus, $fraudStatus) {
+                $participant = Participant::where('order_code', $orderCode)->lockForUpdate()->first();
 
-            if (!$participant) {
-                return response()->json(['message' => 'Participant not found'], 404);
-            }
-
-            if ($transactionStatus == 'capture') {
-                if ($fraudStatus == 'challenge') {
-                    $participant->update(['status' => 'pending']);
-                } else if ($fraudStatus == 'accept') {
-                    $this->handleSuccessPayment($participant);
+                if (!$participant) {
+                    return response()->json(['message' => 'Participant not found'], 404);
                 }
-            } else if ($transactionStatus == 'settlement') {
-                $this->handleSuccessPayment($participant);
-            } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
-                $participant->update(['status' => 'failed']);
-            } else if ($transactionStatus == 'pending') {
-                $participant->update(['status' => 'pending']);
-            }
 
-            return response()->json(['status' => 'success']);
+                if ($transactionStatus == 'capture') {
+                    if ($fraudStatus == 'challenge') {
+                        $participant->update(['status' => 'pending']);
+                    } else if ($fraudStatus == 'accept') {
+                        $this->handleSuccessPayment($participant);
+                    }
+                } else if ($transactionStatus == 'settlement') {
+                    $this->handleSuccessPayment($participant);
+                } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
+                    $participant->update(['status' => 'failed']);
+                } else if ($transactionStatus == 'pending') {
+                    $participant->update(['status' => 'pending']);
+                }
+
+                return response()->json(['status' => 'success']);
+            });
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -114,11 +116,14 @@ class PaymentController extends Controller
 
         $pdfOutput = $pdf->output();
 
-        // 5. Send Notification Email with Credentials and Invoice PDF
         try {
             Mail::to($participant->email)->send(new ParticipantPaidNotification($participant, $randomPassword, $pdfOutput));
         } catch (\Exception $e) {
-            // Log error but don't stop the flow
+            \Illuminate\Support\Facades\Log::error('Email Sending Failed', [
+                'order_code' => $participant->order_code,
+                'email' => $participant->email,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 }
