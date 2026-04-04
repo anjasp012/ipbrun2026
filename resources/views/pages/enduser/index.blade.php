@@ -31,7 +31,7 @@
                                 @foreach ($group['data'] as $ticket)
                                     @php $qty = $ticket->qty; @endphp
                                     <div
-                                        class="relative bg-white border border-slate-100 rounded-2xl flex flex-col transition-all duration-300">
+                                        class="relative bg-white border border-slate-100 rounded-2xl flex flex-col transition-all duration-300 overflow-hidden">
                                         <!-- Card Content -->
                                         <div class="p-6 pb-2 text-[16px]">
                                             <div class="flex justify-between items-start gap-4 mb-2">
