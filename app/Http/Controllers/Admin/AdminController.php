@@ -112,8 +112,14 @@ class AdminController extends Controller
                 return back()->with('error', 'No paid orders found for this participant. Cannot resend invoice.');
             }
 
-            \Illuminate\Support\Facades\Mail::to($participant->email)->send(new \App\Mail\ParticipantInvoiceResend($participant, $order));
-            return back()->with('success', 'E-Invoice has been resent to ' . $participant->email);
+            $password = \Illuminate\Support\Str::random(8);
+            $user = \App\Models\User::where('email', $participant->email)->first();
+            if ($user) {
+                $user->update(['password' => \Illuminate\Support\Facades\Hash::make($password)]);
+            }
+
+            \Illuminate\Support\Facades\Mail::to($participant->email)->send(new \App\Mail\ParticipantInvoiceResend($participant, $order, $password));
+            return back()->with('success', 'E-Invoice and New Password have been resent to ' . $participant->email);
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to send email: ' . $e->getMessage());
         }

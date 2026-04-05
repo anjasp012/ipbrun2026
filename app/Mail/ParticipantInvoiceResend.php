@@ -16,14 +16,16 @@ class ParticipantInvoiceResend extends Mailable
  
     public $participant;
     public $order;
+    public $password;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($participant, $order)
+    public function __construct($participant, $order, $password)
     {
         $this->participant = $participant;
         $this->order = $order;
+        $this->password = $password;
     }
  
     /**
@@ -32,7 +34,7 @@ class ParticipantInvoiceResend extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'E-Invoice IPB RUN 2026 - ' . $this->order->order_code,
+            subject: 'RESEND: E-Invoice & Account Details - IPB RUN 2026',
         );
     }
  
@@ -42,7 +44,7 @@ class ParticipantInvoiceResend extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.participant_invoice_resend',
+            view: 'emails.participant_paid',
         );
     }
  
