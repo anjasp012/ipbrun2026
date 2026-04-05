@@ -1,4 +1,4 @@
-<x-layouts.app title="Registration Form - IPB RUN 2026">
+<x-layouts.app>
     <div class="fixed inset-0 bg-[#f1f5f9] z-[-2]"></div>
     <div class="fixed inset-0 z-[-1] bg-cover bg-center bg-fixed opacity-100"
         style="background-image: url('{{ asset('assets/images/bg.png') }}')"></div>

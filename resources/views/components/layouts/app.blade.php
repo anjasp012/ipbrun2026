@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title ? $title . ' - ' : '' }}{{ config('app.name', 'IPB Run 2026') }}</title>
+    <title>IPB Run 2026 - Lestari Untuk Bumi</title>
 
     <!-- SEO & Branding -->
     <meta name="description" content="IPB Run 2026 - Lestari Untuk Bumi">
