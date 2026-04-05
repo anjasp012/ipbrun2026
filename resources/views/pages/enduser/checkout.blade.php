@@ -107,7 +107,13 @@
                         @error('blood_type')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
                     </div>
                     <div>
-                        <x-label for="jersey_size">Ukuran Jersey *</x-label>
+                        <div class="flex justify-between items-center mb-1">
+                            <x-label for="jersey_size" class="!mb-0">Ukuran Jersey *</x-label>
+                            <button type="button" onclick="showSizeChart()" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Size Chart
+                            </button>
+                        </div>
                         <x-select id="jersey_size" name="jersey_size" required :options="['S' => 'S', 'M' => 'M', 'L' => 'L', 'XL' => 'XL', 'XXL' => 'XXL']" :selected="old('jersey_size')" class="{{ $errors->has('jersey_size') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
                         @error('jersey_size')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
                     </div>
@@ -127,6 +133,48 @@
                             placeholder="Alamat pengiriman/domisili" required class="{{ $errors->has('address') ? '!border-red-500 ring-4 ring-red-50' : '' }}">{{ old('address') }}</x-textarea>
                         @error('address')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
                     </div>
+
+                    <div class="md:col-span-2 mt-4">
+                        <h3 class="text-sm font-black text-[#003366] uppercase tracking-[2px] mb-6 pb-2 border-b border-slate-100">Optional Running Data</h3>
+                    </div>
+
+                    <div>
+                        <x-label for="running_community">Dari komunitas lari apa? (Optional)</x-label>
+                        <x-input id="running_community" name="running_community" placeholder="Nama komunitas (jika ada)" value="{{ old('running_community') }}" />
+                    </div>
+                    <div>
+                        <x-label for="best_time">Best time yang pernah didapat? (Optional)</x-label>
+                        <x-input id="best_time" name="best_time" placeholder="Contoh: 55:20 (10K)" value="{{ old('best_time') }}" />
+                    </div>
+                    <div class="md:col-span-2">
+                        <x-label for="previous_events">Pernah mengikuti event lari dan kategori apa saja? (Optional)</x-label>
+                        <x-textarea id="previous_events" name="previous_events" rows="2" placeholder="Sebutkan event yang pernah diikuti sebelumnya" >{{ old('previous_events') }}</x-textarea>
+                    </div>
+
+                    <div>
+                        <x-label for="shuttle_bus">Menggunakan shuttle bus dari terminal? (Optional)</x-label>
+                        <x-select id="shuttle_bus" name="shuttle_bus" :options="[
+                            '' => 'Tidak Menggunakan',
+                            'Terminal Barangsiang' => 'Terminal Barangsiang',
+                            'Terminal Bubulak' => 'Terminal Bubulak'
+                        ]" :selected="old('shuttle_bus')" />
+                    </div>
+
+                    <div>
+                        <x-label for="other_race_interest">Ingin mengikuti kategori race lainnya? (Optional)</x-label>
+                        <x-select id="other_race_interest" name="other_race_interest" :options="[
+                            '' => 'Hanya satu kategori saja',
+                            '5K vs 10K (Sabtu-Minggu)' => '5K (Sabtu) & 10K (Minggu)',
+                            '42K vs 10K (Sabtu-Minggu)' => '42K (Sabtu) & 10K (Minggu)',
+                            '10K vs 5K (Minggu-Sabtu)' => '10K (Minggu) & 5K (Sabtu)',
+                            '21K vs 5K (Minggu-Sabtu)' => '21K (Minggu) & 5K (Sabtu)'
+                        ]" :selected="old('other_race_interest')" />
+                    </div>
+
+                    <div class="md:col-span-2 mt-4">
+                        <h3 class="text-sm font-black text-[#003366] uppercase tracking-[2px] mb-6 pb-2 border-b border-slate-100">Emergency Contact</h3>
+                    </div>
+
                     <div>
                         <x-label for="emergency_contact_name">Kontak Darurat *</x-label>
                         <x-input id="emergency_contact_name" name="emergency_contact_name"
@@ -320,9 +368,44 @@
                 document.getElementById('lbl_total').innerText = formattedTotal;
             }
 
-            document.getElementById('donation_event')?.addEventListener('change', updateTotal);
             document.getElementById('donation_scholarship')?.addEventListener('change', updateTotal);
             updateTotal();
         });
+
+        function showSizeChart() {
+            Swal.fire({
+                title: '<span class="text-[#003366] font-black uppercase tracking-tight">Jersey Size Chart</span>',
+                html: `
+                    <div class="mt-4 overflow-hidden rounded-2xl border border-slate-100">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-[#003366] font-black uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-4 py-3">Size</th>
+                                    <th class="px-4 py-3">Width (cm)</th>
+                                    <th class="px-4 py-3">Length (cm)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50 font-bold text-slate-600">
+                                <tr><td class="px-4 py-3 bg-slate-50/30">S</td><td class="px-4 py-3">47</td><td class="px-4 py-3">67</td></tr>
+                                <tr><td class="px-4 py-3 bg-slate-50/30">M</td><td class="px-4 py-3">50</td><td class="px-4 py-3">70</td></tr>
+                                <tr><td class="px-4 py-3 bg-slate-50/30">L</td><td class="px-4 py-3">53</td><td class="px-4 py-3">73</td></tr>
+                                <tr><td class="px-4 py-3 bg-slate-50/30">XL</td><td class="px-4 py-3">56</td><td class="px-4 py-3">75</td></tr>
+                                <tr><td class="px-4 py-3 bg-slate-50/30">XXL</td><td class="px-4 py-3">59</td><td class="px-4 py-3">77</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="mt-4 text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">
+                        * Toleransi ukuran ±1-2 cm. <br> Pastikan ukuran yang Anda pilih sudah sesuai.
+                    </p>
+                `,
+                showConfirmButton: true,
+                confirmButtonText: 'TUTUP',
+                confirmButtonColor: '#003366',
+                customClass: {
+                    popup: 'rounded-3xl border border-slate-100 shadow-2xl',
+                    confirmButton: 'rounded-xl px-10 py-3 font-bold uppercase tracking-widest text-xs'
+                }
+            });
+        }
     </script>
 </x-app>

@@ -93,6 +93,11 @@ class TicketController extends Controller
             'emergency_contact_name' => 'required|string',
             'emergency_contact_phone_number' => 'required|numeric',
             'emergency_contact_relationship' => 'required|string',
+            'running_community' => 'nullable|string',
+            'previous_events' => 'nullable|string',
+            'best_time' => 'nullable|string',
+            'shuttle_bus' => 'nullable|string',
+            'other_race_interest' => 'nullable|string',
         ], [
             'required' => ':attribute wajib diisi.',
             'email' => 'Format email tidak valid.',
@@ -154,7 +159,12 @@ class TicketController extends Controller
                 'donation_event' => $donationEvent,
                 'donation_scholarship' => $donationScholarship,
                 'total_price' => $totalPrice,
-                'status' => 'pending'
+                'status' => 'pending',
+                'running_community' => $request->running_community,
+                'previous_events' => $request->previous_events,
+                'best_time' => $request->best_time,
+                'shuttle_bus' => $request->shuttle_bus,
+                'other_race_interest' => $request->other_race_interest,
             ]));
 
             $params = [

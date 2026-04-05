@@ -180,7 +180,12 @@
         });
     </script>
 
-    @if($ticketSaleStart && \Illuminate\Support\Carbon::parse($ticketSaleStart)->isFuture())
+    @php
+        $startTime = $ticketSaleStart ? \Illuminate\Support\Carbon::parse($ticketSaleStart) : null;
+        $isFuture = $startTime && $startTime->isFuture();
+    @endphp
+
+    @if($isFuture)
         <div class="fixed inset-0 z-[100] flex items-center justify-center p-6 overflow-hidden">
             <div class="fixed inset-0 bg-[#001A33]/90 backdrop-blur-2xl"></div>
             
@@ -231,13 +236,13 @@
         </div>
 
         <script>
-            const targetDate = new Date("{{ $ticketSaleStart }}").getTime();
+            const targetDate = {{ $startTime->timestamp * 1000 }};
 
             function updateIndexCountdown() {
-                const now = new Date().getTime();
+                const now = Date.now();
                 const distance = targetDate - now;
 
-                if (distance < 0) {
+                if (distance <= 0) {
                     window.location.reload();
                     return;
                 }
@@ -257,4 +262,4 @@
             updateIndexCountdown();
         </script>
     @endif
-</x-layouts.app>
+</x-app>
