@@ -8,7 +8,7 @@
     <title>{{ $title ? $title . ' - ' : '' }}{{ config('app.name', 'IPB Run 2026') }}</title>
 
     <!-- SEO & Branding -->
-    <meta name="description" content="Platform Resmi Pendaftaran IPB RUN 2026. Ikuti event lari bergengsi di Kampus IPB University dengan berbagai kategori seru.">
+    <meta name="description" content="IPB Run 2026 - Lestari Untuk Bumi">
     <link rel="icon" type="image/png" href="{{ asset('assets/images/logo_ipbrun2026.png') }}">
 
     <!-- Fonts -->

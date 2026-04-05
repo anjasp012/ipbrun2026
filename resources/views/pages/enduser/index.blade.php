@@ -1,4 +1,4 @@
-<x-layouts.app title="Official Registration - IPB RUN 2026">
+<x-layouts.app title="IPB Run 2026 - Lestari Untuk Bumi">
     <div class="fixed inset-0 bg-[#f1f5f9] z-[-2]"></div>
     <div class="fixed inset-0 z-[-1] bg-cover bg-center bg-fixed opacity-100"
         style="background-image: url('{{ asset('assets/images/bg.png') }}')"></div>
@@ -149,7 +149,7 @@
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            @if(session('error'))
+            @if (session('error'))
                 Swal.fire({
                     icon: 'error',
                     title: 'Waduh, Maaf!',
@@ -164,7 +164,7 @@
                 });
             @endif
 
-            @if(session('success'))
+            @if (session('success'))
                 const Toast = Swal.mixin({
                     toast: true,
                     position: 'top-end',
@@ -184,40 +184,56 @@
         $isFuture = isset($ticketSaleStartValue) && $ticketSaleStartValue->isFuture();
     @endphp
 
-    @if($isFuture)
+    @if ($isFuture)
         <div class="fixed inset-0 z-[100] flex items-center justify-center p-6 overflow-hidden">
             <div class="fixed inset-0 bg-[#001A33]/90 backdrop-blur-2xl"></div>
-            
+
             <div class="relative w-full max-w-4xl text-center">
                 {{-- Decorative Lines --}}
-                <div class="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-y-1/2"></div>
-                <div class="absolute top-1/2 left-1/2 w-[1px] h-32 bg-gradient-to-b from-transparent via-[#FF7A21]/30 to-transparent -translate-x-1/2 -translate-y-1/2"></div>
+                <div
+                    class="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-y-1/2">
+                </div>
+                <div
+                    class="absolute top-1/2 left-1/2 w-[1px] h-32 bg-gradient-to-b from-transparent via-[#FF7A21]/30 to-transparent -translate-x-1/2 -translate-y-1/2">
+                </div>
 
                 <div class="relative space-y-12">
                     <div class="space-y-6">
-                        <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" alt="IPB Run 2026" class="h-24 md:h-32 mx-auto drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                        <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" alt="IPB Run 2026"
+                            class="h-24 md:h-32 mx-auto drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
                         <div>
-                            <h2 class="text-[13px] font-[900] text-[#FF7A21] uppercase tracking-[0.6em] mb-4 drop-shadow-md">OFFICIAL REGISTRATION OPENS IN</h2>
+                            <h2
+                                class="text-[13px] font-[900] text-[#FF7A21] uppercase tracking-[0.6em] mb-4 drop-shadow-md">
+                                OFFICIAL REGISTRATION OPENS IN</h2>
                             <div class="w-16 h-1 bg-[#FF7A21] mx-auto rounded-full"></div>
                         </div>
                     </div>
 
-                    <div id="index-countdown" class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 max-w-3xl mx-auto items-center">
+                    <div id="index-countdown"
+                        class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 max-w-3xl mx-auto items-center">
                         <div class="flex flex-col group">
-                            <span id="idx-days" class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
-                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Days</span>
+                            <span id="idx-days"
+                                class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
+                            <span
+                                class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Days</span>
                         </div>
                         <div class="flex flex-col group">
-                            <span id="idx-hours" class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
-                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Hours</span>
+                            <span id="idx-hours"
+                                class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
+                            <span
+                                class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Hours</span>
                         </div>
                         <div class="flex flex-col group">
-                            <span id="idx-minutes" class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
-                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Minutes</span>
+                            <span id="idx-minutes"
+                                class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
+                            <span
+                                class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Minutes</span>
                         </div>
                         <div class="flex flex-col group">
-                            <span id="idx-seconds" class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-[#FF7A21] tracking-tighter drop-shadow-[0_0_25px_rgba(255,122,33,0.3)] transition-all group-hover:scale-110">00</span>
-                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF7A21]/60 mt-3">Seconds</span>
+                            <span id="idx-seconds"
+                                class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-[#FF7A21] tracking-tighter drop-shadow-[0_0_25px_rgba(255,122,33,0.3)] transition-all group-hover:scale-110">00</span>
+                            <span
+                                class="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF7A21]/60 mt-3">Seconds</span>
                         </div>
                     </div>
 
@@ -225,9 +241,11 @@
                         <p class="text-white/60 text-sm font-medium tracking-[0.1em] max-w-sm mx-auto leading-relaxed">
                             Pastikan koneksi internet Anda stabil dan data diri sudah siap untuk pendaftaran tercepat.
                         </p>
-                        <div class="flex items-center gap-4 py-3 px-6 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
+                        <div
+                            class="flex items-center gap-4 py-3 px-6 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
                             <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                            <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Countdown Active • Live Update</span>
+                            <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Countdown
+                                Active • Live Update</span>
                         </div>
                     </div>
                 </div>
@@ -261,4 +279,4 @@
             updateIndexCountdown();
         </script>
     @endif
-</x-app>
+    </x-app>
