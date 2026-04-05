@@ -27,17 +27,22 @@ class TestController extends Controller
         $email = $request->email;
         $orderCode = $request->order_code;
         
-        // 1. Get sample order
+        // 1. Logic Pencarian Data: Prioritaskan Email pendaftar, lalu Order Code, lalu Latest
         $query = \App\Models\Order::with('raceEntries.ticket.category');
         
-        if ($orderCode) {
+        // Coba cari berdasarkan Email Peserta dulu jika terdaftar
+        $participantMatch = Participant::where('email', $email)->first();
+        
+        if ($participantMatch) {
+            $order = $query->where('participant_id', $participantMatch->id)->latest()->first();
+        } elseif ($orderCode) {
             $order = $query->where('order_code', 'LIKE', "%{$orderCode}%")->first();
         } else {
             $order = $query->latest()->first();
         }
 
         if (!$order) {
-            return back()->with('error', 'Pesanan tidak ditemukan. Periksa kode order atau buat pendaftaran baru.');
+            return back()->with('error', 'Data tidak ditemukan. Pastikan email atau Kode Order sudah benar.');
         }
 
         $participant = $order->participant;
