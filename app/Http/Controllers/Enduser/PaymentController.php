@@ -135,7 +135,7 @@ class PaymentController extends Controller
         try {
             $fonnte = new \App\Services\FonnteService();
             if ($userExists) {
-                $message = "Halo *{$participant->name}*!\n\nPembayaran tambahan Anda untuk kode order *{$order->order_code}* BERHASIL dikonfirmasi.\n\nAnda dapat melihat detail tiket baru Anda di dashboard peserta. Terima kasih!";
+                $message = "Halo *{$participant->name}*!\n\nPembayaran untuk *tiket tambahan* Anda dengan kode order *{$order->order_code}* BERHASIL dikonfirmasi.\n\nAnda dapat melihat detail tiket baru Anda di dashboard peserta. Terima kasih!";
             } else {
                 $message = "Halo *{$participant->name}*!\n\nPembayaran untuk kode order *{$order->order_code}* BERHASIL dikonfirmasi. Selamat! Anda telah terdaftar sebagai peserta IPB Run 2026.\n\nDetail akun login Anda:\nEmail: *{$participant->email}*\nPassword: *{$randomPassword}*\n\nSimpan detail ini untuk login ke dashboard peserta. Terima kasih!";
             }

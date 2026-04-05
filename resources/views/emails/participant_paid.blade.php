@@ -25,9 +25,9 @@
             <tr>
                 <td style="padding:40px 40px 20px;">
                     @if($userExists ?? false)
-                        <h1 style="margin:0 0 15px;font-size:26px;color:#1a2b4b;letter-spacing:-0.5px;">E-Invoice: New Category 🏃‍♂️</h1>
+                        <h1 style="margin:0 0 15px;font-size:26px;color:#1a2b4b;letter-spacing:-0.5px;">E-Invoice: Tiket Tambahan 🏃‍♂️</h1>
                         <p style="margin:0;font-size:16px;line-height:1.6;color:#556677;">
-                            Halo <strong style="color:#1a2b4b;">{{ $participant->name }}</strong>, pesanan kategori tambahan Anda telah berhasil dikonfirmasi. Berikut adalah detail untuk:
+                            Halo <strong style="color:#1a2b4b;">{{ $participant->name }}</strong>, pesanan tiket tambahan Anda telah berhasil dikonfirmasi. Berikut adalah detail untuk:
                         </p>
                     @else
                         <h1 style="margin:0 0 15px;font-size:26px;color:#1a2b4b;letter-spacing:-0.5px;">Congratulations! 🏃‍♂️</h1>

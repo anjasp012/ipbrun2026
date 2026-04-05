@@ -27,7 +27,7 @@
         <div class="mb-12 border-b border-slate-200 pb-10">
             <h2 class="text-3xl font-[900] text-[#003366] tracking-tight uppercase mb-3">Selamat Datang, {{ explode(' ', $participant->name)[0] }}</h2>
             <p class="text-sm text-slate-500 font-bold uppercase tracking-widest leading-relaxed max-w-2xl opacity-70">
-                Gunakan dashboard ini untuk memantau status pendaftaran, mengunduh bukti pembayaran, dan melengkapi pendaftaran kategori tambahan.
+                Gunakan dashboard ini untuk memantau status pendaftaran, mengunduh bukti pembayaran, dan melengkapi pendaftaran tiket tambahan.
             </p>
         </div>
 
@@ -98,7 +98,7 @@
             <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
             <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
                 <div class="max-w-xl text-center md:text-left">
-                    <h4 class="text-2xl font-black uppercase tracking-tight mb-4">Pendaftaran Kategori Tambahan</h4>
+                    <h4 class="text-2xl font-black uppercase tracking-tight mb-4">Pendaftaran Tiket Tambahan</h4>
                     <p class="text-[13px] text-white/60 font-bold uppercase tracking-widest leading-loose italic opacity-80 mb-0">
                         Anda memenuhi kualifikasi untuk mengikuti kategori {{ $pairRecommendation->category->name }} (HARI {{ (str_contains(strtoupper($pairRecommendation->category->name), '5K') || str_contains(strtoupper($pairRecommendation->category->name), '42K')) ? 'SABTU' : 'MINGGU' }}). Gunakan tombol di samping untuk mendaftar secara instan.
                     </p>
