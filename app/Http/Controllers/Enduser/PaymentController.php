@@ -49,22 +49,26 @@ class PaymentController extends Controller
             $fraudStatus = $notification->fraud_status;
 
             return \Illuminate\Support\Facades\DB::transaction(function() use ($orderCode, $transactionStatus, $fraudStatus) {
-                $participant = Participant::where('order_code', $orderCode)->lockForUpdate()->first();
+                $order = \App\Models\Order::where('order_code', $orderCode)->with('raceEntries')->first();
 
-                if (!$participant) {
-                    return response()->json(['message' => 'Participant not found'], 404);
+                if (!$order) {
+                    return response()->json(['message' => 'Order not found'], 404);
                 }
+
+                $participant = $order->participant;
 
                 if ($transactionStatus == 'capture') {
                     if ($fraudStatus == 'challenge') {
-                        $participant->update(['status' => 'pending']);
+                        $order->update(['status' => 'pending']);
+                        foreach($order->raceEntries as $entry) $entry->update(['status' => 'pending']);
                     } else if ($fraudStatus == 'accept') {
-                        $this->handleSuccessPayment($participant);
+                        $this->handleSuccessPayment($order, $participant);
                     }
                 } else if ($transactionStatus == 'settlement') {
-                    $this->handleSuccessPayment($participant);
+                    $this->handleSuccessPayment($order, $participant);
                 } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
-                    $participant->update(['status' => 'failed']);
+                    $order->update(['status' => 'failed']);
+                    foreach($order->raceEntries as $entry) $entry->update(['status' => 'failed']);
                     
                     // Send WhatsApp notification for failure
                     try {
@@ -86,31 +90,38 @@ class PaymentController extends Controller
         }
     }
 
-    private function handleSuccessPayment($participant)
+    private function handleSuccessPayment($order, $participant)
     {
         // Don't repeat if already paid
-        if ($participant->status === 'paid') {
+        if ($order->status === 'paid') {
             return;
         }
 
-        // 1. Update Participant Status
-        $participant->update(['status' => 'paid']);
+        // 1. Update Order & Race Entry Status
+        $order->update(['status' => 'paid']);
+        foreach($order->raceEntries as $entry) {
+            $entry->update(['status' => 'paid']);
+        }
 
-        // 2. Create User Account
+        $entries = $order->raceEntries; // For compatibility with Mail
+
+        // 2. Create or Get User Account
         $randomPassword = Str::random(8);
 
-        $user = User::create([
-            'name' => $participant->name,
-            'email' => $participant->email,
-            'username' => $participant->email,
-            'password' => Hash::make($randomPassword),
-            'role' => 'participant' // Default role
-        ]);
+        $user = User::firstOrCreate(
+            ['email' => $participant->email],
+            [
+                'name' => $participant->name,
+                'username' => $participant->email,
+                'password' => Hash::make($randomPassword),
+                'role' => 'participant' 
+            ]
+        );
 
         // 3. Link Participant to User
         $participant->update(['user_id' => $user->id]);
         try {
-            Mail::to($participant->email)->send(new ParticipantPaidNotification($participant, $randomPassword));
+            Mail::to($participant->email)->send(new ParticipantPaidNotification($participant, $randomPassword, $entries));
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Email Sending Failed', [
                 'order_code' => $participant->order_code,
@@ -134,8 +145,8 @@ class PaymentController extends Controller
         $order_id = $request->query('order_id');
         $status = $request->query('transaction_status');
         
-        $participant = Participant::where('order_code', $order_id)->first();
-        $email = $participant ? $participant->email : null;
+        $order = \App\Models\Order::where('order_code', $order_id)->first();
+        $email = $order ? $order->participant->email : null;
 
         return view('pages.enduser.payment_finish', [
             'order_id' => $order_id,

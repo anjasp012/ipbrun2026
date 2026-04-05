@@ -27,9 +27,21 @@
                     <h1 style="margin:0 0 15px;font-size:26px;color:#1a2b4b;letter-spacing:-0.5px;">Congratulations!
                         🏃‍♂️</h1>
                     <p style="margin:0;font-size:16px;line-height:1.6;color:#556677;">
-                        Dear <strong style="color:#1a2b4b;">{{ $participant->name }}</strong>, your registration for
-                        <span style="color:#00875a;font-weight:bold;">IPB Run 2026 –
-                            {{ $participant->ticket->category->name }} ({{ $participant->ticket->name }})</span>
+                        Dear <strong style="color:#1a2b4b;">{{ $participant->name }}</strong>, your registration for:
+                    </p>
+                    <div style="margin-top:15px;">
+                        @foreach($participant->raceEntries as $entry)
+                            <div style="background-color:#f0f9f6; padding:12px 20px; border-radius:10px; margin-bottom:8px; border-left:4px solid #00875a;">
+                                <span style="color:#00875a;font-weight:bold;font-size:15px;display:block;">
+                                    IPB Run 2026 – {{ $entry->ticket->category->name }}
+                                </span>
+                                <span style="font-size:11px; color:#778899; text-transform:uppercase; font-weight:bold;">
+                                    Category: {{ $entry->ticket->name }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                    <p style="margin:15px 0 0;font-size:16px;line-height:1.6;color:#556677;">
                         is successfully confirmed.
                     </p>
                 </td>

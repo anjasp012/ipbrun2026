@@ -26,9 +26,16 @@
                 <td style="padding:40px 40px 20px;">
                     <h1 style="margin:0 0 15px;font-size:26px;color:#1a2b4b;letter-spacing:-0.5px;">E-Invoice IPB RUN 2026 🏃‍♂️</h1>
                     <p style="margin:0;font-size:16px;line-height:1.6;color:#556677;">
-                        Halo <strong style="color:#1a2b4b;">{{ $participant->name }}</strong>, berikut adalah salinan E-Invoice pendaftaran Anda untuk kegiatan 
-                        <span style="color:#00875a;font-weight:bold;">IPB Run 2026 –
-                            {{ $participant->ticket->category->name }} ({{ $participant->ticket->name }})</span>.
+                        Halo <strong style="color:#1a2b4b;">{{ $participant->name }}</strong>, berikut adalah salinan E-Invoice pendaftaran Anda untuk kegiatan:
+                        <div style="margin-top:15px;">
+                            @foreach($participant->raceEntries as $entry)
+                                <div style="background-color:#f0f9f6; padding:10px 15px; border-radius:8px; margin-bottom:5px; border-left:3px solid #00875a;">
+                                    <span style="color:#00875a;font-weight:bold;font-size:14px;">
+                                        IPB Run 2026 – {{ $entry->ticket->category->name }} ({{ $entry->ticket->name }})
+                                    </span>
+                                </div>
+                            @endforeach
+                        </div>
                     </p>
                     <p style="margin-top:15px;font-size:14px;line-height:1.6;color:#556677;">
                         Silakan simpan dokumen ini sebagai bukti pendaftaran resmi Anda. Detail pendaftaran Anda dapat dilihat pada tabel di bawah ini.

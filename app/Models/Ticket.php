@@ -25,4 +25,9 @@ class Ticket extends Model
     {
         return $this->hasMany(Participant::class);
     }
+
+    public function raceEntries()
+    {
+        return $this->hasMany(RaceEntry::class);
+    }
 }

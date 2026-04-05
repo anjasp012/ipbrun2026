@@ -16,14 +16,16 @@ class ParticipantPaidNotification extends Mailable implements ShouldQueue
 
     public $participant;
     public $password;
+    public $entries;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($participant, $password)
+    public function __construct($participant, $password, $entries = [])
     {
         $this->participant = $participant;
         $this->password = $password;
+        $this->entries = $entries;
     }
 
     /**

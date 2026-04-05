@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Participant;
 use App\Models\Category;
 use App\Models\Setting;
+use App\Models\RaceEntry;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
@@ -14,27 +15,26 @@ class AdminController extends Controller
     public function dashboard()
     {
         // 1. Ringkasan Data
-        $totalSoldTickets = Participant::whereIn('status', ['pending', 'paid'])->count();
-        $totalPaidParticipants = Participant::where('status', 'paid')->count();
-        $totalTicketsSold = $totalSoldTickets; 
+        $totalTicketsSold = RaceEntry::where('status', 'paid')->count();
+        $totalOrders = \App\Models\Order::where('status', 'paid')->count();
         $totalCapacity = \App\Models\Ticket::sum('qty');
 
         $stats = [
-            'total_revenue' => Participant::where('status', 'paid')->sum('total_price'),
-            'total_order' => Participant::count(),
-            'total_participants' => $totalPaidParticipants,
+            'total_revenue' => \App\Models\Order::where('status', 'paid')->sum('total_price'),
+            'total_order' => \App\Models\Order::count(),
+            'total_participants' => Participant::count(),
             'total_remaining_tickets' => $totalCapacity - $totalTicketsSold,
             'is_running' => Setting::getValue('is_running', '0') === '1'
         ];
 
         // 2. Periods & Tickets Breakdown
-        $periods = \App\Models\Period::with(['tickets.category', 'tickets.participants' => function($q) {
+        $periods = \App\Models\Period::with(['tickets.category', 'tickets.raceEntries' => function($q) {
             $q->whereIn('status', ['pending', 'paid']);
         }])->get();
-
+        
         $periodsData = $periods->map(function($period) {
             $tickets = $period->tickets->map(function($ticket) {
-                $terjual = $ticket->participants->count();
+                $terjual = $ticket->raceEntries->count();
                 return (object) [
                     'kategori' => $ticket->category->name ?? '-',
                     'name' => $ticket->name,
@@ -73,19 +73,24 @@ class AdminController extends Controller
 
     public function participants(Request $request)
     {
-        $query = Participant::with(['ticket.category', 'ticket.period']);
+        $query = Participant::with(['raceEntries.ticket.category', 'raceEntries.ticket.period']);
 
         if ($request->has('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
                   ->orWhere('email', 'like', "%$search%")
-                  ->orWhere('order_code', 'like', "%$search%");
+                  ->orWhereHas('raceEntries.order', function($rq) use ($search) {
+                      $rq->where('order_code', 'like', "%$search%");
+                  });
             });
         }
 
         if ($request->has('status')) {
-            $query->where('status', $request->status);
+            $status = $request->status;
+            $query->whereHas('raceEntries.order', function($rq) use ($status) {
+                $rq->where('status', $status);
+            });
         }
 
         $participants = $query->latest()->paginate(25);

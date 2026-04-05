@@ -161,10 +161,13 @@
         <div class="header">
             <h1 class="invoice-title">INVOICE</h1>
             <div class="invoice-info">
+                @php
+                    $mainEntry = $participant->raceEntries->where('status', 'paid')->last() ?? $participant->raceEntries->last();
+                @endphp
                 <table>
                     <tr>
                         <td>FULL NAME : <strong>{{ $participant->name }}</strong></td>
-                        <td>ORDER CODE : <strong>#{{ $participant->order_code }}</strong></td>
+                        <td>ORDER CODE : <strong>#{{ $mainEntry->order_code }}</strong></td>
                     </tr>
                 </table>
             </div>
@@ -177,44 +180,34 @@
                     <td class="item-total">TOTAL</td>
                 </tr>
                 
+                @foreach($participant->raceEntries->where('status', 'paid') as $entry)
                 @php
-                    $discount = $participant->ticket->discount ?? 0;
-                    $hasDiscount = $discount > 0;
-                    $ticketName = strtoupper($participant->ticket->name);
+                    $ticketName = strtoupper($entry->ticket->name);
                     $isIPB = str_contains($ticketName, 'IPB');
                 @endphp
-
                 <tr class="table-row">
                     <td class="item-name">
-                        {{ $participant->ticket->category->name }} ({{ $isIPB ? 'Keluarga besar dan alumni IPB' : 'Public' }})
+                        {{ $entry->ticket->category->name }} ({{ $isIPB ? 'Keluarga besar IPB' : 'Public' }})
                     </td>
                     <td class="item-total">
-                        IDR {{ number_format($participant->ticket->price + $discount, 0, ',', ',') }}
+                        IDR {{ number_format($entry->price, 0, ',', ',') }}
                     </td>
                 </tr>
-
-                @if($hasDiscount)
-                <tr class="table-row discount">
-                    <td class="item-name">Discount ({{ $participant->ticket->period->name }})</td>
-                    <td class="item-total">- IDR {{ number_format($discount, 0, ',', ',') }}</td>
+                
+                @if($entry->donation_scholarship > 0)
+                <tr class="table-row donation">
+                    <td class="item-name">Donation for Scholarship</td>
+                    <td class="item-total">IDR {{ number_format($entry->donation_scholarship, 0, ',', ',') }}</td>
                 </tr>
                 @endif
                 
-                @if($isIPB)
-                    @if($participant->donation_scholarship > 0)
-                    <tr class="table-row donation">
-                        <td class="item-name">Donation for Scholarship</td>
-                        <td class="item-total">IDR {{ number_format($participant->donation_scholarship, 0, ',', ',') }}</td>
-                    </tr>
-                    @endif
-                    
-                    @if($participant->donation_event > 0)
-                    <tr class="table-row donation">
-                        <td class="item-name">Donation for Event</td>
-                        <td class="item-total">IDR {{ number_format($participant->donation_event, 0, ',', ',') }}</td>
-                    </tr>
-                    @endif
+                @if($entry->donation_event > 0)
+                <tr class="table-row donation">
+                    <td class="item-name">Donation for Event</td>
+                    <td class="item-total">IDR {{ number_format($entry->donation_event, 0, ',', ',') }}</td>
+                </tr>
                 @endif
+                @endforeach
                 
                 <tr class="table-row">
                     <td class="item-name">Transaction Fee</td>
@@ -222,8 +215,8 @@
                 </tr>
                 
                 <tr class="table-row total-row">
-                    <td>Total</td>
-                    <td class="item-total">IDR {{ number_format($participant->total_price, 0, ',', ',') }}</td>
+                    <td>Total Paid</td>
+                    <td class="item-total">IDR {{ number_format($participant->raceEntries->where('status', 'paid')->sum(fn($e) => $e->price + $e->donation_scholarship + $e->donation_event) + 4500, 0, ',', ',') }}</td>
                 </tr>
             </table>
         </div>

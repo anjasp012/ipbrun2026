@@ -44,10 +44,14 @@
                         <span class="text-slate-500 font-medium">Peserta</span>
                         <span class="text-[#003366] font-bold">{{ $participant->name }}</span>
                     </div>
-                    <div class="flex justify-between items-center text-sm">
-                        <span class="text-slate-500 font-medium">Kategori</span>
-                        <span class="text-[#003366] font-bold">{{ $participant->ticket->category->name }}
-                            ({{ $participant->ticket->name }})</span>
+                    <div class="flex flex-col gap-2 py-2">
+                        <span class="text-slate-500 font-medium text-sm">Kategori Lomba</span>
+                        @foreach($participant->raceEntries as $entry)
+                            <div class="flex justify-between items-center bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
+                                <span class="text-[#003366] font-bold text-sm uppercase">{{ $entry->ticket->category->name }}</span>
+                                <span class="text-slate-500 font-bold text-[10px] uppercase opacity-70">({{ $entry->ticket->name }})</span>
+                            </div>
+                        @endforeach
                     </div>
                     <div class="flex justify-between items-center text-sm">
                         <span class="text-slate-500 font-medium">Nomor WhatsApp</span>

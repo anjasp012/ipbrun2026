@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Ticket;
 use App\Models\Participant;
 use App\Models\Setting;
+use App\Models\RaceEntry;
+use App\Models\Order;
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -69,15 +71,35 @@ class TicketController extends Controller
         }
 
         // 2. Check current stock accurately (capacity - pending/paid)
-        $usedQty = Participant::where('ticket_id', $ticket->id)
-            ->whereIn('status', ['pending', 'paid'])
-            ->count();
+        $usedQty = RaceEntry::where('ticket_id', $ticket->id)
+            ->whereHas('participant', function($q) {
+                $q->whereIn('status', ['pending', 'paid']);
+            })->count();
 
         if ($usedQty >= $ticket->qty) {
             return redirect('/')->with('error', 'Maaf, tiket untuk kategori ini baru saja habis terjual.');
         }
 
-        return view('pages.enduser.checkout', compact('ticket'));
+        // Find the pair ticket
+        $categoryName = strtoupper($ticket->category->name ?? '');
+        $pairTarget = '';
+        if (str_contains($categoryName, '5K') || str_contains($categoryName, '42K')) {
+            $pairTarget = '10K';
+        } elseif (str_contains($categoryName, '10K') || str_contains($categoryName, '21K')) {
+            $pairTarget = '5K';
+        }
+
+        $pairTicket = null;
+        if ($pairTarget) {
+            $pairTicket = Ticket::where('period_id', $ticket->period_id)
+                ->whereHas('category', function($q) use ($pairTarget) {
+                    $q->where('name', 'LIKE', "%$pairTarget%");
+                })
+                ->where('id', '!=', $ticket->id)
+                ->first();
+        }
+
+        return view('pages.enduser.checkout', compact('ticket', 'pairTicket'));
     }
 
     public function register(Request $request)
@@ -124,88 +146,198 @@ class TicketController extends Controller
             $ticket = Ticket::where('id', $request->ticket_id)->lockForUpdate()->firstOrFail();
             
             // 2. Check current stock accurately
-            $usedQty = Participant::where('ticket_id', $ticket->id)
-                ->whereIn('status', ['pending', 'paid'])
-                ->count();
+            // 2. Check current stock accurately
+            $usedQty = RaceEntry::where('ticket_id', $ticket->id)
+                ->whereHas('participant', function($q) {
+                    $q->whereIn('status', ['pending', 'paid']);
+                })->count();
 
             if ($usedQty >= $ticket->qty) {
                 return redirect('/')->with('error', 'Maaf, tiket untuk kategori ini baru saja habis terjual.');
             }
 
-            // 3. Duplicate check for participant
-            $duplicateCheck = Participant::where(function ($query) use ($request) {
-                    $query->where('email', $request->email)
-                        ->orWhere('nik', $request->nik);
-                    if ($request->filled('nim_nrp')) { $query->orWhere('nim_nrp', $request->nim_nrp); }
+            // 3. Duplicate check for entry (One NIK cannot buy SAME ticket category twice)
+            // This allows users to register for DIFFERENT days/categories in separate orders later.
+            $duplicateCheck = RaceEntry::whereHas('participant', function($q) use ($request) {
+                    $q->where('nik', $request->nik)
+                      ->whereIn('status', ['pending', 'paid']);
                 })
-                ->whereIn('status', ['pending', 'paid'])
-                ->lockForUpdate() // Lock existing participant records if found
+                ->where('ticket_id', $ticket->id)
                 ->first();
 
             if ($duplicateCheck) {
-                $fieldKey = $duplicateCheck->email === $request->email ? 'email' : ($duplicateCheck->nik === $request->nik ? 'nik' : 'nim_nrp');
-                $fieldName = $fieldKey === 'email' ? 'Email' : ($fieldKey === 'nik' ? 'NIK' : 'NIM/NRP');
-                
                 return back()->withInput()->withErrors([
-                    $fieldKey => "Field ini sudah terdaftar dalam sistem.",
-                    'duplicate' => "$fieldName sudah terdaftar dalam sistem dan sedang dalam status Pending/Paid. Silakan gunakan data lain atau selesaikan pembayaran sebelumnya."
+                    'nik' => "Peserta dengan NIK ini sudah terdaftar atau memiliki pesanan tertunda untuk kategori ({$ticket->category->name}).",
+                    'duplicate' => "Anda diperbolehkan mendaftar kategori lain (hari berbeda), namun tidak diperbolehkan mendaftar kategori yang sama dua kali."
                 ]);
+            }
+
+            // Also check for Second Ticket if applicable
+            if ($request->other_race_interest) {
+                // ... same logic for second ticket if needed ...
             }
 
             $adminFee = 4500;
             $donationEvent = (int) $request->input('donation_event', 0);
             $donationScholarship = (int) $request->input('donation_scholarship', 0);
             $totalPrice = $ticket->price + $adminFee + $donationEvent + $donationScholarship;
+            $second_ticket_id = null;
 
-            $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
-            $participantData = \Illuminate\Support\Arr::except($validated, ['email_confirmation']);
-            
-            $participant = Participant::create(array_merge($participantData, [
-                'order_code' => $orderCode,
-                'donation_event' => $donationEvent,
-                'donation_scholarship' => $donationScholarship,
-                'total_price' => $totalPrice,
-                'status' => 'pending',
-                'running_community' => $request->running_community,
-                'previous_events' => $request->previous_events,
-                'best_time' => $request->best_time,
-                'shuttle_bus' => $request->shuttle_bus,
-                'other_race_interest' => $request->other_race_interest,
-            ]));
-
-            $params = [
-                'transaction_details' => ['order_id' => $participant->order_code, 'gross_amount' => $totalPrice],
-                'customer_details' => ['first_name' => $participant->name, 'email' => $participant->email, 'phone' => $participant->phone_number],
-                'item_details' => [
-                    ['id' => $ticket->id, 'price' => $ticket->price, 'quantity' => 1, 'name' => 'Tiket IPB Run 2026 - ' . $ticket->category->name],
-                    ['id' => 'ADMIN_FEE', 'price' => $adminFee, 'quantity' => 1, 'name' => 'Biaya Layanan']
-                ],
-                'callbacks' => [
-                    'finish' => route('payment.finish')
-                ]
-            ];
-
-            if ($donationEvent > 0) $params['item_details'][] = ['id' => 'DONATION_EVENT', 'price' => $donationEvent, 'quantity' => 1, 'name' => 'Donasi Event'];
-            if ($donationScholarship > 0) $params['item_details'][] = ['id' => 'DONATION_SCHOLARSHIP', 'price' => $donationScholarship, 'quantity' => 1, 'name' => 'Donasi Beasiswa'];
-
-            try {
-                $snapResponse = Snap::createTransaction($params);
-                $participant->update(['snap_token' => $snapResponse->token, 'payment_url' => $snapResponse->redirect_url]);
-                
-                // Send WhatsApp notification
-                try {
-                    $fonnte = new \App\Services\FonnteService();
-                    $message = "Halo *{$participant->name}*!\n\nRegistrasi IPB Run 2026 Anda berhasil dengan kode order *{$participant->order_code}*.\n\nSilakan lakukan pembayaran melalui link berikut:\n{$snapResponse->redirect_url}\n\nMohon segera selesaikan pembayaran agar registrasi Anda tidak kadaluarsa. Terima kasih!";
-                    $fonnte->sendMessage($participant->phone_number, $message);
-                } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::error('Fonnte registration notification failed: ' . $e->getMessage());
+            if ($request->other_race_interest) {
+                $categoryName = strtoupper($ticket->category->name ?? '');
+                $pairTarget = '';
+                if (str_contains($categoryName, '5K') || str_contains($categoryName, '42K')) {
+                    $pairTarget = '10K';
+                } elseif (str_contains($categoryName, '10K') || str_contains($categoryName, '21K')) {
+                    $pairTarget = '5K';
                 }
 
-                return redirect($snapResponse->redirect_url);
-            } catch (\Exception $e) {
-                // Transaction will rollback if an exception is thrown here
-                throw new \Exception('Midtrans integration failed: ' . $e->getMessage());
+                if ($pairTarget) {
+                    $pairTicket = Ticket::where('period_id', $ticket->period_id)
+                        ->whereHas('category', function($q) use ($pairTarget) {
+                            $q->where('name', 'LIKE', "%$pairTarget%");
+                        })
+                        ->where('id', '!=', $ticket->id)
+                        ->first();
+                    
+                    if ($pairTicket) {
+                        $second_ticket_id = $pairTicket->id;
+                        $totalPrice += $pairTicket->price;
+                    }
+                }
             }
+
+            // 4. Find or Create Participant Profile (One NIK = One Participant)
+            $participant = Participant::updateOrCreate(
+                ['nik' => $request->nik],
+                \Illuminate\Support\Arr::except($validated, ['email_confirmation', 'ticket_id', 'other_race_interest'])
+            );
+
+            // 5. Create the TRANSACTION (Order)
+            $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
+            $order = Order::create([
+                'participant_id' => $participant->id,
+                'order_code' => $orderCode,
+                'status' => 'pending',
+                'admin_fee' => $adminFee,
+                'donation_event' => $donationEvent,
+                'donation_scholarship' => $donationScholarship,
+                'total_price' => $totalPrice, // From previous logic
+            ]);
+
+            // 6. Create Race Entries (HasMany Support)
+            // Primary Entry
+            $participant->raceEntries()->create([
+                'ticket_id' => $ticket->id,
+                'order_id' => $order->id,
+                'status' => 'pending',
+            ]);
+
+            // Secondary Entry (Ganda Kategori)
+            if ($second_ticket_id) {
+                $participant->raceEntries()->create([
+                    'ticket_id' => $second_ticket_id,
+                    'order_id' => $order->id,
+                    'status' => 'pending',
+                ]);
+            }
+
+            return $this->createMidtransTransaction($order);
         });
+    }
+
+    public function buyMore(Ticket $ticket)
+    {
+        $user = auth()->user();
+        if (!$user) return redirect('/login');
+
+        // 1. Get personal data from latest successful participant record
+        $latestParticipant = $user->participants()->where('status', 'paid')->latest()->first();
+        if (!$latestParticipant) {
+             $latestParticipant = $user->participants()->latest()->first();
+        }
+
+        if (!$latestParticipant) {
+            return redirect('/')->with('error', 'Data profil Anda belum ditemukan. Silakan daftar manual terlebih dahulu.');
+        }
+
+        // 2. Duplicate check (NIK + Ticket)
+        $exists = RaceEntry::whereHas('participant', function($q) use ($latestParticipant) {
+                $q->where('nik', $latestParticipant->nik)->whereIn('status', ['pending', 'paid']);
+            })->where('ticket_id', $ticket->id)->count();
+
+        if ($exists) {
+            return back()->with('error', 'Anda sudah terdaftar atau memiliki pesanan tertunda untuk kategori ini!');
+        }
+
+        // 3. Create new Participant row (Cloning Profile)
+        $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
+        $adminFee = 4500;
+        
+        $order = Order::create([
+            'participant_id' => $latestParticipant->id,
+            'order_code' => $orderCode,
+            'status' => 'pending',
+            'admin_fee' => $adminFee,
+            'total_price' => $ticket->price + $adminFee,
+        ]);
+
+        $latestParticipant->raceEntries()->create([
+            'ticket_id' => $ticket->id,
+            'order_id' => $order->id,
+            'status' => 'pending',
+        ]);
+
+        return $this->createMidtransTransaction($order);
+    }
+
+    private function createMidtransTransaction(Order $order)
+    {
+        $participant = $order->participant;
+        $itemDetails = [];
+
+        foreach($order->raceEntries as $entry) {
+            $itemDetails[] = [
+                'id' => $entry->ticket_id,
+                'price' => $entry->ticket->price,
+                'quantity' => 1,
+                'name' => 'Tiket IPB Run 2026 - ' . $entry->ticket->category->name
+            ];
+        }
+
+        $itemDetails[] = ['id' => 'ADMIN_FEE', 'price' => $order->admin_fee, 'quantity' => 1, 'name' => 'Biaya Layanan'];
+
+        if ($order->donation_event > 0) $itemDetails[] = ['id' => 'DONATION_EVENT', 'price' => $order->donation_event, 'quantity' => 1, 'name' => 'Donasi Event'];
+        if ($order->donation_scholarship > 0) $itemDetails[] = ['id' => 'DONATION_SCHOLARSHIP', 'price' => $order->donation_scholarship, 'quantity' => 1, 'name' => 'Donasi Beasiswa'];
+
+        $params = [
+            'transaction_details' => ['order_id' => $order->order_code, 'gross_amount' => $order->total_price],
+            'customer_details' => ['first_name' => $participant->name, 'email' => $participant->email, 'phone' => $participant->phone_number],
+            'item_details' => $itemDetails,
+            'callbacks' => [
+                'finish' => route('payment.finish')
+            ]
+        ];
+
+        try {
+            $snapResponse = Snap::createTransaction($params);
+            $order->update([
+                'snap_token' => $snapResponse->token,
+                'payment_url' => $snapResponse->redirect_url
+            ]);
+            
+            // Send WhatsApp notification
+            try {
+                $fonnte = new \App\Services\FonnteService();
+                $message = "Halo *{$participant->name}*!\n\nPesanan tiket IPB Run 2026 Anda berhasil dengan kode order *{$order->order_code}*.\n\nSilakan lakukan pembayaran melalui link berikut:\n{$snapResponse->redirect_url}\n\nTerima kasih!";
+                $fonnte->sendMessage($participant->phone_number, $message);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Fonnte notification failed: ' . $e->getMessage());
+            }
+
+            return redirect($snapResponse->redirect_url);
+        } catch (\Exception $e) {
+            throw new \Exception('Midtrans integration failed: ' . $e->getMessage());
+        }
     }
 }

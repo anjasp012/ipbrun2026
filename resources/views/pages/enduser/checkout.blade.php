@@ -294,7 +294,7 @@
                             </div>
                             
                             <label class="relative inline-flex items-center cursor-pointer group">
-                                <input type="checkbox" name="other_race_interest" value="{{ $pairCategory }}" class="sr-only peer" {{ old('other_race_interest') ? 'checked' : '' }}>
+                                <input type="checkbox" name="other_race_interest" id="cb_second_ticket" value="{{ $pairCategory }}" class="sr-only peer" {{ old('other_race_interest') ? 'checked' : '' }}>
                                 <div class="w-20 h-10 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-10 after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-8 after:w-8 after:transition-all peer-checked:bg-[#FF7A21] shadow-inner ring-4 ring-slate-100 peer-checked:ring-orange-100"></div>
                                 <span class="ml-4 text-xs font-black text-slate-400 peer-checked:text-[#FF7A21] uppercase tracking-widest transition-colors">
                                     <span class="group-peer-checked:hidden">TIDAK</span>
@@ -376,6 +376,12 @@
                                 <span class="text-slate-500 font-medium italic">Biaya Layanan</span>
                                 <span class="text-[#003366] font-bold">Rp 4.500</span>
                             </div>
+                            @if ($pairTicket)
+                                <div id="row_second_ticket" class="hidden flex justify-between items-center text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg">
+                                    <span class="text-[#E8630A] font-bold italic">Paket Ganda: {{ $pairTicket->category->name }} ({{ $pairTicket->name }})</span>
+                                    <span class="text-[#E8630A] font-black">Rp {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
+                                </div>
+                            @endif
                             <div id="row_donation_event" class="hidden flex justify-between items-center text-sm">
                                 <span class="text-slate-500 font-medium italic">Donasi Event</span>
                                 <span id="lbl_donation_event" class="text-[#E8630A] font-bold">Rp 0</span>
@@ -451,8 +457,7 @@
 
             const ticketName = "{{ $ticket->name }}";
             const isIPB = ticketName.toUpperCase().includes("IPB");
-            const ticketPrice = {{ $ticket->price }};
-            const adminFee = 4500;
+            const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
 
             if (isIPB) {
                 document.getElementById('donateSection').classList.remove('hidden');
@@ -464,6 +469,7 @@
             function updateTotal() {
                 let donEvent = parseInt(document.getElementById('donation_event')?.value || 0);
                 let donScholar = parseInt(document.getElementById('donation_scholarship')?.value || 0);
+                let isSecondTicketChecked = document.getElementById('cb_second_ticket')?.checked || false;
 
                 const summaryEvent = document.getElementById('row_donation_event');
                 const lblEvent = document.getElementById('lbl_donation_event');
@@ -483,12 +489,23 @@
                     summaryScholar.classList.add('hidden');
                 }
 
-                let total = ticketPrice + adminFee + donEvent + donScholar;
+                const summarySecond = document.getElementById('row_second_ticket');
+                let secondPrice = 0;
+                if (isSecondTicketChecked && summarySecond) {
+                    summarySecond.classList.remove('hidden');
+                    secondPrice = pairTicketPrice;
+                } else if (summarySecond) {
+                    summarySecond.classList.add('hidden');
+                }
+
+                let total = ticketPrice + adminFee + donEvent + donScholar + secondPrice;
                 const formattedTotal = 'Rp ' + total.toLocaleString('id-ID');
                 document.getElementById('lbl_total').innerText = formattedTotal;
             }
 
+            document.getElementById('donation_event')?.addEventListener('change', updateTotal);
             document.getElementById('donation_scholarship')?.addEventListener('change', updateTotal);
+            document.getElementById('cb_second_ticket')?.addEventListener('change', updateTotal);
             updateTotal();
         });
 

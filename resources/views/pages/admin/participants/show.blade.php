@@ -12,9 +12,11 @@
                             <p class="text-[10px] font-black text-[#E8630A] uppercase tracking-[3px] mb-1">REGISTERED ATHLETE</p>
                             <h3 class="text-3xl font-black text-[#003366] uppercase tracking-tighter">{{ $participant->name }}</h3>
                             <div class="flex items-center gap-3 mt-1">
-                                <span class="text-xs font-bold text-slate-400 font-mono tracking-widest uppercase">Order #{{ $participant->order_code }}</span>
+                                <span class="text-xs font-bold text-slate-400 font-mono tracking-widest uppercase">NIK: {{ $participant->nik }}</span>
                                 <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                <span class="text-[10px] font-black text-emerald-600 uppercase tracking-widest border border-emerald-100 px-2 py-0.5 rounded-full bg-emerald-50">Paid Status Verified</span>
+                                <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest border border-blue-100 px-2 py-0.5 rounded-full bg-blue-50">
+                                    {{ $participant->raceEntries->where('status', 'paid')->count() }}/{{ $participant->raceEntries->count() }} Tickets Paid
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -101,15 +103,55 @@
         <!-- Logistics Card (Right Column) -->
         <div class="space-y-8">
             <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden flex flex-col items-center p-8">
-                 <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-[2px] mb-8 text-center pb-4 border-b border-slate-50 w-full">Race Logistics Status</h4>
-                 
-                 <!-- BIB Section Mock -->
-                 <div class="w-full bg-[#f8fafc] border border-slate-100 rounded-3xl p-6 text-center relative overflow-hidden mb-6">
-                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-[3px] mb-2 leading-none">BIB CODE</div>
-                    <div class="text-4xl font-black text-slate-300 tracking-widest uppercase">NOT ASSIGNED</div>
-                    <p class="mt-4 text-[10px] font-bold text-blue-600 uppercase underline cursor-pointer">GENERATE BIB NOW</p>
-                    <svg class="absolute -top-10 -right-10 w-24 h-24 text-slate-50/50" fill="currentColor" viewBox="0 0 24 24"><path d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
+                 <!-- Logistics Sections (Dynamic for HasMany) -->
+                 @foreach($participant->raceEntries->groupBy('order_id') as $orderId => $entries)
+                 @php $order = $entries->first()->order; @endphp
+                 <div class="w-full bg-slate-50/80 border border-slate-100 rounded-3xl p-6 mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-[10px] font-black text-blue-600 font-mono uppercase">#{{ $order->order_code }}</span>
+                        @if($order->status == 'paid')
+                            <span class="text-[9px] font-black text-emerald-500 uppercase">Paid Order</span>
+                        @else
+                            <span class="text-[9px] font-black text-orange-500 uppercase animate-pulse">Pending Order</span>
+                        @endif
+                    </div>
+                    
+                    @foreach($entries as $entry)
+                    <div class="w-full bg-white border border-slate-100 rounded-2xl p-4 text-center relative overflow-hidden mb-3 last:mb-0 shadow-sm">
+                        <div class="text-[9px] font-black text-slate-400 uppercase tracking-[2px] mb-2 leading-none">
+                            {{ strtoupper($entry->ticket->category->name) }} ({{ strtoupper($entry->ticket->name) }})
+                        </div>
+                        @if($entry->bib_number)
+                            <div class="text-2xl font-black text-[#003366] tracking-widest uppercase">{{ $entry->bib_number }}</div>
+                        @else
+                            <div class="text-xl font-black text-slate-200 tracking-widest uppercase italic opacity-60">NO BIB</div>
+                        @endif
+                        
+                        <div class="mt-4 pt-3 border-t border-slate-50 flex items-center justify-between">
+                            <div class="text-left">
+                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Racepack Status</p>
+                                @if($entry->scanned_at)
+                                    <h5 class="text-[11px] font-black text-emerald-600 uppercase leading-none italic">CLAIMED</h5>
+                                @else
+                                    <h5 class="text-[11px] font-black text-slate-300 uppercase leading-none italic">UNCLAIMED</h5>
+                                @endif
+                            </div>
+                            <div @class([
+                                'w-8 h-8 rounded-full border flex items-center justify-center',
+                                'bg-emerald-50 border-emerald-100 text-emerald-600' => $entry->scanned_at,
+                                'bg-slate-50 border-slate-100 text-slate-300' => !$entry->scanned_at
+                            ])>
+                                @if($entry->scanned_at)
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                @else
+                                    <svg class="w-4 h-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
                  </div>
+                 @endforeach
 
                  <div class="w-full space-y-4">
                     <div class="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-2xl">
@@ -121,16 +163,6 @@
                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
                          </div>
                     </div>
-                    
-                    <div class="flex items-center justify-between p-4 bg-slate-50/50 border border-slate-100 rounded-2xl group cursor-pointer hover:border-emerald-200 transition-colors">
-                         <div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Racepack (RPC)</p>
-                            <h5 class="text-xl font-black text-slate-300 uppercase leading-none">UNCLAIMED</h5>
-                         </div>
-                         <div class="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-300">
-                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
-                         </div>
-                    </div>
                  </div>
             </div>
 
@@ -138,25 +170,19 @@
                  <div class="relative z-10">
                     <h4 class="text-[10px] font-black text-white/40 uppercase tracking-[3px] mb-6">Payment Summary</h4>
                     <div class="space-y-4">
+                        @php
+                            $paidOrders = \App\Models\Order::where('participant_id', $participant->id)->where('status', 'paid')->get();
+                        @endphp
+                        @foreach($paidOrders as $o)
                         <div class="flex justify-between items-center text-xs text-white/70 font-bold uppercase tracking-wider">
-                            <span>Ticket Price</span>
-                            <span>IDR {{ number_format($participant->ticket->price, 0, ',', '.') }}</span>
+                            <span>Order #{{ $o->order_code }}</span>
+                            <span>IDR {{ number_format($o->total_price, 0, ',', '.') }}</span>
                         </div>
-                        @if($participant->donation_event > 0)
-                        <div class="flex justify-between items-center text-xs text-white/70 font-bold uppercase tracking-wider">
-                            <span>Donation Event</span>
-                            <span>IDR {{ number_format($participant->donation_event, 0, ',', '.') }}</span>
-                        </div>
-                        @endif
-                        @if($participant->donation_scholarship > 0)
-                        <div class="flex justify-between items-center text-xs text-white/70 font-bold uppercase tracking-wider">
-                            <span>Donation Scholarship</span>
-                            <span>IDR {{ number_format($participant->donation_scholarship, 0, ',', '.') }}</span>
-                        </div>
-                        @endif
+                        @endforeach
+                        
                         <div class="flex justify-between items-center pt-4 border-t border-white/10 text-xl font-black text-white uppercase tracking-tighter">
-                            <span>Settled Sum</span>
-                            <span class="text-[#E8630A]">IDR {{ number_format($participant->total_price, 0, ',', '.') }}</span>
+                            <span>Total Verified</span>
+                            <span class="text-[#E8630A]">IDR {{ number_format($paidOrders->sum('total_price'), 0, ',', '.') }}</span>
                         </div>
                     </div>
                  </div>
