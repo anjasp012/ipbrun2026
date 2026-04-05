@@ -10,30 +10,32 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ParticipantInvoiceResend extends Mailable implements ShouldQueue
+class ParticipantInvoiceResend extends Mailable
 {
     use Queueable, SerializesModels;
-
+ 
     public $participant;
+    public $order;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($participant)
+    public function __construct($participant, $order)
     {
         $this->participant = $participant;
+        $this->order = $order;
     }
-
+ 
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'E-Invoice IPB RUN 2026 - ' . $this->participant->order_code,
+            subject: 'E-Invoice IPB RUN 2026 - ' . $this->order->order_code,
         );
     }
-
+ 
     /**
      * Get the message content definition.
      */
@@ -43,7 +45,7 @@ class ParticipantInvoiceResend extends Mailable implements ShouldQueue
             view: 'emails.participant_invoice_resend',
         );
     }
-
+ 
     /**
      * Get the attachments for the message.
      *
@@ -58,9 +60,10 @@ class ParticipantInvoiceResend extends Mailable implements ShouldQueue
         } else {
             $bgBase64 = '';
         }
-
+ 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('emails.invoice', [
             'participant' => $this->participant,
+            'order' => $this->order,
             'bg_base64' => $bgBase64,
         ])->setPaper('a4', 'portrait');
 
