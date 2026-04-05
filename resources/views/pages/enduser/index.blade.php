@@ -181,39 +181,51 @@
     </script>
 
     @if($ticketSaleStart && \Illuminate\Support\Carbon::parse($ticketSaleStart)->isFuture())
-        <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <div class="fixed inset-0 bg-[#003366]/40 backdrop-blur-md"></div>
-            <div class="relative bg-white/95 backdrop-blur-xl p-10 md:p-16 rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,51,102,0.4)] border border-white text-center max-w-xl w-full transform -rotate-1">
-                <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" alt="IPB Run 2026" class="h-20 mx-auto mb-10 drop-shadow-sm">
-                
-                <h2 class="text-[11px] font-black text-[#E8630A] uppercase tracking-[0.4em] mb-12 italic border-y border-orange-100 py-3 block">
-                    Official Registration Opens In
-                </h2>
+        <div class="fixed inset-0 z-[100] flex items-center justify-center p-6 overflow-hidden">
+            <div class="fixed inset-0 bg-[#001A33]/90 backdrop-blur-2xl"></div>
+            
+            <div class="relative w-full max-w-4xl text-center">
+                {{-- Decorative Lines --}}
+                <div class="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-y-1/2"></div>
+                <div class="absolute top-1/2 left-1/2 w-[1px] h-32 bg-gradient-to-b from-transparent via-[#FF7A21]/30 to-transparent -translate-x-1/2 -translate-y-1/2"></div>
 
-                <div id="index-countdown" class="flex gap-4 md:gap-8 justify-center items-center mb-12">
-                    <div class="flex flex-col items-center">
-                        <span id="idx-days" class="text-4xl md:text-6xl font-black font-outfit tabular-nums text-[#003366]">00</span>
-                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mt-2">Hari</span>
+                <div class="relative space-y-12">
+                    <div class="space-y-6">
+                        <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" alt="IPB Run 2026" class="h-24 md:h-32 mx-auto drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                        <div>
+                            <h2 class="text-[13px] font-[900] text-[#FF7A21] uppercase tracking-[0.6em] mb-4 drop-shadow-md">OFFICIAL REGISTRATION OPENS IN</h2>
+                            <div class="w-16 h-1 bg-[#FF7A21] mx-auto rounded-full"></div>
+                        </div>
                     </div>
-                    <div class="text-2xl font-black text-slate-200 mt-[-20px] md:mt-[-30px]">:</div>
-                    <div class="flex flex-col items-center">
-                        <span id="idx-hours" class="text-4xl md:text-6xl font-black font-outfit tabular-nums text-[#003366]">00</span>
-                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mt-2">Jam</span>
-                    </div>
-                    <div class="text-2xl font-black text-slate-200 mt-[-20px] md:mt-[-30px]">:</div>
-                    <div class="flex flex-col items-center">
-                        <span id="idx-minutes" class="text-4xl md:text-6xl font-black font-outfit tabular-nums text-[#003366]">00</span>
-                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mt-2">Menit</span>
-                    </div>
-                    <div class="text-2xl font-black text-slate-200 mt-[-20px] md:mt-[-30px]">:</div>
-                    <div class="flex flex-col items-center">
-                        <span id="idx-seconds" class="text-4xl md:text-6xl font-black font-outfit tabular-nums text-[#E8630A] animate-pulse">00</span>
-                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mt-2">Detik</span>
-                    </div>
-                </div>
 
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] leading-relaxed">
-                    Siapkan diri Anda untuk event lari terbesar <br> di Kampus IPB University.
+                    <div id="index-countdown" class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 max-w-3xl mx-auto items-center">
+                        <div class="flex flex-col group">
+                            <span id="idx-days" class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
+                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Days</span>
+                        </div>
+                        <div class="flex flex-col group">
+                            <span id="idx-hours" class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
+                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Hours</span>
+                        </div>
+                        <div class="flex flex-col group">
+                            <span id="idx-minutes" class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
+                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Minutes</span>
+                        </div>
+                        <div class="flex flex-col group">
+                            <span id="idx-seconds" class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-[#FF7A21] tracking-tighter drop-shadow-[0_0_25px_rgba(255,122,33,0.3)] transition-all group-hover:scale-110">00</span>
+                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF7A21]/60 mt-3">Seconds</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-8 flex flex-col items-center gap-6">
+                        <p class="text-white/60 text-sm font-medium tracking-[0.1em] max-w-sm mx-auto leading-relaxed">
+                            Pastikan koneksi internet Anda stabil dan data diri sudah siap untuk pendaftaran tercepat.
+                        </p>
+                        <div class="flex items-center gap-4 py-3 px-6 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
+                            <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                            <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Countdown Active • Live Update</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
