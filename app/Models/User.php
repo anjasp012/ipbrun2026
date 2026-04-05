@@ -33,8 +33,8 @@ class User extends Authenticatable
         ];
     }
 
-    public function participants(): HasMany
+    public function participant(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasMany(Participant::class);
+        return $this->hasOne(Participant::class);
     }
 }

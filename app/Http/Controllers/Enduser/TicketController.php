@@ -35,7 +35,7 @@ class TicketController extends Controller
         // 2. Auth Check: If Participant, show Dashboard
         if (auth()->check() && auth()->user()->role === 'participant') {
             $user = auth()->user();
-            $participant = $user->participants()->latest()->with('raceEntries.ticket.category')->first();
+            $participant = $user->participant()->with('raceEntries.ticket.category')->first();
 
             if (!$participant) {
                 // If somehow they are logged in but have no profile, show regular tickets
