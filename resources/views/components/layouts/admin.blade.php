@@ -21,15 +21,17 @@
     @stack('styles')
 </head>
 <body class="antialiased text-slate-800">
-    <div class="flex min-h-screen">
+    <div x-data="{ sidebarOpen: true }" class="flex min-h-screen">
         <!-- Sidebar -->
-        <div class="w-64 sidebar text-white flex-shrink-0 flex flex-col fixed h-full z-50">
-            <div class="p-6 text-center border-b border-white/10">
+        <div 
+            :class="sidebarOpen ? 'w-64' : 'w-0 overflow-hidden'"
+            class="sidebar text-white flex-shrink-0 flex flex-col fixed h-full z-50 transition-all duration-300">
+            <div class="p-6 text-center border-b border-white/10 min-w-[256px]">
                 <h1 class="text-xl font-black uppercase tracking-widest text-[#E8630A]">IPB RUN <span class="text-white">2026</span></h1>
                 <p class="text-[10px] uppercase font-bold tracking-[3px] mt-1 opacity-50">ADMIN DASHBOARD</p>
             </div>
             
-            <nav class="flex-1 p-4 space-y-2 mt-4">
+            <nav class="flex-1 p-4 space-y-2 mt-4 min-w-[256px]">
                 <a href="{{ url('/admin/dashboard') }}" class="flex items-center gap-3 p-3 rounded-xl sidebar-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                     <span class="font-bold text-sm tracking-wide">Overview</span>
@@ -39,7 +41,7 @@
                     <span class="font-bold text-sm tracking-wide">Participants</span>
                 </a>
                 <a href="{{ url('/admin/categories') }}" class="flex items-center gap-3 p-3 rounded-xl sidebar-item {{ request()->is('admin/categories*') ? 'active' : '' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 01-2-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                     <span class="font-bold text-sm tracking-wide">Ticket Categories</span>
                 </a>
                 <a href="{{ url('/admin/tickets') }}" class="flex items-center gap-3 p-3 rounded-xl sidebar-item {{ request()->is('admin/tickets*') ? 'active' : '' }}">
@@ -52,7 +54,7 @@
                 </a>
             </nav>
 
-            <div class="p-4 mt-auto border-t border-white/10">
+            <div class="p-4 mt-auto border-t border-white/10 min-w-[256px]">
                 <a href="{{ url('/') }}" class="flex items-center gap-2 p-3 text-xs font-bold text-white/50 hover:text-white transition-colors capitalize">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                     View Website Front
@@ -61,9 +63,16 @@
         </div>
 
         <!-- Main Content -->
-        <div class="flex-1 ml-64 min-h-screen">
+        <div 
+            :class="sidebarOpen ? 'ml-64' : 'ml-0'"
+            class="flex-1 min-h-screen transition-all duration-300">
             <header class="bg-white h-20 border-b border-slate-200 sticky top-0 z-40 px-8 flex items-center justify-between shadow-sm">
-                <h2 class="text-xl font-black text-[#003366] uppercase tracking-tight">{{ $title }}</h2>
+                <div class="flex items-center gap-6">
+                    <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-400 hover:text-[#003366] hover:bg-white transition-all">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <h2 class="text-xl font-black text-[#003366] uppercase tracking-tight">{{ $title }}</h2>
+                </div>
                 <div class="flex items-center gap-4">
                     <div class="text-right">
                         <p class="text-sm font-bold text-slate-800">{{ auth()->user()->name ?? 'Admin Master' }}</p>
