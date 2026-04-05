@@ -106,7 +106,6 @@ class AdminController extends Controller
     public function resendInvoice(Participant $participant)
     {
         try {
-            $order = \App\Models\Order::where('participant_id', $participant->id)->where('status', 'paid')->latest()->first();
             $password = \Illuminate\Support\Str::random(8);
             $orders = \App\Models\Order::where('participant_id', $participant->id)->where('status', 'paid')->latest()->get();
             
@@ -114,9 +113,11 @@ class AdminController extends Controller
                 return back()->with('error', 'No paid orders found for this participant. Cannot resend invoice.');
             }
 
-            $user = \App\Models\User::where('email', $participant->email)->first();
+            $user = $participant->user ?: \App\Models\User::where('email', $participant->email)->first();
+            
             if ($user) {
-                $user->update(['password' => \Illuminate\Support\Facades\Hash::make($password)]);
+                $user->password = \Illuminate\Support\Facades\Hash::make($password);
+                $user->save();
             }
 
             \Illuminate\Support\Facades\Mail::to($participant->email)->send(new \App\Mail\ParticipantInvoiceResend($participant, $orders, $password));

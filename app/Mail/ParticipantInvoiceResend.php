@@ -46,7 +46,7 @@ class ParticipantInvoiceResend extends Mailable
         return new Content(
             view: 'emails.participant_paid',
             with: [
-                'userExists' => true, // Simple view for resend
+                'userExists' => false, // ALWAYS show login details for resend (contains NEW password)
                 'order' => $this->orders->first() // For simple summary in body
             ]
         );
