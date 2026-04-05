@@ -29,17 +29,14 @@ class BlastController extends Controller
         $count = 0;
 
         foreach ($recipients as $recipient) {
-            try {
-                if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
-                    Mail::to(trim($recipient))->send(new PromotionBlast($request->subject, $request->message));
-                    $count++;
-                }
-            } catch (\Exception $e) {
-                // Skip failed emails
+            $recipient = trim($recipient);
+            if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+                Mail::to($recipient)->queue(new PromotionBlast($request->subject, $request->message));
+                $count++;
             }
         }
 
-        return back()->with('success', "Email blast sent successfully to {$count} recipients.");
+        return back()->with('success', "Success! {$count} emails have been added to the queue for background delivery.");
     }
 
     public function blastWhatsapp(Request $request)
@@ -49,17 +46,17 @@ class BlastController extends Controller
             'message' => 'required|string'
         ]);
 
-        $fonnte = new FonnteService();
         $recipients = array_filter(preg_split("/[\s,]+/", $request->targets));
         $count = 0;
 
         foreach ($recipients as $recipient) {
-            $response = $fonnte->sendMessage(trim($recipient), $request->message);
-            if (isset($response['status']) && $response['status']) {
+            $recipient = trim($recipient);
+            if (!empty($recipient)) {
+                \App\Jobs\SendWhatsAppBlast::dispatch($recipient, $request->message);
                 $count++;
             }
         }
 
-        return back()->with('success', "WhatsApp blast sent successfully to {$count} recipients.");
+        return back()->with('success', "Success! {$count} WhatsApp messages have been added to the queue for background delivery.");
     }
 }
