@@ -44,22 +44,30 @@ class TicketController extends Controller
 
             $orders = Order::where('participant_id', $participant->id)->with('raceEntries.ticket.category')->latest()->get();
             
-            // Recommend pair categories
+            // Logic for Pair Recommendation (ONLY ONE)
             $ownedCategories = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->get()->pluck('ticket.category.name')->map(fn($n) => strtoupper($n))->toArray();
             
-            $recommendations = Ticket::whereHas('period', fn($q) => $q->where('is_active', true))
-                ->with(['category', 'period'])
-                ->get()
-                ->filter(function($t) use ($ownedCategories) {
-                    $cat = strtoupper($t->category->name);
-                    foreach($ownedCategories as $oc) {
-                        if (str_contains($cat, '5K') && str_contains($oc, '5K')) return false;
-                        if (str_contains($cat, '10K') && str_contains($oc, '10K')) return false;
-                    }
-                    return true;
-                });
+            $pairTarget = '';
+            $has5K = false;
+            $has10K = false;
+            
+            foreach($ownedCategories as $oc) {
+                if (str_contains($oc, '5K')) $has5K = true;
+                if (str_contains($oc, '10K')) $has10K = true;
+            }
 
-            return view('pages.enduser.dashboard', compact('participant', 'orders', 'recommendations'));
+            if ($has5K && !$has10K) $pairTarget = '10K';
+            elseif ($has10K && !$has5K) $pairTarget = '5K';
+
+            $pairRecommendation = null;
+            if ($pairTarget) {
+                $pairRecommendation = Ticket::whereHas('period', fn($q) => $q->where('is_active', true))
+                    ->whereHas('category', fn($q) => $q->where('name', 'LIKE', "%$pairTarget%"))
+                    ->with(['category', 'period'])
+                    ->first();
+            }
+
+            return view('pages.enduser.dashboard', compact('participant', 'orders', 'pairRecommendation'));
         }
 
         showTickets:
