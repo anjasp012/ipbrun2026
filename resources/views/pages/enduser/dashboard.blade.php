@@ -56,7 +56,7 @@
                              <div class="flex flex-wrap items-center gap-x-10 gap-y-4">
                                 <div class="item">
                                     <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Paket Tiket</p>
-                                    <p class="text-sm font-black text-[#E8630A] uppercase">{{ $entry->ticket->name }}</p>
+                                    <p class="text-sm font-black text-[#E8630A] uppercase">{{ $entry->ticket->name ?: $entry->ticket->type }}</p>
                                 </div>
                                 <div class="item">
                                     <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Jadwal Lomba</p>

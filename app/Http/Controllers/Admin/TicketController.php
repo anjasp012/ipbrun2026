@@ -37,7 +37,8 @@ class TicketController extends Controller
     public function update(Request $request, Ticket $ticket)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'nullable|string|max:255',
+            'type' => 'required|string|in:umum,ipb',
             'price' => 'required|numeric|min:0',
             'discount' => 'nullable|numeric|min:0',
             'qty' => 'required|numeric|min:0'
@@ -54,7 +55,8 @@ class TicketController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'nullable|string|max:255',
+            'type' => 'required|string|in:umum,ipb',
             'price' => 'required|numeric|min:0',
             'qty' => 'required|numeric|min:0',
             'category_id' => 'required|exists:categories,id',

@@ -44,32 +44,31 @@ class TicketController extends Controller
 
             $orders = Order::where('participant_id', $participant->id)->with('raceEntries.ticket.category')->latest()->get();
             
-            // Logic for Pair Recommendation (ONLY ONE)
-            $ownedCategories = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->get()->pluck('ticket.category.name')->map(fn($n) => strtoupper($n))->toArray();
+            // Logic for Pair Recommendation (Strict Mapping)
+            // (5K = 10K; 42K = 10K; 10K = 5K; 21K = 5K)
+            $firstEntry = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->with('ticket.category')->first();
+            $ownedCategoryNames = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->get()->pluck('ticket.category.name')->map(fn($n) => strtoupper($n))->toArray();
             
             $pairTarget = '';
-            $hasSabtu = false;
-            $hasMingguBy10K = false;
-            $hasMingguBy21K = false;
-            
-            foreach($ownedCategories as $oc) {
-                if (str_contains($oc, '5K') || str_contains($oc, '42K')) $hasSabtu = true;
-                if (str_contains($oc, '10K')) $hasMingguBy10K = true;
-                if (str_contains($oc, '21K')) $hasMingguBy21K = true;
+            if ($firstEntry) {
+                $firstCatName = strtoupper($firstEntry->ticket->category->name);
+                if (str_contains($firstCatName, '5K') || str_contains($firstCatName, '42K')) {
+                    $pairTarget = '10K';
+                } elseif (str_contains($firstCatName, '10K') || str_contains($firstCatName, '21K')) {
+                    $pairTarget = '5K';
+                }
             }
 
-            // (5K/42K = Sabtu) recommend 10K (Minggu)
-            // (10K/21K = Minggu) recommend 5K (Sabtu)
-            if ($hasSabtu && !$hasMingguBy10K) {
-                $pairTarget = '10K';
-            } elseif (($hasMingguBy10K || $hasMingguBy21K) && !$hasSabtu) {
-                $pairTarget = '5K';
+            // Don't recommend if they already own the target category
+            if (in_array($pairTarget, $ownedCategoryNames)) {
+                $pairTarget = '';
             }
 
             $pairRecommendation = null;
-            if ($pairTarget) {
+            if ($pairTarget && $firstEntry) {
                 $pairRecommendation = Ticket::whereHas('period', fn($q) => $q->where('is_active', true))
                     ->whereHas('category', fn($q) => $q->where('name', 'LIKE', "%$pairTarget%"))
+                    ->where('type', $firstEntry->ticket->type)
                     ->with(['category', 'period'])
                     ->first();
             }

@@ -108,9 +108,9 @@
                             <table class="w-full text-left">
                                 <thead>
                                     <tr class="bg-slate-50 uppercase tracking-widest text-[9px] font-black text-slate-400 border-b border-slate-100">
-                                        <th class="px-6 py-4">Nama Tiket</th>
+                                        <th class="px-6 py-4">Tipe & Nama</th>
                                         <th class="px-6 py-4 text-center">Harga</th>
-                                        <th class="px-6 py-4 text-center">Diskon (Nominal)</th>
+                                        <th class="px-6 py-4 text-center">Diskon</th>
                                         <th class="px-6 py-4 text-center">Stok</th>
                                         <th class="px-6 py-4 text-center">Terjual</th>
                                         <th class="px-6 py-4 text-right">Aksi</th>
@@ -121,6 +121,7 @@
                                     @forelse ($periodTickets as $ticket)
                                     <tr class="hover:bg-slate-50/30 transition-colors group" x-data="{ 
                                         name: '{{ $ticket->name }}',
+                                        type: '{{ $ticket->type }}',
                                         price: '{{ $ticket->price }}', 
                                         discount: '{{ $ticket->discount ?? 0 }}',
                                         qty: '{{ $ticket->qty }}',
@@ -128,16 +129,23 @@
                                         isSaving: false,
                                         async save() {
                                             this.isSaving = true;
-                                            await updateTicket('{{ $ticket->id }}', { name: this.name, price: this.price, discount: this.discount, qty: this.qty });
+                                            await updateTicket('{{ $ticket->id }}', { name: this.name, type: this.type, price: this.price, discount: this.discount, qty: this.qty });
                                             this.isSaving = false;
                                             this.isDirty = false;
                                         }
                                     }">
                                         <td class="px-6 py-4">
-                                            <div class="inline-flex flex-col w-full">
-                                                <input type="text" x-model="name" @input="isDirty = true" @keyup.enter="save()"
-                                                    class="bg-transparent border-none p-0 text-sm font-bold text-slate-800 uppercase tracking-tight focus:ring-0 w-full mb-0.5">
-                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-[2px] opacity-60 italic">Kategori: {{ $ticket->category->name ?? '-' }}</div>
+                                            <div class="flex flex-col gap-1 w-full max-w-[200px]">
+                                                <div class="flex items-center gap-2">
+                                                    <select x-model="type" @change="isDirty = true"
+                                                        class="bg-blue-50/50 border border-blue-100 rounded-lg px-2 py-1 text-[10px] font-black uppercase text-blue-700 focus:ring-0">
+                                                        <option value="umum">UMUM</option>
+                                                        <option value="ipb">IPB</option>
+                                                    </select>
+                                                    <input type="text" x-model="name" @input="isDirty = true" @keyup.enter="save()" placeholder="Nama opsional..."
+                                                        class="bg-transparent border-none p-0 text-sm font-bold text-slate-800 uppercase tracking-tight focus:ring-0 flex-grow">
+                                                </div>
+                                                <div class="text-[9px] text-slate-400 font-bold uppercase tracking-[2px] opacity-60 italic pl-1">Kategori: {{ $ticket->category->name ?? '-' }}</div>
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 text-center">
@@ -163,10 +171,10 @@
                                         <td class="px-6 py-4 text-center">
                                             <span @class([
                                                 'inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider',
-                                                'bg-emerald-50 text-emerald-600' => $ticket->participants_count > 0,
-                                                'bg-slate-50 text-slate-300' => $ticket->participants_count == 0
+                                                'bg-emerald-50 text-emerald-600' => $ticket->race_entries_count > 0,
+                                                'bg-slate-50 text-slate-300' => $ticket->race_entries_count == 0
                                             ])>
-                                                {{ $ticket->participants_count }}
+                                                {{ $ticket->race_entries_count }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 text-right flex items-center justify-end gap-3">
@@ -198,13 +206,22 @@
 
                         {{-- Quick Add Ticket --}}
                         <div class="mt-4 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                            <form action="{{ route('tickets.store') }}" method="POST" class="flex items-end gap-4">
+                            <form action="{{ route('tickets.store') }}" method="POST" class="flex items-end gap-3 flex-wrap lg:flex-nowrap">
                                 @csrf
                                 <input type="hidden" name="period_id" value="{{ $period->id }}">
                                 
-                                <div class="flex-1">
-                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Nama Tiket</label>
-                                    <input type="text" name="name" required placeholder="Contoh: 5K Regular"
+                                <div class="w-32">
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Tipe</label>
+                                    <select name="type" required
+                                        class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all">
+                                        <option value="umum">UMUM</option>
+                                        <option value="ipb">IPB</option>
+                                    </select>
+                                </div>
+
+                                <div class="flex-grow min-w-[150px]">
+                                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Nama Tiket (Opsional)</label>
+                                    <input type="text" name="name" placeholder="Reguler / Early Bird..."
                                         class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all">
                                 </div>
 
@@ -230,8 +247,8 @@
                                         class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-xs font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all text-center">
                                 </div>
 
-                                <button type="submit" class="px-6 py-2.5 bg-[#003366] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#002244] transition-all shadow-sm shadow-blue-100">
-                                    Tambah Tiket
+                                <button type="submit" class="px-6 h-10 bg-[#003366] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#002244] transition-all shadow-sm shadow-blue-100 whitespace-nowrap">
+                                    Simpan Tiket
                                 </button>
                             </form>
                         </div>
