@@ -107,6 +107,7 @@
                     <p class="text-[10px] font-black text-white/40 uppercase tracking-[4px] mb-4 leading-none">Biaya Pendaftaran</p>
                     <div class="text-3xl font-black text-white leading-none mb-8 tracking-tighter italic">Rp {{ number_format($pairRecommendation->price, 0, ',', '.') }}</div>
                     <a href="{{ route('participant.buy-more', $pairRecommendation->id) }}" 
+                        target="_blank"
                         class="inline-flex items-center justify-center px-10 h-14 bg-white text-[#003366] rounded-2xl font-black text-[11px] uppercase tracking-[3px] hover:bg-orange-500 hover:text-white transition-all shadow-xl active:scale-95">
                         Daftar Kategori Ini
                     </a>

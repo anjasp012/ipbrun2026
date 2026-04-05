@@ -26,7 +26,8 @@ Route::get('/payment/{participant}', function (\App\Models\Participant $particip
 Route::match(['GET', 'POST'], '/payments/midtrans-callback', [PaymentController::class, 'callback'])->name('midtrans.callback');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/participant/buy-more/{ticket}', [EnduserTicket::class, 'buyMore'])->name('participant.buy-more');
+    Route::get('/buy-more/{ticket}', [EnduserTicket::class, 'buyMore'])->name('participant.buy-more');
+    Route::post('/buy-more/{ticket}/process', [EnduserTicket::class, 'buyMoreProcess'])->name('participant.buy-more.process');
 });
 
 // Utilities / Test
