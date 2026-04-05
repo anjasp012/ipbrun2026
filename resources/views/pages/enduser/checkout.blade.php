@@ -106,6 +106,9 @@
                         @error('phone_number')
                             <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
                             </p>
+                        @else
+                            <p class="mt-2 text-[10px] text-[#E8630A] font-bold uppercase tracking-wider leading-tight">
+                                Gunakan nomor WhatsApp aktif untuk mendapatkan notifikasi pendaftaran & pembayaran</p>
                         @enderror
                     </div>
                     <div>

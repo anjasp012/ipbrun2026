@@ -7,6 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ? $title . ' - ' : '' }}{{ config('app.name', 'IPB Run 2026') }}</title>
 
+    <!-- SEO & Branding -->
+    <meta name="description" content="Platform Resmi Pendaftaran IPB RUN 2026. Ikuti event lari bergengsi di Kampus IPB University dengan berbagai kategori seru.">
+    <link rel="icon" type="image/png" href="{{ asset('assets/images/logo_ipbrun2026.png') }}">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
