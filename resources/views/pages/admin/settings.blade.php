@@ -67,6 +67,37 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Registration Schedule -->
+                <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+                    <div class="p-8 border-b border-slate-50 bg-slate-50/30 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-black text-slate-800 uppercase tracking-wider">Registration Schedule</h4>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Control when registration opens</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-8 space-y-6">
+                        <div>
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1.5 ml-1">Ticket Sale Start Date</label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-300 group-focus-within:text-blue-500 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                                <input type="datetime-local" 
+                                       name="ticket_sale_start" 
+                                       value="{{ $settings['ticket_sale_start'] ?? '' }}"
+                                       class="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-300 focus:ring-4 focus:ring-blue-50 transition-all outline-none">
+                            </div>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-tight mt-2 ml-1">Jadwal ini akan muncul sebagai hitung mundur di halaman Coming Soon.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="lg:col-span-1">

@@ -22,8 +22,16 @@ class TicketController extends Controller
 
     public function home()
     {
-        if (Setting::getValue('is_running', '0') !== '1') {
-            return view('pages.enduser.coming-soon');
+        $ticketSaleStart = Setting::getValue('ticket_sale_start');
+        $isRunning = Setting::getValue('is_running', '0') === '1';
+
+        // Auto-running if schedule reached
+        if (!$isRunning && $ticketSaleStart) {
+            $isRunning = now()->greaterThan(\Illuminate\Support\Carbon::parse($ticketSaleStart));
+        }
+
+        if (!$isRunning) {
+            return view('pages.enduser.coming-soon', compact('ticketSaleStart'));
         }
 
         // Fetch tickets only from the active period
@@ -42,7 +50,14 @@ class TicketController extends Controller
 
     public function checkout(Ticket $ticket)
     {
-        if (Setting::getValue('is_running', '0') !== '1') {
+        $ticketSaleStart = Setting::getValue('ticket_sale_start');
+        $isRunning = Setting::getValue('is_running', '0') === '1';
+
+        if (!$isRunning && $ticketSaleStart) {
+            $isRunning = now()->greaterThan(\Illuminate\Support\Carbon::parse($ticketSaleStart));
+        }
+
+        if (!$isRunning) {
             return redirect('/');
         }
 
