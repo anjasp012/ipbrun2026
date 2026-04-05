@@ -107,6 +107,7 @@ class PaymentController extends Controller
 
         // 2. Create or Get User Account
         $randomPassword = Str::random(8);
+        $userExists = User::where('email', $participant->email)->exists();
 
         $user = User::firstOrCreate(
             ['email' => $participant->email],
@@ -121,7 +122,7 @@ class PaymentController extends Controller
         // 3. Link Participant to User
         $participant->update(['user_id' => $user->id]);
         try {
-            Mail::to($participant->email)->send(new ParticipantPaidNotification($participant, $randomPassword, $order));
+            Mail::to($participant->email)->send(new ParticipantPaidNotification($participant, $randomPassword, $order, $userExists));
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Email Sending Failed', [
                 'order_code' => $participant->order_code,

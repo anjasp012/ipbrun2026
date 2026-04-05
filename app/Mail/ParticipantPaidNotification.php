@@ -17,15 +17,17 @@ class ParticipantPaidNotification extends Mailable
     public $participant;
     public $password;
     public $order;
+    public $userExists;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($participant, $password, $order)
+    public function __construct($participant, $password, $order, $userExists = false)
     {
         $this->participant = $participant;
         $this->password = $password;
         $this->order = $order;
+        $this->userExists = $userExists;
     }
 
     /**

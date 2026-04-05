@@ -107,19 +107,20 @@ class AdminController extends Controller
     {
         try {
             $order = \App\Models\Order::where('participant_id', $participant->id)->where('status', 'paid')->latest()->first();
+            $password = \Illuminate\Support\Str::random(8);
+            $orders = \App\Models\Order::where('participant_id', $participant->id)->where('status', 'paid')->latest()->get();
             
-            if (!$order) {
+            if ($orders->isEmpty()) {
                 return back()->with('error', 'No paid orders found for this participant. Cannot resend invoice.');
             }
 
-            $password = \Illuminate\Support\Str::random(8);
             $user = \App\Models\User::where('email', $participant->email)->first();
             if ($user) {
                 $user->update(['password' => \Illuminate\Support\Facades\Hash::make($password)]);
             }
 
-            \Illuminate\Support\Facades\Mail::to($participant->email)->send(new \App\Mail\ParticipantInvoiceResend($participant, $order, $password));
-            return back()->with('success', 'E-Invoice and New Password have been resent to ' . $participant->email);
+            \Illuminate\Support\Facades\Mail::to($participant->email)->send(new \App\Mail\ParticipantInvoiceResend($participant, $orders, $password));
+            return back()->with('success', 'E-Invoices and New Password have been resent to ' . $participant->email);
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to send email: ' . $e->getMessage());
         }

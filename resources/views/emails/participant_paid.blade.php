@@ -24,13 +24,19 @@
             <!-- Main Greeting -->
             <tr>
                 <td style="padding:40px 40px 20px;">
-                    <h1 style="margin:0 0 15px;font-size:26px;color:#1a2b4b;letter-spacing:-0.5px;">Congratulations!
-                        🏃‍♂️</h1>
-                    <p style="margin:0;font-size:16px;line-height:1.6;color:#556677;">
-                        Dear <strong style="color:#1a2b4b;">{{ $participant->name }}</strong>, your registration for:
-                    </p>
+                    @if($userExists ?? false)
+                        <h1 style="margin:0 0 15px;font-size:26px;color:#1a2b4b;letter-spacing:-0.5px;">E-Invoice: New Category 🏃‍♂️</h1>
+                        <p style="margin:0;font-size:16px;line-height:1.6;color:#556677;">
+                            Halo <strong style="color:#1a2b4b;">{{ $participant->name }}</strong>, pesanan kategori tambahan Anda telah berhasil dikonfirmasi. Berikut adalah detail untuk:
+                        </p>
+                    @else
+                        <h1 style="margin:0 0 15px;font-size:26px;color:#1a2b4b;letter-spacing:-0.5px;">Congratulations! 🏃‍♂️</h1>
+                        <p style="margin:0;font-size:16px;line-height:1.6;color:#556677;">
+                            Dear <strong style="color:#1a2b4b;">{{ $participant->name }}</strong>, your registration for:
+                        </p>
+                    @endif
                     <div style="margin-top:15px;">
-                        @foreach($participant->raceEntries as $entry)
+                        @foreach($order->raceEntries as $entry)
                             <div style="background-color:#f0f9f6; padding:12px 20px; border-radius:10px; margin-bottom:8px; border-left:4px solid #00875a;">
                                 <span style="color:#00875a;font-weight:bold;font-size:15px;display:block;">
                                     IPB Run 2026 – {{ $entry->ticket->category->name }}
@@ -61,7 +67,7 @@
                                     Order Code</td>
                                 <td
                                     style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
-                                    #{{ $participant->order_code }}</td>
+                                    #{{ $order->order_code }}</td>
                             </tr>
                             <tr>
                                 <td
@@ -79,51 +85,13 @@
                                     style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
                                     {{ $participant->phone_number }}</td>
                             </tr>
-                            <tr>
-                                <td
-                                    style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
-                                    Address</td>
-                                <td
-                                    style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
-                                    {{ Str::limit($participant->address, 30) }}</td>
-                            </tr>
-                            <tr>
-                                <td
-                                    style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
-                                    T-Shirt Size</td>
-                                <td
-                                    style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
-                                    {{ $participant->jersey_size }}</td>
-                            </tr>
-                            <tr>
-                                <td
-                                    style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
-                                    Nationality</td>
-                                <td
-                                    style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
-                                    {{ $participant->nationality }}</td>
-                            </tr>
-                            <tr>
-                                <td
-                                    style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
-                                    Emergency Contact</td>
-                                <td
-                                    style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
-                                    {{ $participant->emergency_contact_name }}
-                                    ({{ $participant->emergency_contact_phone_number }})</td>
-                            </tr>
-                            <tr>
-                                <td style="padding:10px 0;font-size:13px;color:#778899;">NIK / NIM</td>
-                                <td
-                                    style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;">
-                                    {{ $participant->nik }} / {{ $participant->nim_nrp ?? '-' }}</td>
-                            </tr>
                         </table>
                     </div>
                 </td>
             </tr>
 
             <!-- Dashboard Access Account Box -->
+            @if(!($userExists ?? false))
             <tr>
                 <td style="padding:0 40px 40px;">
                     <div
@@ -154,6 +122,7 @@
                     </div>
                 </td>
             </tr>
+            @endif
 
             <!-- Footer -->
             <tr>

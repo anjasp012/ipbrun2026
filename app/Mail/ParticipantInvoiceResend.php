@@ -15,16 +15,16 @@ class ParticipantInvoiceResend extends Mailable
     use Queueable, SerializesModels;
  
     public $participant;
-    public $order;
+    public $orders;
     public $password;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($participant, $order, $password)
+    public function __construct($participant, $orders, $password)
     {
         $this->participant = $participant;
-        $this->order = $order;
+        $this->orders = $orders;
         $this->password = $password;
     }
  
@@ -45,6 +45,10 @@ class ParticipantInvoiceResend extends Mailable
     {
         return new Content(
             view: 'emails.participant_paid',
+            with: [
+                'userExists' => true, // Simple view for resend
+                'order' => $this->orders->first() // For simple summary in body
+            ]
         );
     }
  
@@ -62,15 +66,22 @@ class ParticipantInvoiceResend extends Mailable
         } else {
             $bgBase64 = '';
         }
- 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('emails.invoice', [
-            'participant' => $this->participant,
-            'order' => $this->order,
-            'bg_base64' => $bgBase64,
-        ])->setPaper('a4', 'portrait');
 
-        return [
-            \Illuminate\Mail\Mailables\Attachment::fromData(fn() => $pdf->output(), 'E-Invoice-IPB-RUN-2026.pdf')
-        ];
+        $attachments = [];
+        
+        foreach ($this->orders as $order) {
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('emails.invoice', [
+                'participant' => $this->participant,
+                'order' => $order,
+                'bg_base64' => $bgBase64,
+            ])->setPaper('a4', 'portrait');
+
+            $attachments[] = \Illuminate\Mail\Mailables\Attachment::fromData(
+                fn() => $pdf->output(), 
+                'Invoice-' . $order->order_code . '.pdf'
+            );
+        }
+
+        return $attachments;
     }
 }
