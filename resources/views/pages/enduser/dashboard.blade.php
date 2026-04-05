@@ -170,7 +170,11 @@
                         
                         <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
                             <div class="max-w-xl text-center md:text-left">
-                                <span class="inline-flex items-center px-4 py-2 bg-orange-500 text-white text-[9px] font-black uppercase tracking-[3px] rounded-full mb-8 shadow-lg shadow-orange-500/20">SPECIAL UPSELL OFFER</span>
+                                @php
+                                    $recName = strtoupper($pairRecommendation->category->name);
+                                    $recDay = (str_contains($recName, '5K') || str_contains($recName, '42K')) ? 'Sabtu' : 'Minggu';
+                                @endphp
+                                <span class="inline-flex items-center px-4 py-2 bg-orange-500 text-white text-[9px] font-black uppercase tracking-[3px] rounded-full mb-8 shadow-lg shadow-orange-500/20">TANTANGAN HARI {{ $recDay }}</span>
                                 <h3 class="text-4xl md:text-5xl font-[900] text-white leading-none uppercase tracking-tighter mb-6">
                                     LENGKAPI PAKET <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-300 italic underline decoration-white/20 underline-offset-8">GANDA KATEGORI</span>
                                 </h3>

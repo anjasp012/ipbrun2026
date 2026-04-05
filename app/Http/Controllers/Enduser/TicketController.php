@@ -295,11 +295,8 @@ class TicketController extends Controller
         $user = auth()->user();
         if (!$user) return redirect('/login');
 
-        // 1. Get personal data from latest successful participant record
-        $latestParticipant = $user->participants()->where('status', 'paid')->latest()->first();
-        if (!$latestParticipant) {
-            $latestParticipant = $user->participants()->latest()->first();
-        }
+        // 1. Get personal data from single participant profile
+        $latestParticipant = $user->participant;
 
         if (!$latestParticipant) {
             return redirect('/')->with('error', 'Data profil Anda belum ditemukan. Silakan daftar manual terlebih dahulu.');
