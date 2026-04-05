@@ -474,11 +474,14 @@
             const isIPB = "{{ $ticket->type }}" === "ipb";
             const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
 
+            const nimInput = document.getElementById('nim_nrp');
             if (isIPB) {
                 document.getElementById('donateSection').classList.remove('hidden');
                 document.getElementById('nimSection').classList.remove('hidden');
+                nimInput.setAttribute('required', 'required');
             } else {
-                document.getElementById('nim_nrp').value = ''; // Clear if hidden
+                nimInput.value = ''; // Clear if hidden
+                nimInput.removeAttribute('required');
             }
 
             function updateTotal() {

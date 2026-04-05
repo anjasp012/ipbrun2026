@@ -148,6 +148,9 @@ class TicketController extends Controller
 
     public function register(Request $request)
     {
+        $ticket = Ticket::findOrFail($request->ticket_id);
+        $nimRule = ($ticket->type === 'ipb') ? 'required|string' : 'nullable|string';
+
         $validated = $request->validate([
             'ticket_id' => 'required',
             'name' => 'required|string|max:255',
@@ -159,7 +162,7 @@ class TicketController extends Controller
             'sex' => 'required|in:male,female',
             'blood_type' => 'required|in:A,B,AB,O,-',
             'jersey_size' => 'required|in:S,M,L,XL,XXL',
-            'nim_nrp' => 'nullable|string',
+            'nim_nrp' => $nimRule,
             'nationality' => 'required',
             'address' => 'required|string',
             'emergency_contact_name' => 'required|string',
@@ -183,11 +186,12 @@ class TicketController extends Controller
             'sex' => 'Jenis Kelamin', 'blood_type' => 'Golongan Darah', 'jersey_size' => 'Ukuran Jersey',
             'address' => 'Alamat Lengkap', 'emergency_contact_name' => 'Nama Kontak Darurat',
             'emergency_contact_phone_number' => 'Nomor HP Darurat', 'emergency_contact_relationship' => 'Hubungan Kontak',
+            'nim_nrp' => 'NIM / NRP',
         ]);
 
-        return \Illuminate\Support\Facades\DB::transaction(function () use ($request, $validated) {
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($request, $validated, $ticket) {
             // 1. Lock the ticket record to prevent race conditions
-            $ticket = Ticket::where('id', $request->ticket_id)->lockForUpdate()->firstOrFail();
+            $ticket->lockForUpdate()->first();
             
             // 2. Check current stock accurately
             // 2. Check current stock accurately
