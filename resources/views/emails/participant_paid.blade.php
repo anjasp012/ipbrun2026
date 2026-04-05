@@ -85,6 +85,32 @@
                                     style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
                                     {{ $participant->phone_number }}</td>
                             </tr>
+                            @if(!($userExists ?? false))
+                            <tr>
+                                <td
+                                    style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
+                                    NIK / NIM</td>
+                                <td
+                                    style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
+                                    {{ $participant->nik }} / {{ $participant->nim_nrp ?? '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
+                                    Jersey Size</td>
+                                <td
+                                    style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
+                                    {{ $participant->jersey_size }}</td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
+                                    Address</td>
+                                <td
+                                    style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
+                                    {{ \Illuminate\Support\Str::limit($participant->address, 50) }}</td>
+                            </tr>
+                            @endif
                         </table>
                     </div>
                 </td>
