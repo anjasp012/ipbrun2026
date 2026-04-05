@@ -36,7 +36,7 @@
                                     IPB Run 2026 – {{ $entry->ticket->category->name }}
                                 </span>
                                 <span style="font-size:11px; color:#778899; text-transform:uppercase; font-weight:bold;">
-                                    Category: {{ $entry->ticket->name }}
+                                    Category: {{ $entry->ticket->name ?: strtoupper($entry->ticket->type) }}
                                 </span>
                             </div>
                         @endforeach

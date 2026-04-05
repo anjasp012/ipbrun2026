@@ -180,34 +180,30 @@
                     <td class="item-total">TOTAL</td>
                 </tr>
                 
-                @foreach($participant->raceEntries->where('status', 'paid') as $entry)
-                @php
-                    $ticketName = strtoupper($entry->ticket->name);
-                    $isIPB = str_contains($ticketName, 'IPB');
-                @endphp
+                @foreach($order->raceEntries as $entry)
                 <tr class="table-row">
                     <td class="item-name">
-                        {{ $entry->ticket->category->name }} ({{ $isIPB ? 'Keluarga besar IPB' : 'Public' }})
+                        {{ $entry->ticket->category->name }} ({{ $entry->ticket->name ?: strtoupper($entry->ticket->type) }})
                     </td>
                     <td class="item-total">
-                        IDR {{ number_format($entry->price, 0, ',', ',') }}
+                        IDR {{ number_format($entry->ticket->price, 0, ',', ',') }}
                     </td>
                 </tr>
-                
-                @if($entry->donation_scholarship > 0)
+                @endforeach
+
+                @if($order->donation_scholarship > 0)
                 <tr class="table-row donation">
                     <td class="item-name">Donation for Scholarship</td>
-                    <td class="item-total">IDR {{ number_format($entry->donation_scholarship, 0, ',', ',') }}</td>
+                    <td class="item-total">IDR {{ number_format($order->donation_scholarship, 0, ',', ',') }}</td>
                 </tr>
                 @endif
                 
-                @if($entry->donation_event > 0)
+                @if($order->donation_event > 0)
                 <tr class="table-row donation">
                     <td class="item-name">Donation for Event</td>
-                    <td class="item-total">IDR {{ number_format($entry->donation_event, 0, ',', ',') }}</td>
+                    <td class="item-total">IDR {{ number_format($order->donation_event, 0, ',', ',') }}</td>
                 </tr>
                 @endif
-                @endforeach
                 
                 <tr class="table-row">
                     <td class="item-name">Transaction Fee</td>
@@ -216,7 +212,7 @@
                 
                 <tr class="table-row total-row">
                     <td>Total Paid</td>
-                    <td class="item-total">IDR {{ number_format($participant->raceEntries->where('status', 'paid')->sum(fn($e) => $e->price + $e->donation_scholarship + $e->donation_event) + 4500, 0, ',', ',') }}</td>
+                    <td class="item-total">IDR {{ number_format($order->total_price, 0, ',', ',') }}</td>
                 </tr>
             </table>
         </div>

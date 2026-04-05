@@ -16,16 +16,16 @@ class ParticipantPaidNotification extends Mailable implements ShouldQueue
 
     public $participant;
     public $password;
-    public $entries;
+    public $order;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($participant, $password, $entries = [])
+    public function __construct($participant, $password, $order)
     {
         $this->participant = $participant;
         $this->password = $password;
-        $this->entries = $entries;
+        $this->order = $order;
     }
 
     /**
@@ -66,6 +66,7 @@ class ParticipantPaidNotification extends Mailable implements ShouldQueue
 
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('emails.invoice', [
             'participant' => $this->participant,
+            'order' => $this->order,
             'bg_base64' => $bgBase64,
         ])->setPaper('a4', 'portrait');
 
