@@ -69,7 +69,7 @@
                                 <div class="text-[9px] font-bold text-slate-400 mt-2 uppercase italic opacity-60">Jersey: {{ $p->jersey_size }}</div>
                             </td>
                             <td class="px-6 py-6 font-bold text-xs text-slate-800">
-                                Rp {{ number_format($p->raceEntries->where('status', 'paid')->sum(fn($se) => $se->order->total_price ?? 0), 0, ',', '.') }}
+                                Rp {{ number_format($p->raceEntries->where('status', 'paid')->pluck('order')->unique('id')->sum('total_price'), 0, ',', '.') }}
                             </td>
                             <td class="px-6 py-6">
                                 @php
