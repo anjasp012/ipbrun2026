@@ -25,35 +25,21 @@ class TestController extends Controller
 
         $email = $request->email;
         
-        // 1. Get sample participant (the latest one)
-        $participant = Participant::latest()->first();
+        // 1. Get sample order (the latest one)
+        $order = \App\Models\Order::with('raceEntries.ticket.category')->latest()->first();
 
-        if (!$participant) {
-            return back()->with('error', 'Belum ada data pendaftar di database. Silakan isi form pendaftaran sekali dulu.');
+        if (!$order) {
+            return back()->with('error', 'Belum ada data pesanan (Order) di database. Silakan isi form pendaftaran sekali dulu.');
         }
+
+        $participant = $order->participant;
 
         // 2. Mock password
         $mockPassword = Str::random(8);
 
-        // 3. Generate PDF
+        // 3. Send Email
         try {
-            $bgPath = public_path('assets/images/bg_invoice.jpg');
-            if (file_exists($bgPath)) {
-                $bgData = base64_encode(file_get_contents($bgPath));
-                $bgBase64 = 'data:image/jpeg;base64,' . $bgData;
-            } else {
-                $bgBase64 = '';
-            }
-
-            $pdf = Pdf::loadView('emails.invoice', [
-                'participant' => $participant,
-                'bg_base64' => $bgBase64,
-            ])->setPaper('a4', 'portrait');
-
-            $pdfOutput = $pdf->output();
-
-            // 4. Send Email
-            Mail::to($email)->send(new ParticipantPaidNotification($participant, $mockPassword, $pdfOutput));
+            Mail::to($email)->send(new ParticipantPaidNotification($participant, $mockPassword, $order));
 
             return back()->with('success', 'Email Test berhasil dikirim ke ' . $email . '. Silakan cek Inbox/Spam.');
 
