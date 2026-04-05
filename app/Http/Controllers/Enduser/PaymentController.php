@@ -74,7 +74,7 @@ class PaymentController extends Controller
                     try {
                         $fonnte = new \App\Services\FonnteService();
                         $statusText = ($transactionStatus == 'expire') ? 'Telah Kadaluarsa' : 'Gagal';
-                        $message = "Halo *{$participant->name}*!\n\nPembayaran untuk kode order *{$participant->order_code}* dinyatakan *{$statusText}*.\n\nJika ini adalah kesalahan, Anda dapat mencoba mendaftar kembali. Terima kasih!";
+                        $message = "Halo *{$participant->name}*!\n\nPembayaran untuk kode order *{$orderCode}* dinyatakan *{$statusText}*.\n\nJika ini adalah kesalahan, Anda dapat mencoba mendaftar kembali. Terima kasih!";
                         $fonnte->sendMessage($participant->phone_number, $message);
                     } catch (\Exception $e) {
                         \Illuminate\Support\Facades\Log::error('Fonnte failure notification failed: ' . $e->getMessage());
@@ -131,10 +131,14 @@ class PaymentController extends Controller
             ]);
         }
 
-        // 5. Send WhatsApp notification for success
+        // 5. Send WhatsApp notification for success/buy-more
         try {
             $fonnte = new \App\Services\FonnteService();
-            $message = "Halo *{$participant->name}*!\n\nPembayaran untuk kode order *{$participant->order_code}* BERHASIL dikonfirmasi. Selamat! Anda telah terdaftar sebagai peserta IPB Run 2026.\n\nDetail akun login Anda:\nEmail: *{$participant->email}*\nPassword: *{$randomPassword}*\n\nSimpan detail ini untuk login ke dashboard peserta. Terima kasih!";
+            if ($userExists) {
+                $message = "Halo *{$participant->name}*!\n\nPembayaran tambahan Anda untuk kode order *{$order->order_code}* BERHASIL dikonfirmasi.\n\nAnda dapat melihat detail tiket baru Anda di dashboard peserta. Terima kasih!";
+            } else {
+                $message = "Halo *{$participant->name}*!\n\nPembayaran untuk kode order *{$order->order_code}* BERHASIL dikonfirmasi. Selamat! Anda telah terdaftar sebagai peserta IPB Run 2026.\n\nDetail akun login Anda:\nEmail: *{$participant->email}*\nPassword: *{$randomPassword}*\n\nSimpan detail ini untuk login ke dashboard peserta. Terima kasih!";
+            }
             $fonnte->sendMessage($participant->phone_number, $message);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Fonnte success notification failed: ' . $e->getMessage());
