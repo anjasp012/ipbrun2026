@@ -273,19 +273,42 @@
                 </div>
 
                 <!-- Other Race Interest Section -->
-                <div class="mt-10">
-                    <x-label for="other_race_interest">Ingin mengikuti kategori race lainnya? (Optional)</x-label>
-                    <x-select id="other_race_interest" name="other_race_interest" :options="[
-                        '' => 'Hanya satu kategori saja',
-                        '5K vs 10K (Sabtu-Minggu)' => '5K (Sabtu) & 10K (Minggu)',
-                        '42K vs 10K (Sabtu-Minggu)' => '42K (Sabtu) & 10K (Minggu)',
-                        '10K vs 5K (Minggu-Sabtu)' => '10K (Minggu) & 5K (Sabtu)',
-                        '21K vs 5K (Minggu-Sabtu)' => '21K (Minggu) & 5K (Sabtu)',
-                    ]"
-                        :selected="old('other_race_interest')" />
-                    <p class="mt-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-tight">
-                        Pilih jika Anda tertarik mengikuti kategori tambahan di hari yang berbeda.</p>
-                </div>
+                @php
+                    $categoryName = strtoupper($ticket->category->name ?? '');
+                    $pairCategory = '';
+                    if (str_contains($categoryName, '5K') || str_contains($categoryName, '42K')) {
+                        $pairCategory = '10K (Minggu)';
+                    } elseif (str_contains($categoryName, '10K') || str_contains($categoryName, '21K')) {
+                        $pairCategory = '5K (Sabtu)';
+                    }
+                @endphp
+
+                @if ($pairCategory)
+                    <div class="mt-12 bg-orange-50/50 border border-orange-100 p-8 rounded-[2.5rem]">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div class="space-y-1">
+                                <h4 class="text-[13px] font-black text-[#003366] uppercase tracking-wider italic">GANDA KATEGORI?</h4>
+                                <p class="text-[11px] font-bold text-[#E8630A]/80 uppercase tracking-widest leading-loose">
+                                    APAKAH ANDA INGIN MENGIKUTI KATEGORI <span class="text-[#E8630A] underline underline-offset-4 decoration-2">{{ $pairCategory }}</span> JUGA?
+                                </p>
+                            </div>
+                            
+                            <label class="relative inline-flex items-center cursor-pointer group">
+                                <input type="checkbox" name="other_race_interest" value="{{ $pairCategory }}" class="sr-only peer" {{ old('other_race_interest') ? 'checked' : '' }}>
+                                <div class="w-20 h-10 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-10 after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-8 after:w-8 after:transition-all peer-checked:bg-[#FF7A21] shadow-inner ring-4 ring-slate-100 peer-checked:ring-orange-100"></div>
+                                <span class="ml-4 text-xs font-black text-slate-400 peer-checked:text-[#FF7A21] uppercase tracking-widest transition-colors">
+                                    <span class="group-peer-checked:hidden">TIDAK</span>
+                                    <span class="hidden group-peer-checked:inline">YA, IKUT!</span>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="mt-6 pt-6 border-t border-orange-100/50">
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed italic">
+                                * Pilihan ini bersifat opsional. Jika dipilih, data Anda akan tercatat sebagai peminat kategori {{ $pairCategory }}.
+                            </p>
+                        </div>
+                    </div>
+                @endif
 
                 <!-- Donation Section -->
                 <div id="donateSection" class="hidden mt-10">
