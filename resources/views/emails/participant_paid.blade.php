@@ -36,15 +36,16 @@
                         </p>
                     @endif
                     <div style="margin-top:15px;">
-                        @foreach($order->raceEntries as $entry)
-                            <div style="background-color:#f0f9f6; padding:12px 20px; border-radius:10px; margin-bottom:8px; border-left:4px solid #00875a;">
-                                <span style="color:#00875a;font-weight:bold;font-size:15px;display:block;">
-                                    IPB Run 2026 – {{ $entry->ticket->category->name }}
-                                </span>
-                                <span style="font-size:11px; color:#778899; text-transform:uppercase; font-weight:bold;">
-                                    Category: {{ $entry->ticket->name ?: strtoupper($entry->ticket->type) }}
-                                </span>
-                            </div>
+                        @foreach($orders ?? ([($order ?? null)] ?: []) as $o)
+                            @if($o)
+                                @foreach($o->raceEntries as $entry)
+                                    <div style="background-color:#f0f9f6; padding:12px 20px; border-radius:10px; margin-bottom:8px; border-left:4px solid #00875a;">
+                                        <span style="color:#00875a;font-weight:bold;font-size:15px;display:block;">
+                                            IPB Run 2026 – {{ $entry->ticket->category->name }} {{ $entry->ticket->name ?: strtoupper($entry->ticket->type) }}
+                                        </span>
+                                    </div>
+                                @endforeach
+                            @endif
                         @endforeach
                     </div>
                     <p style="margin:15px 0 0;font-size:16px;line-height:1.6;color:#556677;">

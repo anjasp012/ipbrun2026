@@ -47,6 +47,11 @@ class ParticipantPaidNotification extends Mailable
     {
         return new Content(
             view: 'emails.participant_paid',
+            with: [
+                'orders' => collect([$this->order]),
+                'order' => $this->order, // Keep for table summary
+                'userExists' => $this->userExists,
+            ]
         );
     }
 
