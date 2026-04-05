@@ -368,7 +368,7 @@
                     <div class="p-8 pt-4 bg-slate-50/40 space-y-4">
                         <div class="space-y-3">
                             <div class="flex justify-between items-center text-sm">
-                                <span class="text-slate-500 font-medium italic">Tiket {{ $ticket->name }}</span>
+                                <span class="text-slate-500 font-medium italic">Tiket {{ $ticket->category->name }} ({{ $ticket->name }})</span>
                                 <span class="text-[#003366] font-bold">Rp
                                     {{ number_format($ticket->price, 0, ',', '.') }}</span>
                             </div>
@@ -455,6 +455,8 @@
                 disableMobile: "true"
             });
 
+            const ticketPrice = {{ $ticket->price }};
+            const adminFee = 4500;
             const ticketName = "{{ $ticket->name }}";
             const isIPB = ticketName.toUpperCase().includes("IPB");
             const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
@@ -575,4 +577,4 @@
             });
         }
     </script>
-    </x-app>
+</x-layouts.app>
