@@ -13,11 +13,11 @@ use App\Http\Controllers\Enduser\TestController;
 Route::get('/', [EnduserTicket::class, 'home']);
 Route::get('/checkout/{ticket}', [EnduserTicket::class, 'checkout'])->name('checkout');
 Route::post('/register', [EnduserTicket::class, 'register'])->name('register');
+Route::get('/payment/finish', [PaymentController::class, 'finish'])->name('payment.finish');
 Route::get('/payment/{participant}', function (\App\Models\Participant $participant) {
     return view('pages.enduser.payment', compact('participant'));
 })->name('payment.show');
 Route::match(['GET', 'POST'], '/payments/midtrans-callback', [PaymentController::class, 'callback'])->name('midtrans.callback');
-Route::get('/payment/finish', [PaymentController::class, 'finish'])->name('payment.finish');
 
 // Utilities / Test
 Route::get('/test-email', [TestController::class, 'emailForm']);
