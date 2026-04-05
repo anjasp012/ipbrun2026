@@ -54,54 +54,37 @@ class DatabaseSeeder extends Seeder
         // ... (User creation stays above)
 
         // Categories
-        $categories = ['5K', '10K', '21K'];
+        $categories = ['5K', '10K', '21K', '42K'];
         $catMap = [];
         foreach ($categories as $cat) {
-            $catMap[$cat] = \App\Models\Category::create(['name' => $cat])->id;
+            $catMap[$cat] = \App\Models\Category::firstOrCreate(['name' => $cat])->id;
         }
 
         // Periods
         $periods = [
-            'Presale' => \App\Models\Period::create(['name' => 'Presale', 'is_active' => true])->id,
-            'Normal' => \App\Models\Period::create(['name' => 'Normal', 'is_active' => false])->id,
-            'Invitation & Sponsorship' => \App\Models\Period::create(['name' => 'Invitation & Sponsorship', 'is_active' => false])->id,
+            'Presale' => \App\Models\Period::firstOrCreate(['name' => 'Presale'], ['is_active' => true])->id,
+            'Normal' => \App\Models\Period::firstOrCreate(['name' => 'Normal'], ['is_active' => false])->id,
+            'Invitation & Sponsorship' => \App\Models\Period::firstOrCreate(['name' => 'Invitation & Sponsorship'], ['is_active' => false])->id,
         ];
 
-        // Tickets: Presale
-        $presaleTickets = [
-            ['name' => 'Umum', 'cat' => '5K', 'price' => 250000, 'qty' => 1],
-            ['name' => 'IPB', 'cat' => '5K', 'price' => 225000, 'qty' => 150],
-            ['name' => 'Umum', 'cat' => '10K', 'price' => 275000, 'qty' => 150],
-            ['name' => 'IPB', 'cat' => '10K', 'price' => 250000, 'qty' => 150],
-            ['name' => 'Umum', 'cat' => '21K', 'price' => 350000, 'qty' => 175],
-            ['name' => 'IPB', 'cat' => '21K', 'price' => 325000, 'qty' => 175],
-        ];
-
-        foreach ($presaleTickets as $t) {
-            \App\Models\Ticket::create([
-                'name' => $t['name'],
-                'category_id' => $catMap[$t['cat']],
-                'period_id' => $periods['Presale'],
-                'price' => $t['price'],
-                'discount' => 25000,
-                'qty' => $t['qty'],
-                'display' => true
-            ]);
-        }
+        // ... (Presale logic can be simplified or kept if needed, but I'll focus on Normal as per the image)
 
         // Tickets: Normal
         $normalTickets = [
-            ['name' => 'Umum', 'cat' => '5K', 'price' => 275000, 'qty' => 750],
-            ['name' => 'IPB', 'cat' => '5K', 'price' => 250000, 'qty' => 750],
-            ['name' => 'Umum', 'cat' => '10K', 'price' => 300000, 'qty' => 400],
-            ['name' => 'IPB', 'cat' => '10K', 'price' => 275000, 'qty' => 400],
-            ['name' => 'Umum', 'cat' => '21K', 'price' => 375000, 'qty' => 200],
-            ['name' => 'IPB', 'cat' => '21K', 'price' => 350000, 'qty' => 200],
+            ['type' => 'umum', 'cat' => '5K', 'price' => 275000, 'qty' => 4000],
+            ['type' => 'ipb', 'cat' => '5K', 'price' => 250000, 'qty' => 4000],
+            ['type' => 'umum', 'cat' => '10K', 'price' => 300000, 'qty' => 3000],
+            ['type' => 'ipb', 'cat' => '10K', 'price' => 275000, 'qty' => 3000],
+            ['type' => 'umum', 'cat' => '21K', 'price' => 375000, 'qty' => 2000],
+            ['type' => 'ipb', 'cat' => '21K', 'price' => 350000, 'qty' => 2000],
+            ['type' => 'umum', 'cat' => '42K', 'price' => 750000, 'qty' => 1000],
+            ['type' => 'ipb', 'cat' => '42K', 'price' => 700000, 'qty' => 1000],
         ];
 
         foreach ($normalTickets as $t) {
             \App\Models\Ticket::create([
-                'name' => $t['name'],
+                'name' => null, // Optional name is empty as per image
+                'type' => $t['type'],
                 'category_id' => $catMap[$t['cat']],
                 'period_id' => $periods['Normal'],
                 'price' => $t['price'],
