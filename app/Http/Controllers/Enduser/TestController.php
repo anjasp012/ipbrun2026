@@ -20,16 +20,24 @@ class TestController extends Controller
     public function sendEmail(Request $request)
     {
         $request->validate([
-            'email' => 'required|email'
+            'email' => 'required|email',
+            'order_code' => 'nullable|string'
         ]);
 
         $email = $request->email;
+        $orderCode = $request->order_code;
         
-        // 1. Get sample order (the latest one)
-        $order = \App\Models\Order::with('raceEntries.ticket.category')->latest()->first();
+        // 1. Get sample order
+        $query = \App\Models\Order::with('raceEntries.ticket.category');
+        
+        if ($orderCode) {
+            $order = $query->where('order_code', 'LIKE', "%{$orderCode}%")->first();
+        } else {
+            $order = $query->latest()->first();
+        }
 
         if (!$order) {
-            return back()->with('error', 'Belum ada data pesanan (Order) di database. Silakan isi form pendaftaran sekali dulu.');
+            return back()->with('error', 'Pesanan tidak ditemukan. Periksa kode order atau buat pendaftaran baru.');
         }
 
         $participant = $order->participant;

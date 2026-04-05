@@ -26,12 +26,17 @@
             <form action="{{ url('/test-email') }}" method="POST" class="space-y-6">
                 @csrf
                 <div>
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-[2px] mb-3">Email Tujuan</label>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-[2px] mb-3">Kode Order (Opsional)</label>
+                    <x-input name="order_code" placeholder="Misal: IPB2026xxxx" value="{{ old('order_code') }}" />
+                </div>
+
+                <div>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-[2px] mb-3">Kirim ke Email (Tujuan)</label>
                     <x-input type="email" name="email" placeholder="nama@email.com" required value="{{ old('email') }}" />
                 </div>
 
                 <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 italic text-[11px] text-slate-500">
-                    Sistem akan mengambil satu data pendaftar terakhir dari database untuk dijadikan contoh (mock data) di dalam invoice.
+                    Sistem akan mencari Order Code di atas. Jika dikosongkan, akan mengambil data pendaftar terakhir dari database sebagai mock data.
                 </div>
 
                 <x-button type="submit" class="w-full h-14 rounded-2xl">
