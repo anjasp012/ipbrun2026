@@ -231,17 +231,6 @@
                         ]" :selected="old('shuttle_bus')" />
                     </div>
 
-                    <div>
-                        <x-label for="other_race_interest">Ingin mengikuti kategori race lainnya? (Optional)</x-label>
-                        <x-select id="other_race_interest" name="other_race_interest" :options="[
-                            '' => 'Hanya satu kategori saja',
-                            '5K vs 10K (Sabtu-Minggu)' => '5K (Sabtu) & 10K (Minggu)',
-                            '42K vs 10K (Sabtu-Minggu)' => '42K (Sabtu) & 10K (Minggu)',
-                            '10K vs 5K (Minggu-Sabtu)' => '10K (Minggu) & 5K (Sabtu)',
-                            '21K vs 5K (Minggu-Sabtu)' => '21K (Minggu) & 5K (Sabtu)',
-                        ]"
-                            :selected="old('other_race_interest')" />
-                    </div>
 
                     <div class="md:col-span-2 mt-4">
                         <h3
@@ -281,6 +270,21 @@
                                 {{ $message }}</p>
                         @enderror
                     </div>
+                </div>
+
+                <!-- Other Race Interest Section -->
+                <div class="mt-10">
+                    <x-label for="other_race_interest">Ingin mengikuti kategori race lainnya? (Optional)</x-label>
+                    <x-select id="other_race_interest" name="other_race_interest" :options="[
+                        '' => 'Hanya satu kategori saja',
+                        '5K vs 10K (Sabtu-Minggu)' => '5K (Sabtu) & 10K (Minggu)',
+                        '42K vs 10K (Sabtu-Minggu)' => '42K (Sabtu) & 10K (Minggu)',
+                        '10K vs 5K (Minggu-Sabtu)' => '10K (Minggu) & 5K (Sabtu)',
+                        '21K vs 5K (Minggu-Sabtu)' => '21K (Minggu) & 5K (Sabtu)',
+                    ]"
+                        :selected="old('other_race_interest')" />
+                    <p class="mt-2 text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-tight">
+                        Pilih jika Anda tertarik mengikuti kategori tambahan di hari yang berbeda.</p>
                 </div>
 
                 <!-- Donation Section -->
