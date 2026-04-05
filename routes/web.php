@@ -54,6 +54,10 @@ Route::prefix('admin')->group(function () {
 
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('admin.settings');
     Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update');
+
+    Route::get('/blast', [\App\Http\Controllers\Admin\BlastController::class, 'index'])->name('admin.blast');
+    Route::post('/blast/email', [\App\Http\Controllers\Admin\BlastController::class, 'blastEmail'])->name('admin.blast.email');
+    Route::post('/blast/whatsapp', [\App\Http\Controllers\Admin\BlastController::class, 'blastWhatsapp'])->name('admin.blast.whatsapp');
 });
 
 Route::get('/test-tailwind', function () {
