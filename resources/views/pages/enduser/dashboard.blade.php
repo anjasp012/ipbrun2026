@@ -127,12 +127,19 @@
                              <!-- Footer Details Area -->
                              <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100/50 flex items-center justify-between group-hover:bg-blue-50/50 transition-colors">
                                 @if($entry->status === 'paid')
-                                    <div class="flex-grow">
-                                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">BIB Number Assigned</p>
-                                        <span class="text-3xl font-black text-blue-600 tracking-[5px] font-mono select-all">{{ $entry->bib_number ?: 'TBA' }}</span>
-                                    </div>
-                                    <div class="w-12 h-12 bg-white rounded-2xl border border-slate-100 flex items-center justify-center text-blue-600 shadow-sm">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                                    <div class="flex items-center justify-between p-4 bg-blue-600 rounded-2xl text-white w-full">
+                                        <div>
+                                            <p class="text-[8px] font-bold text-white/60 uppercase tracking-widest mb-0.5">BIB Number Assigned</p>
+                                            <span class="text-3xl font-black text-white tracking-[5px] font-mono select-all">{{ $entry->bib_number ?: 'TBA' }}</span>
+                                        </div>
+                                        <div class="text-right">
+                                             @php
+                                                 $catName = strtoupper($entry->ticket->category->name);
+                                                 $day = (str_contains($catName, '5K') || str_contains($catName, '42K')) ? 'Sabtu' : 'Minggu';
+                                             @endphp
+                                             <p class="text-[8px] font-bold text-white/60 uppercase tracking-widest mb-0.5">Race Day</p>
+                                             <span class="text-xs font-black uppercase">{{ $day }}</span>
+                                        </div>
                                     </div>
                                 @else
                                     <div class="flex-grow">

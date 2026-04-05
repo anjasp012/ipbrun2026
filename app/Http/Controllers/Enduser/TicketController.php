@@ -48,16 +48,23 @@ class TicketController extends Controller
             $ownedCategories = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->get()->pluck('ticket.category.name')->map(fn($n) => strtoupper($n))->toArray();
             
             $pairTarget = '';
-            $has5K = false;
-            $has10K = false;
+            $hasSabtu = false;
+            $hasMingguBy10K = false;
+            $hasMingguBy21K = false;
             
             foreach($ownedCategories as $oc) {
-                if (str_contains($oc, '5K')) $has5K = true;
-                if (str_contains($oc, '10K')) $has10K = true;
+                if (str_contains($oc, '5K') || str_contains($oc, '42K')) $hasSabtu = true;
+                if (str_contains($oc, '10K')) $hasMingguBy10K = true;
+                if (str_contains($oc, '21K')) $hasMingguBy21K = true;
             }
 
-            if ($has5K && !$has10K) $pairTarget = '10K';
-            elseif ($has10K && !$has5K) $pairTarget = '5K';
+            // (5K/42K = Sabtu) recommend 10K (Minggu)
+            // (10K/21K = Minggu) recommend 5K (Sabtu)
+            if ($hasSabtu && !$hasMingguBy10K) {
+                $pairTarget = '10K';
+            } elseif (($hasMingguBy10K || $hasMingguBy21K) && !$hasSabtu) {
+                $pairTarget = '5K';
+            }
 
             $pairRecommendation = null;
             if ($pairTarget) {
