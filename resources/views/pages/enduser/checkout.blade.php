@@ -11,7 +11,7 @@
 
             <div class="mb-10 text-center">
                 <h1 class="text-3xl font-[800] text-[#003366] uppercase tracking-tight">Formulir Data Pelari</h1>
-                
+
                 <!-- Ticket Card Head (Top Part of Index Card Style) -->
                 <div class="mt-10 relative bg-white border border-slate-100 rounded-t-2xl overflow-hidden">
                     <div class="p-6 text-center">
@@ -50,10 +50,13 @@
                 <input type="hidden" name="ticket_id" value="{{ $ticket->id }}">
 
                 <!-- General Error Alert (Duplicate, etc) -->
-                @if($errors->has('duplicate') || $errors->has('midtrans'))
+                @if ($errors->has('duplicate') || $errors->has('midtrans'))
                     <div class="mb-8 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl">
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
                             <p class="text-xs font-bold text-red-700 uppercase tracking-tight">
                                 {{ $errors->first('duplicate') ?: $errors->first('midtrans') }}
                             </p>
@@ -65,90 +68,155 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
                         <x-label for="name">Nama Lengkap (Sesuai KTP) *</x-label>
-                        <x-input id="name" name="name" placeholder="Ketik nama lengkap Anda" required value="{{ old('name') }}" class="{{ $errors->has('name') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
-                        @error('name')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                        <x-input id="name" name="name" placeholder="Ketik nama lengkap Anda" required
+                            value="{{ old('name') }}"
+                            class="{{ $errors->has('name') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('name')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                            </p>
+                        @enderror
                     </div>
                     <div>
                         <x-label for="email">Alamat Email *</x-label>
-                        <x-input type="email" id="email" name="email" placeholder="nama@email.com" required value="{{ old('email') }}" class="{{ $errors->has('email') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
-                        @error('email')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@else<p class="mt-2 text-[10px] text-[#E8630A] font-bold uppercase tracking-wider leading-tight">Gunakan email asli untuk mendapatkan notifikasi invoice</p>@enderror
+                        <x-input type="email" id="email" name="email" placeholder="nama@email.com" required
+                            value="{{ old('email') }}"
+                            class="{{ $errors->has('email') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('email')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                        </p>@else<p
+                                class="mt-2 text-[10px] text-[#E8630A] font-bold uppercase tracking-wider leading-tight">
+                                Gunakan email asli untuk mendapatkan notifikasi invoice</p>
+                        @enderror
                     </div>
                     <div>
                         <x-label for="email_confirmation">Konfirmasi Alamat Email *</x-label>
-                        <x-input type="email" id="email_confirmation" name="email_confirmation" placeholder="Ketik ulang email Anda" required value="{{ old('email_confirmation') }}" class="{{ $errors->has('email_confirmation') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
-                        @error('email_confirmation')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                        <x-input type="email" id="email_confirmation" name="email_confirmation"
+                            placeholder="Ketik ulang email Anda" required value="{{ old('email_confirmation') }}"
+                            class="{{ $errors->has('email_confirmation') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('email_confirmation')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                            </p>
+                        @enderror
                     </div>
                     <div>
                         <x-label for="phone_number">Nomor WhatsApp *</x-label>
                         <x-input id="phone_number" name="phone_number" placeholder="08xxxxxxxxx" required
-                            :numeric="true" maxlength="14" value="{{ old('phone_number') }}" class="{{ $errors->has('phone_number') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
-                        @error('phone_number')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                            :numeric="true" maxlength="14" value="{{ old('phone_number') }}"
+                            class="{{ $errors->has('phone_number') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('phone_number')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                            </p>
+                        @enderror
                     </div>
                     <div>
                         <x-label for="nik">NIK KTP *</x-label>
                         <x-input id="nik" name="nik" placeholder="16 digit NIK" required :numeric="true"
-                            maxlength="16" value="{{ old('nik') }}" class="{{ $errors->has('nik') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
-                        @error('nik')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                            maxlength="16" value="{{ old('nik') }}"
+                            class="{{ $errors->has('nik') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('nik')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                            </p>
+                        @enderror
                     </div>
                     <div>
                         <x-label for="date_birth">Tanggal Lahir *</x-label>
-                        <x-input id="date_birth" name="date_birth" class="datepicker bg-white {{ $errors->has('date_birth') ? '!border-red-500 ring-4 ring-red-50' : '' }}" placeholder="DD-MM-YYYY"
-                            readonly required value="{{ old('date_birth') }}" />
-                        @error('date_birth')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                        <x-input id="date_birth" name="date_birth"
+                            class="datepicker bg-white {{ $errors->has('date_birth') ? '!border-red-500 ring-4 ring-red-50' : '' }}"
+                            placeholder="DD-MM-YYYY" readonly required value="{{ old('date_birth') }}" />
+                        @error('date_birth')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                            </p>
+                        @enderror
                     </div>
                     <div>
                         <x-label for="sex">Jenis Kelamin *</x-label>
-                        <x-select id="sex" name="sex" required :options="['male' => 'Laki-laki', 'female' => 'Perempuan']" :selected="old('sex')" class="{{ $errors->has('sex') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
-                        @error('sex')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                        <x-select id="sex" name="sex" required :options="['male' => 'Laki-laki', 'female' => 'Perempuan']" :selected="old('sex')"
+                            class="{{ $errors->has('sex') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('sex')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                            </p>
+                        @enderror
                     </div>
                     <div>
                         <x-label for="blood_type">Golongan Darah *</x-label>
-                        <x-select id="blood_type" name="blood_type" required :options="['A' => 'A', 'B' => 'B', 'AB' => 'AB', 'O' => 'O', '-' => 'N/A']" :selected="old('blood_type')" class="{{ $errors->has('blood_type') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
-                        @error('blood_type')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                        <x-select id="blood_type" name="blood_type" required :options="['A' => 'A', 'B' => 'B', 'AB' => 'AB', 'O' => 'O', '-' => 'N/A']" :selected="old('blood_type')"
+                            class="{{ $errors->has('blood_type') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('blood_type')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                            </p>
+                        @enderror
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <x-label for="jersey_size" class="!mb-0">Ukuran Jersey *</x-label>
-                            <button type="button" onclick="showSizeChart()" class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-1">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <button type="button" onclick="showSizeChart()"
+                                class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
                                 Size Chart
                             </button>
                         </div>
-                        <x-select id="jersey_size" name="jersey_size" required :options="['S' => 'S', 'M' => 'M', 'L' => 'L', 'XL' => 'XL', 'XXL' => 'XXL']" :selected="old('jersey_size')" class="{{ $errors->has('jersey_size') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
-                        @error('jersey_size')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                        <x-select id="jersey_size" name="jersey_size" required :options="['S' => 'S', 'M' => 'M', 'L' => 'L', 'XL' => 'XL', 'XXL' => 'XXL']" :selected="old('jersey_size')"
+                            class="{{ $errors->has('jersey_size') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('jersey_size')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
+                                {{ $message }}</p>
+                        @enderror
                     </div>
                     <div id="nimSection" class="hidden">
                         <x-label for="nim_nrp">NIM/NRP (Optional)</x-label>
-                        <x-input id="nim_nrp" name="nim_nrp" placeholder="Khusus Mahasiswa/Alumni IPB" value="{{ old('nim_nrp') }}" class="{{ $errors->has('nim_nrp') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
-                        @error('nim_nrp')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                        <x-input id="nim_nrp" name="nim_nrp" placeholder="Khusus Mahasiswa/Alumni IPB"
+                            value="{{ old('nim_nrp') }}"
+                            class="{{ $errors->has('nim_nrp') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('nim_nrp')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
+                                {{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
                         <x-label for="nationality">Kewarganegaraan</x-label>
-                        <x-input id="nationality" name="nationality" value="{{ old('nationality', 'WNI') }}" required class="{{ $errors->has('nationality') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
-                        @error('nationality')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                        <x-input id="nationality" name="nationality" value="{{ old('nationality', 'WNI') }}"
+                            required
+                            class="{{ $errors->has('nationality') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('nationality')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
+                                {{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="md:col-span-2">
                         <x-label for="address">Alamat Lengkap *</x-label>
                         <x-textarea id="address" name="address" rows="2"
-                            placeholder="Alamat pengiriman/domisili" required class="{{ $errors->has('address') ? '!border-red-500 ring-4 ring-red-50' : '' }}">{{ old('address') }}</x-textarea>
-                        @error('address')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                            placeholder="Alamat pengiriman/domisili" required
+                            class="{{ $errors->has('address') ? '!border-red-500 ring-4 ring-red-50' : '' }}">{{ old('address') }}</x-textarea>
+                        @error('address')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
+                                {{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="md:col-span-2 mt-4">
-                        <h3 class="text-sm font-black text-[#003366] uppercase tracking-[2px] mb-6 pb-2 border-b border-slate-100">Optional Running Data</h3>
+                        <h3
+                            class="text-sm font-black text-[#003366] uppercase tracking-[2px] pb-2 border-b border-slate-100">
+                            Optional Running Data</h3>
                     </div>
 
                     <div>
                         <x-label for="running_community">Dari komunitas lari apa? (Optional)</x-label>
-                        <x-input id="running_community" name="running_community" placeholder="Nama komunitas (jika ada)" value="{{ old('running_community') }}" />
+                        <x-input id="running_community" name="running_community"
+                            placeholder="Nama komunitas (jika ada)" value="{{ old('running_community') }}" />
                     </div>
                     <div>
                         <x-label for="best_time">Best time yang pernah didapat? (Optional)</x-label>
-                        <x-input id="best_time" name="best_time" placeholder="Contoh: 55:20 (10K)" value="{{ old('best_time') }}" />
+                        <x-input id="best_time" name="best_time" placeholder="Contoh: 55:20 (10K)"
+                            value="{{ old('best_time') }}" />
                     </div>
                     <div class="md:col-span-2">
-                        <x-label for="previous_events">Pernah mengikuti event lari dan kategori apa saja? (Optional)</x-label>
-                        <x-textarea id="previous_events" name="previous_events" rows="2" placeholder="Sebutkan event yang pernah diikuti sebelumnya" >{{ old('previous_events') }}</x-textarea>
+                        <x-label for="previous_events">Pernah mengikuti event lari dan kategori apa saja?
+                            (Optional)</x-label>
+                        <x-textarea id="previous_events" name="previous_events" rows="2"
+                            placeholder="Sebutkan event yang pernah diikuti sebelumnya">{{ old('previous_events') }}</x-textarea>
                     </div>
 
                     <div>
@@ -156,7 +224,7 @@
                         <x-select id="shuttle_bus" name="shuttle_bus" :options="[
                             '' => 'Tidak Menggunakan',
                             'Terminal Barangsiang' => 'Terminal Barangsiang',
-                            'Terminal Bubulak' => 'Terminal Bubulak'
+                            'Terminal Bubulak' => 'Terminal Bubulak',
                         ]" :selected="old('shuttle_bus')" />
                     </div>
 
@@ -167,31 +235,48 @@
                             '5K vs 10K (Sabtu-Minggu)' => '5K (Sabtu) & 10K (Minggu)',
                             '42K vs 10K (Sabtu-Minggu)' => '42K (Sabtu) & 10K (Minggu)',
                             '10K vs 5K (Minggu-Sabtu)' => '10K (Minggu) & 5K (Sabtu)',
-                            '21K vs 5K (Minggu-Sabtu)' => '21K (Minggu) & 5K (Sabtu)'
-                        ]" :selected="old('other_race_interest')" />
+                            '21K vs 5K (Minggu-Sabtu)' => '21K (Minggu) & 5K (Sabtu)',
+                        ]"
+                            :selected="old('other_race_interest')" />
                     </div>
 
                     <div class="md:col-span-2 mt-4">
-                        <h3 class="text-sm font-black text-[#003366] uppercase tracking-[2px] mb-6 pb-2 border-b border-slate-100">Emergency Contact</h3>
+                        <h3
+                            class="text-sm font-black text-[#003366] uppercase tracking-[2px] pb-2 border-b border-slate-100">
+                            Emergency Contact</h3>
                     </div>
 
                     <div>
                         <x-label for="emergency_contact_name">Kontak Darurat *</x-label>
                         <x-input id="emergency_contact_name" name="emergency_contact_name"
-                            placeholder="Nama keluarga/kerabat" required value="{{ old('emergency_contact_name') }}" class="{{ $errors->has('emergency_contact_name') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
-                        @error('emergency_contact_name')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                            placeholder="Nama keluarga/kerabat" required value="{{ old('emergency_contact_name') }}"
+                            class="{{ $errors->has('emergency_contact_name') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('emergency_contact_name')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
+                                {{ $message }}</p>
+                        @enderror
                     </div>
                     <div>
                         <x-label for="emergency_contact_phone_number">HP Darurat *</x-label>
                         <x-input id="emergency_contact_phone_number" name="emergency_contact_phone_number"
-                            placeholder="08xxxxxxxxx" required :numeric="true" value="{{ old('emergency_contact_phone_number') }}" class="{{ $errors->has('emergency_contact_phone_number') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
-                        @error('emergency_contact_phone_number')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                            placeholder="08xxxxxxxxx" required :numeric="true"
+                            value="{{ old('emergency_contact_phone_number') }}"
+                            class="{{ $errors->has('emergency_contact_phone_number') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('emergency_contact_phone_number')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
+                                {{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="md:col-span-2">
                         <x-label for="emergency_contact_relationship">Hubungan Kontak *</x-label>
                         <x-input id="emergency_contact_relationship" name="emergency_contact_relationship"
-                            placeholder="Misal: Orang Tua, Pasangan" required value="{{ old('emergency_contact_relationship') }}" class="{{ $errors->has('emergency_contact_relationship') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
-                        @error('emergency_contact_relationship')<p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>@enderror
+                            placeholder="Misal: Orang Tua, Pasangan" required
+                            value="{{ old('emergency_contact_relationship') }}"
+                            class="{{ $errors->has('emergency_contact_relationship') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('emergency_contact_relationship')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
+                                {{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
@@ -209,7 +294,8 @@
                                 '100000' => 'Rp 100.000',
                                 '250000' => 'Rp 250.000',
                                 '500000' => 'Rp 500.000',
-                            ]" :selected="old('donation_event')" />
+                            ]"
+                                :selected="old('donation_event')" />
                         </div>
                         <div>
                             <x-label for="donation_scholarship">Donasi Beasiswa</x-label>
@@ -219,7 +305,8 @@
                                 '100000' => 'Rp 100.000',
                                 '250000' => 'Rp 250.000',
                                 '500000' => 'Rp 500.000',
-                            ]" :selected="old('donation_scholarship')" />
+                            ]"
+                                :selected="old('donation_scholarship')" />
                         </div>
                     </div>
                 </div>
@@ -305,7 +392,7 @@
                 @php
                     $allErrors = $errors->all();
                     $errorMsg = 'Silakan periksa kembali isian formulir Anda yang berwarna merah.';
-                    if(count($allErrors) == 1) {
+                    if (count($allErrors) == 1) {
                         $errorMsg = $allErrors[0];
                     }
                 @endphp
@@ -318,7 +405,10 @@
                 }).then(() => {
                     // Scroll to first error
                     const firstError = document.querySelector('.text-red-500, .border-red-500');
-                    if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if (firstError) firstError.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
                 });
             @endif
 
@@ -408,4 +498,4 @@
             });
         }
     </script>
-</x-app>
+    </x-app>

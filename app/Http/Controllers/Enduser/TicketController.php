@@ -41,7 +41,10 @@ class TicketController extends Controller
         $tickets_ipb = $tickets->filter(fn($t) => str_contains(strtolower($t->name), 'ipb'));
         $tickets_public = $tickets->filter(fn($t) => !str_contains(strtolower($t->name), 'ipb'));
 
-        return view('pages.enduser.index', compact('tickets_ipb', 'tickets_public', 'ticketSaleStart'));
+        // Force WIB for parse
+        $ticketSaleStartValue = $ticketSaleStart ? \Illuminate\Support\Carbon::parse($ticketSaleStart, 'Asia/Jakarta') : null;
+
+        return view('pages.enduser.index', compact('tickets_ipb', 'tickets_public', 'ticketSaleStart', 'ticketSaleStartValue'));
     }
 
     public function checkout(Ticket $ticket)
@@ -53,8 +56,11 @@ class TicketController extends Controller
             return redirect('/');
         }
 
-        if ($ticketSaleStart && now()->lessThan(\Illuminate\Support\Carbon::parse($ticketSaleStart))) {
-            return redirect('/')->with('error', 'Pendaftaran belum dibuka!');
+        if ($ticketSaleStart) {
+            $ticketSaleStartValue = \Illuminate\Support\Carbon::parse($ticketSaleStart, 'Asia/Jakarta');
+            if (now()->lessThan($ticketSaleStartValue)) {
+                return redirect('/')->with('error', 'Pendaftaran belum dibuka!');
+            }
         }
 
         // 1. Check if the ticket's period is active

@@ -181,8 +181,7 @@
     </script>
 
     @php
-        $startTime = $ticketSaleStart ? \Illuminate\Support\Carbon::parse($ticketSaleStart) : null;
-        $isFuture = $startTime && $startTime->isFuture();
+        $isFuture = isset($ticketSaleStartValue) && $ticketSaleStartValue->isFuture();
     @endphp
 
     @if($isFuture)
@@ -236,7 +235,7 @@
         </div>
 
         <script>
-            const targetDate = {{ $startTime->timestamp * 1000 }};
+            const targetDate = {{ $ticketSaleStartValue->timestamp * 1000 }};
 
             function updateIndexCountdown() {
                 const now = Date.now();
