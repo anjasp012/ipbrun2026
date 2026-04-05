@@ -22,6 +22,18 @@
             <form id="blastForm" method="POST" class="space-y-6">
                 @csrf
                 <div class="space-y-2">
+                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-4">Recipients (Manual Input)</label>
+                    <textarea 
+                        name="targets" 
+                        id="form-targets"
+                        required
+                        rows="4"
+                        placeholder="Ex: email1@example.com, email2@example.com OR 0812345678, 0898765432"
+                        class="w-full bg-slate-50 border-2 border-slate-100 rounded-3xl px-6 py-4 text-sm font-bold text-[#003366] outline-none focus:border-[#E8630A] focus:bg-white transition-all"></textarea>
+                    <p class="text-[10px] text-slate-400 font-bold ml-4 uppercase opacity-60">Separate with commas (,) or new lines</p>
+                </div>
+
+                <div class="space-y-2">
                     <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-4">Subject (Email Only)</label>
                     <input 
                         type="text" 

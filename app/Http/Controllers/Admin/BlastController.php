@@ -20,42 +20,46 @@ class BlastController extends Controller
     public function blastEmail(Request $request)
     {
         $request->validate([
+            'targets' => 'required|string',
             'subject' => 'required|string|max:255',
             'message' => 'required|string'
         ]);
 
-        $participants = Participant::whereNotNull('email')->distinct('email')->get();
+        $recipients = array_filter(preg_split("/[\s,]+/", $request->targets));
         $count = 0;
 
-        foreach ($participants as $participant) {
+        foreach ($recipients as $recipient) {
             try {
-                Mail::to($participant->email)->send(new PromotionBlast($request->subject, $request->message));
-                $count++;
+                if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+                    Mail::to(trim($recipient))->send(new PromotionBlast($request->subject, $request->message));
+                    $count++;
+                }
             } catch (\Exception $e) {
                 // Skip failed emails
             }
         }
 
-        return back()->with('success', "Email blast sent successfully to {$count} participants.");
+        return back()->with('success', "Email blast sent successfully to {$count} recipients.");
     }
 
     public function blastWhatsapp(Request $request)
     {
         $request->validate([
+            'targets' => 'required|string',
             'message' => 'required|string'
         ]);
 
         $fonnte = new FonnteService();
-        $participants = Participant::whereNotNull('phone_number')->get();
+        $recipients = array_filter(preg_split("/[\s,]+/", $request->targets));
         $count = 0;
 
-        foreach ($participants as $participant) {
-            $response = $fonnte->sendMessage($participant->phone_number, $request->message);
+        foreach ($recipients as $recipient) {
+            $response = $fonnte->sendMessage(trim($recipient), $request->message);
             if (isset($response['status']) && $response['status']) {
                 $count++;
             }
         }
 
-        return back()->with('success', "WhatsApp blast sent successfully to {$count} participants.");
+        return back()->with('success', "WhatsApp blast sent successfully to {$count} recipients.");
     }
 }
