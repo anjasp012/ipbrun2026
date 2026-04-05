@@ -32,7 +32,38 @@ class TicketController extends Controller
             return view('pages.enduser.coming-soon');
         }
 
-        // 2. Fetch tickets
+        // 2. Auth Check: If Participant, show Dashboard
+        if (auth()->check() && auth()->user()->role === 'participant') {
+            $user = auth()->user();
+            $participant = $user->participants()->latest()->with('raceEntries.ticket.category')->first();
+
+            if (!$participant) {
+                // If somehow they are logged in but have no profile, show regular tickets
+                goto showTickets;
+            }
+
+            $orders = Order::where('participant_id', $participant->id)->with('raceEntries.ticket.category')->latest()->get();
+            
+            // Recommend pair categories
+            $ownedCategories = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->get()->pluck('ticket.category.name')->map(fn($n) => strtoupper($n))->toArray();
+            
+            $recommendations = Ticket::whereHas('period', fn($q) => $q->where('is_active', true))
+                ->with(['category', 'period'])
+                ->get()
+                ->filter(function($t) use ($ownedCategories) {
+                    $cat = strtoupper($t->category->name);
+                    foreach($ownedCategories as $oc) {
+                        if (str_contains($cat, '5K') && str_contains($oc, '5K')) return false;
+                        if (str_contains($cat, '10K') && str_contains($oc, '10K')) return false;
+                    }
+                    return true;
+                });
+
+            return view('pages.enduser.dashboard', compact('participant', 'orders', 'recommendations'));
+        }
+
+        showTickets:
+        // 3. Fetch tickets (Standard Landing Page)
         $tickets = Ticket::whereHas('period', function($query) {
             $query->where('is_active', true);
         })->with(['category', 'period'])

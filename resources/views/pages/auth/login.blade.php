@@ -14,7 +14,7 @@
 
             <div class="relative z-10">
                 <!-- Brand/Logo Area -->
-                <div class="text-center mb-10">
+                <div class="text-center mb-10 text-left">
                     <div class="flex flex-col items-center gap-3">
                          <span class="text-[12px] font-black text-blue-600 uppercase tracking-[4px] opacity-80">IPB RUN 2026</span>
                          <h2 class="text-4xl font-[900] text-[#003366] leading-none uppercase tracking-tighter">Sign In</h2>
@@ -36,29 +36,29 @@
                         <label for="email" class="block text-[11px] font-black text-slate-400 uppercase tracking-[2px] ml-1">Email Address</label>
                         <div class="relative">
                             <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
-                                class="w-full h-14 bg-slate-50/50 border border-slate-100 rounded-2xl px-6 font-bold text-[#003366] placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-200 focus:bg-white transition-all">
-                            <svg class="absolute right-5 top-4.5 w-5 h-5 text-slate-300 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-12H12"></path></svg>
+                                class="w-full h-14 bg-slate-50/50 border border-slate-100 rounded-2xl px-6 font-bold text-[#003366] placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-200 focus:bg-white transition-all text-left">
+                            <svg class="absolute right-5 top-[18px] w-5 h-5 text-slate-300 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-12H12"></path></svg>
                         </div>
                         @error('email')
                             <p class="text-red-500 text-[10px] font-black uppercase italic mt-2 ml-1 tracking-wider animate-pulse">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="space-y-2">
+                    <div class="space-y-2 text-left">
                         <div class="flex justify-between items-center ml-1">
                             <label for="password" class="text-[11px] font-black text-slate-400 uppercase tracking-[2px]">Password</label>
                         </div>
                         <div class="relative">
                             <input id="password" type="password" name="password" required 
-                                class="w-full h-14 bg-slate-50/50 border border-slate-100 rounded-2xl px-6 font-bold text-[#003366] placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-200 focus:bg-white transition-all">
-                            <svg class="absolute right-5 top-4.5 w-5 h-5 text-slate-300 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                class="w-full h-14 bg-slate-50/50 border border-slate-100 rounded-2xl px-6 font-bold text-[#003366] placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-200 focus:bg-white transition-all text-left">
+                            <svg class="absolute right-5 top-[18px] w-5 h-5 text-slate-300 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </div>
                         @error('password')
                             <p class="text-red-500 text-[10px] font-black uppercase italic mt-2 ml-1 tracking-wider">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div class="flex items-center justify-between pb-2 ml-1">
+                    <div class="flex items-center justify-between pb-2 ml-1 flex-row text-left">
                         <label class="flex items-center gap-3 cursor-pointer group">
                              <div class="relative">
                                 <input type="checkbox" name="remember" class="sr-only peer">
@@ -66,7 +66,7 @@
                                     <svg class="w-3 h-3 text-white hidden peer-checked:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                 </div>
                              </div>
-                            <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest group-hover:text-slate-600 transition-colors">Keep me signed in</span>
+                            <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest group-hover:text-slate-600 transition-colors">Remember device</span>
                         </label>
                     </div>
 
@@ -77,7 +77,7 @@
                     </button>
                 </form>
 
-                <div class="mt-12 text-center">
+                <div class="mt-12 text-center text-left">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[2px] leading-relaxed">
                         Belum mendaftar? <br>
                         <a href="{{ url('/') }}" class="text-blue-600 hover:text-blue-800 transition-colors border-b-2 border-blue-100 hover:border-blue-300 pb-0.5">Daftar Tiket Disini</a>
