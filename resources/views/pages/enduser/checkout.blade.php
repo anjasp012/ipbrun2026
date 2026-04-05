@@ -17,7 +17,7 @@
                     <div class="p-6 text-center">
                         <div
                             class="text-[17px] font-[800] text-[#003366] leading-tight font-['Plus_Jakarta_Sans'] uppercase mb-1">
-                            {{ $ticket->category->name }} {{ $ticket->name }}
+                            {{ $ticket->category->name }} {{ $ticket->name ?: strtoupper($ticket->type) }}
                         </div>
                         <div class="text-[11px] text-[#E8630A] font-[800] uppercase tracking-[0.5px] opacity-80">
                             {{ $ticket->period->name ?? 'Standard' }}
@@ -368,7 +368,7 @@
                     <div class="p-8 pt-4 bg-slate-50/40 space-y-4">
                         <div class="space-y-3">
                             <div class="flex justify-between items-center text-sm">
-                                <span class="text-slate-500 font-medium italic">Tiket {{ $ticket->category->name }} ({{ $ticket->name }})</span>
+                                <span class="text-slate-500 font-medium italic">Tiket {{ $ticket->category->name }} ({{ $ticket->name ?: strtoupper($ticket->type) }})</span>
                                 <span class="text-[#003366] font-bold">Rp
                                     {{ number_format($ticket->price, 0, ',', '.') }}</span>
                             </div>
@@ -378,7 +378,7 @@
                             </div>
                             @if ($pairTicket)
                                 <div id="row_second_ticket" class="hidden flex justify-between items-center text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg">
-                                    <span class="text-[#E8630A] font-bold italic">Paket Ganda: {{ $pairTicket->category->name }} ({{ $pairTicket->name }})</span>
+                                    <span class="text-[#E8630A] font-bold italic">Paket Ganda: {{ $pairTicket->category->name }} ({{ $pairTicket->name ?: strtoupper($pairTicket->type) }})</span>
                                     <span class="text-[#E8630A] font-black">Rp {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
                                 </div>
                             @endif
@@ -457,8 +457,7 @@
 
             const ticketPrice = {{ $ticket->price }};
             const adminFee = 4500;
-            const ticketName = "{{ $ticket->name }}";
-            const isIPB = ticketName.toUpperCase().includes("IPB");
+            const isIPB = "{{ $ticket->type }}" === "ipb";
             const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
 
             if (isIPB) {

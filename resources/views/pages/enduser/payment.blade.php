@@ -49,7 +49,7 @@
                         @foreach($participant->raceEntries as $entry)
                             <div class="flex justify-between items-center bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
                                 <span class="text-[#003366] font-bold text-sm uppercase">{{ $entry->ticket->category->name }}</span>
-                                <span class="text-slate-500 font-bold text-[10px] uppercase opacity-70">({{ $entry->ticket->name }})</span>
+                                <span class="text-slate-500 font-bold text-[10px] uppercase opacity-70">({{ $entry->ticket->name ?: strtoupper($entry->ticket->type) }})</span>
                             </div>
                         @endforeach
                     </div>

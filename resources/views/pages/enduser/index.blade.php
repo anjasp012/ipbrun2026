@@ -76,7 +76,7 @@
                                             <div class="flex justify-between items-start gap-4 mb-2">
                                                 <h3
                                                     class="text-[17px] font-[800] text-[#003366] leading-[1.3] font-['Plus_Jakarta_Sans']">
-                                                    {{ $ticket->category->name }} {{ $ticket->name }}
+                                                    {{ $ticket->category->name }} {{ $ticket->name ?: strtoupper($ticket->type) }}
                                                 </h3>
 
                                                 <div class="flex-shrink-0">

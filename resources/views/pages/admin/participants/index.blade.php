@@ -53,7 +53,7 @@
                                     <div class="mb-3 last:mb-0 p-2 bg-slate-50/50 rounded-xl border border-slate-100/50 w-full">
                                         <div class="flex items-center justify-between gap-4">
                                             <div>
-                                                <div class="text-[10px] font-black text-slate-800 uppercase tracking-tighter">{{ $entry->ticket->category->name }} ({{ $entry->ticket->name }})</div>
+                                                <div class="text-[10px] font-black text-slate-800 uppercase tracking-tighter">{{ $entry->ticket->category->name }} ({{ $entry->ticket->name ?: strtoupper($entry->ticket->type) }})</div>
                                                 <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
                                                     {{ $entry->ticket->period->name ?? 'Standard' }}
                                                 </div>

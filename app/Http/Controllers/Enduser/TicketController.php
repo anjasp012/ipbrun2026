@@ -85,8 +85,8 @@ class TicketController extends Controller
             $query->whereIn('status', ['pending', 'paid']);
         }])->get();
 
-        $tickets_ipb = $tickets->filter(fn($t) => str_contains(strtolower($t->name), 'ipb'));
-        $tickets_public = $tickets->filter(fn($t) => !str_contains(strtolower($t->name), 'ipb'));
+        $tickets_ipb = $tickets->filter(fn($t) => $t->type === 'ipb');
+        $tickets_public = $tickets->filter(fn($t) => $t->type === 'umum');
 
         // Force WIB for parse
         $ticketSaleStartValue = $ticketSaleStart ? \Illuminate\Support\Carbon::parse($ticketSaleStart, 'Asia/Jakarta') : null;
