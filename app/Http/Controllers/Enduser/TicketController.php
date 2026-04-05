@@ -36,7 +36,7 @@ class TicketController extends Controller
         $tickets = Ticket::whereHas('period', function($query) {
             $query->where('is_active', true);
         })->with(['category', 'period'])
-        ->withCount(['participants' => function($query) {
+        ->withCount(['raceEntries as participants_count' => function($query) {
             $query->whereIn('status', ['pending', 'paid']);
         }])->get();
 
@@ -72,9 +72,7 @@ class TicketController extends Controller
 
         // 2. Check current stock accurately (capacity - pending/paid)
         $usedQty = RaceEntry::where('ticket_id', $ticket->id)
-            ->whereHas('participant', function($q) {
-                $q->whereIn('status', ['pending', 'paid']);
-            })->count();
+            ->whereIn('status', ['pending', 'paid'])->count();
 
         if ($usedQty >= $ticket->qty) {
             return redirect('/')->with('error', 'Maaf, tiket untuk kategori ini baru saja habis terjual.');
@@ -254,7 +252,7 @@ class TicketController extends Controller
         // 1. Get personal data from latest successful participant record
         $latestParticipant = $user->participants()->where('status', 'paid')->latest()->first();
         if (!$latestParticipant) {
-             $latestParticipant = $user->participants()->latest()->first();
+            $latestParticipant = $user->participants()->latest()->first();
         }
 
         if (!$latestParticipant) {
@@ -263,8 +261,10 @@ class TicketController extends Controller
 
         // 2. Duplicate check (NIK + Ticket)
         $exists = RaceEntry::whereHas('participant', function($q) use ($latestParticipant) {
-                $q->where('nik', $latestParticipant->nik)->whereIn('status', ['pending', 'paid']);
-            })->where('ticket_id', $ticket->id)->count();
+                $q->where('nik', $latestParticipant->nik);
+            })->where('ticket_id', $ticket->id)
+            ->whereIn('status', ['pending', 'paid'])
+            ->count();
 
         if ($exists) {
             return back()->with('error', 'Anda sudah terdaftar atau memiliki pesanan tertunda untuk kategori ini!');
