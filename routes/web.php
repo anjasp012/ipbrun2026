@@ -8,6 +8,12 @@ use App\Http\Controllers\Admin\CategoryController as AdminCategory;
 use App\Http\Controllers\Admin\AdminController as AdminDashboard;
 use App\Http\Controllers\Enduser\PaymentController;
 use App\Http\Controllers\Enduser\TestController;
+use App\Http\Controllers\Auth\AuthController;
+
+// Auth Routes
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Enduser Routes
 Route::get('/', [EnduserTicket::class, 'home']);
