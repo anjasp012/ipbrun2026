@@ -12,6 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('participants', function (Blueprint $table) {
+            // Drop foreign key constraints first
+            $table->dropForeign(['ticket_id']);
+            $table->dropForeign(['scanned_by']);
+
             $table->dropColumn([
                 'ticket_id', 'bib_number', 'scanned_at', 'scanned_by',
                 'status', 'order_code', 'snap_token', 'payment_url', 
