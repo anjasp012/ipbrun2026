@@ -179,4 +179,70 @@
             @endif
         });
     </script>
+
+    @if($ticketSaleStart && \Illuminate\Support\Carbon::parse($ticketSaleStart)->isFuture())
+        <div class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div class="fixed inset-0 bg-[#003366]/40 backdrop-blur-md"></div>
+            <div class="relative bg-white/95 backdrop-blur-xl p-10 md:p-16 rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,51,102,0.4)] border border-white text-center max-w-xl w-full transform -rotate-1">
+                <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" alt="IPB Run 2026" class="h-20 mx-auto mb-10 drop-shadow-sm">
+                
+                <h2 class="text-[11px] font-black text-[#E8630A] uppercase tracking-[0.4em] mb-12 italic border-y border-orange-100 py-3 block">
+                    Official Registration Opens In
+                </h2>
+
+                <div id="index-countdown" class="flex gap-4 md:gap-8 justify-center items-center mb-12">
+                    <div class="flex flex-col items-center">
+                        <span id="idx-days" class="text-4xl md:text-6xl font-black font-outfit tabular-nums text-[#003366]">00</span>
+                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mt-2">Hari</span>
+                    </div>
+                    <div class="text-2xl font-black text-slate-200 mt-[-20px] md:mt-[-30px]">:</div>
+                    <div class="flex flex-col items-center">
+                        <span id="idx-hours" class="text-4xl md:text-6xl font-black font-outfit tabular-nums text-[#003366]">00</span>
+                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mt-2">Jam</span>
+                    </div>
+                    <div class="text-2xl font-black text-slate-200 mt-[-20px] md:mt-[-30px]">:</div>
+                    <div class="flex flex-col items-center">
+                        <span id="idx-minutes" class="text-4xl md:text-6xl font-black font-outfit tabular-nums text-[#003366]">00</span>
+                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mt-2">Menit</span>
+                    </div>
+                    <div class="text-2xl font-black text-slate-200 mt-[-20px] md:mt-[-30px]">:</div>
+                    <div class="flex flex-col items-center">
+                        <span id="idx-seconds" class="text-4xl md:text-6xl font-black font-outfit tabular-nums text-[#E8630A] animate-pulse">00</span>
+                        <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mt-2">Detik</span>
+                    </div>
+                </div>
+
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] leading-relaxed">
+                    Siapkan diri Anda untuk event lari terbesar <br> di Kampus IPB University.
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const targetDate = new Date("{{ $ticketSaleStart }}").getTime();
+
+            function updateIndexCountdown() {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                if (distance < 0) {
+                    window.location.reload();
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("idx-days").innerText = days.toString().padStart(2, '0');
+                document.getElementById("idx-hours").innerText = hours.toString().padStart(2, '0');
+                document.getElementById("idx-minutes").innerText = minutes.toString().padStart(2, '0');
+                document.getElementById("idx-seconds").innerText = seconds.toString().padStart(2, '0');
+            }
+
+            setInterval(updateIndexCountdown, 1000);
+            updateIndexCountdown();
+        </script>
+    @endif
 </x-layouts.app>

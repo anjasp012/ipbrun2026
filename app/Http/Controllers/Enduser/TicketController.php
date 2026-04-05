@@ -23,18 +23,14 @@ class TicketController extends Controller
     public function home()
     {
         $ticketSaleStart = Setting::getValue('ticket_sale_start');
-        $isRunning = Setting::getValue('is_running', '0') === '1';
+        $isMaintenance = Setting::getValue('is_running', '0') !== '1';
 
-        // Auto-running if schedule reached
-        if (!$isRunning && $ticketSaleStart) {
-            $isRunning = now()->greaterThan(\Illuminate\Support\Carbon::parse($ticketSaleStart));
+        // 1. Maintenance Mode (Shows the designed "Coming Soon" background)
+        if ($isMaintenance) {
+            return view('pages.enduser.coming-soon');
         }
 
-        if (!$isRunning) {
-            return view('pages.enduser.coming-soon', compact('ticketSaleStart'));
-        }
-
-        // Fetch tickets only from the active period
+        // 2. Fetch tickets
         $tickets = Ticket::whereHas('period', function($query) {
             $query->where('is_active', true);
         })->with(['category', 'period'])
@@ -45,20 +41,20 @@ class TicketController extends Controller
         $tickets_ipb = $tickets->filter(fn($t) => str_contains(strtolower($t->name), 'ipb'));
         $tickets_public = $tickets->filter(fn($t) => !str_contains(strtolower($t->name), 'ipb'));
 
-        return view('pages.enduser.index', compact('tickets_ipb', 'tickets_public'));
+        return view('pages.enduser.index', compact('tickets_ipb', 'tickets_public', 'ticketSaleStart'));
     }
 
     public function checkout(Ticket $ticket)
     {
         $ticketSaleStart = Setting::getValue('ticket_sale_start');
-        $isRunning = Setting::getValue('is_running', '0') === '1';
+        $isMaintenance = Setting::getValue('is_running', '0') !== '1';
 
-        if (!$isRunning && $ticketSaleStart) {
-            $isRunning = now()->greaterThan(\Illuminate\Support\Carbon::parse($ticketSaleStart));
+        if ($isMaintenance) {
+            return redirect('/');
         }
 
-        if (!$isRunning) {
-            return redirect('/');
+        if ($ticketSaleStart && now()->lessThan(\Illuminate\Support\Carbon::parse($ticketSaleStart))) {
+            return redirect('/')->with('error', 'Pendaftaran belum dibuka!');
         }
 
         // 1. Check if the ticket's period is active
