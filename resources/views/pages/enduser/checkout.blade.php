@@ -284,27 +284,36 @@
                 @endphp
 
                 @if ($pairCategory)
-                    <div class="mt-12 bg-orange-50/50 border border-orange-100 p-8 rounded-[2.5rem]">
+                    <div class="mt-12 bg-orange-50/50 border border-orange-100 p-8 rounded-2xl">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div class="space-y-1">
-                                <h4 class="text-[13px] font-black text-[#003366] uppercase tracking-wider italic">GANDA KATEGORI?</h4>
-                                <p class="text-[11px] font-bold text-[#E8630A]/80 uppercase tracking-widest leading-loose">
-                                    APAKAH ANDA INGIN MENGIKUTI KATEGORI <span class="text-[#E8630A] underline underline-offset-4 decoration-2">{{ $pairCategory }}</span> JUGA?
+                                <p
+                                    class="text-[11px] font-bold text-[#E8630A]/80 uppercase tracking-widest leading-loose">
+                                    APAKAH ANDA INGIN MENGIKUTI KATEGORI <span
+                                        class="text-[#E8630A] underline underline-offset-4 decoration-2">{{ $pairCategory }}</span>
+                                    JUGA?
                                 </p>
                             </div>
-                            
+
                             <label class="relative inline-flex items-center cursor-pointer group">
-                                <input type="checkbox" name="other_race_interest" id="cb_second_ticket" value="{{ $pairCategory }}" class="sr-only peer" {{ old('other_race_interest') ? 'checked' : '' }}>
-                                <div class="w-20 h-10 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-10 after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-8 after:w-8 after:transition-all peer-checked:bg-[#FF7A21] shadow-inner ring-4 ring-slate-100 peer-checked:ring-orange-100"></div>
-                                <span class="ml-4 text-xs font-black text-slate-400 peer-checked:text-[#FF7A21] uppercase tracking-widest transition-colors">
+                                <input type="checkbox" name="other_race_interest" id="cb_second_ticket"
+                                    value="{{ $pairCategory }}" class="sr-only peer"
+                                    {{ old('other_race_interest') ? 'checked' : '' }}>
+                                <div
+                                    class="w-20 h-10 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-10 after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-8 after:w-8 after:transition-all peer-checked:bg-[#FF7A21] shadow-inner ring-4 ring-slate-100 peer-checked:ring-orange-100">
+                                </div>
+                                <span
+                                    class="ml-4 text-xs font-black text-slate-400 peer-checked:text-[#FF7A21] uppercase tracking-widest transition-colors">
                                     <span class="group-peer-checked:hidden">TIDAK</span>
                                     <span class="hidden group-peer-checked:inline">YA, IKUT!</span>
                                 </span>
                             </label>
                         </div>
                         <div class="mt-6 pt-6 border-t border-orange-100/50">
-                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed italic">
-                                * Pilihan ini bersifat opsional. Jika dipilih, data Anda akan tercatat sebagai peminat kategori {{ $pairCategory }}.
+                            <p
+                                class="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed italic">
+                                * Pilihan ini bersifat opsional. Jika dipilih, data Anda akan tercatat sebagai peminat
+                                kategori {{ $pairCategory }}.
                             </p>
                         </div>
                     </div>
@@ -368,7 +377,8 @@
                     <div class="p-8 pt-4 bg-slate-50/40 space-y-4">
                         <div class="space-y-3">
                             <div class="flex justify-between items-center text-sm">
-                                <span class="text-slate-500 font-medium italic">Tiket {{ $ticket->category->name }} ({{ $ticket->name ?: strtoupper($ticket->type) }})</span>
+                                <span class="text-slate-500 font-medium italic">Tiket {{ $ticket->category->name }}
+                                    ({{ $ticket->name ?: strtoupper($ticket->type) }})</span>
                                 <span class="text-[#003366] font-bold">Rp
                                     {{ number_format($ticket->price, 0, ',', '.') }}</span>
                             </div>
@@ -377,9 +387,13 @@
                                 <span class="text-[#003366] font-bold">Rp 4.500</span>
                             </div>
                             @if ($pairTicket)
-                                <div id="row_second_ticket" class="hidden flex justify-between items-center text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg">
-                                    <span class="text-[#E8630A] font-bold italic">Paket Ganda: {{ $pairTicket->category->name }} ({{ $pairTicket->name ?: strtoupper($pairTicket->type) }})</span>
-                                    <span class="text-[#E8630A] font-black">Rp {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
+                                <div id="row_second_ticket"
+                                    class="hidden flex justify-between items-center text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg">
+                                    <span class="text-[#E8630A] font-bold italic">Paket Ganda:
+                                        {{ $pairTicket->category->name }}
+                                        ({{ $pairTicket->name ?: strtoupper($pairTicket->type) }})</span>
+                                    <span class="text-[#E8630A] font-black">Rp
+                                        {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
                                 </div>
                             @endif
                             <div id="row_donation_event" class="hidden flex justify-between items-center text-sm">
