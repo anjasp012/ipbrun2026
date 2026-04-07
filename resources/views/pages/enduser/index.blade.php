@@ -6,7 +6,7 @@
 
     <div class="py-12 md:py-20 flex items-center justify-center p-4">
         <div
-            class="max-w-7xl mx-auto w-full bg-white/80 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 relative flex flex-col p-6 md:p-16 overflow-hidden">
+            class="max-w-7xl mx-auto w-full bg-white/95 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 relative flex flex-col p-6 md:p-16 overflow-hidden">
 
             <!-- Content Area -->
             <div class="relative pr-2 custom-scrollbar flex-grow">
