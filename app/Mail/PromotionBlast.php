@@ -8,6 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 
 class PromotionBlast extends Mailable implements ShouldQueue
 {
@@ -54,9 +55,9 @@ class PromotionBlast extends Mailable implements ShouldQueue
      */
     public function attachments(): array
     {
-        if ($this->attachmentPath && file_exists(storage_path('app/' . $this->attachmentPath))) {
+        if ($this->attachmentPath && Storage::exists($this->attachmentPath)) {
             return [
-                \Illuminate\Mail\Mailables\Attachment::fromPath(storage_path('app/' . $this->attachmentPath))
+                \Illuminate\Mail\Mailables\Attachment::fromPath(Storage::path($this->attachmentPath))
             ];
         }
         return [];
