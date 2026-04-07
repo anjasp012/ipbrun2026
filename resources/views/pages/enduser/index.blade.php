@@ -19,18 +19,18 @@
 
                 @foreach ($ticketGroups as $group)
                     @if (count($group['data']) > 0)
-                        <div class="border border-slate-100 rounded-[2.5rem] bg-white shadow-sm overflow-hidden transition-all duration-500">
+                        <div class="border border-slate-200 rounded-2xl bg-white shadow-sm overflow-hidden mb-3">
                             {{-- Accordion Header --}}
                             <button onclick="toggleAccordion('{{ $group['id'] }}')" 
-                                class="w-full px-8 md:px-12 py-6 md:py-8 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors group">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-2 h-8 bg-[#003366] rounded-full group-hover:scale-y-125 transition-transform duration-300"></div>
-                                    <h2 class="text-lg md:text-2xl font-[900] text-[#003366] font-['Plus_Jakarta_Sans'] tracking-tight uppercase">
+                                class="w-full px-6 py-4 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors group">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-1.5 h-6 bg-[#003366] rounded-full"></div>
+                                    <h2 class="text-sm md:text-base font-[800] text-[#003366] font-['Plus_Jakarta_Sans'] tracking-tight uppercase">
                                         {{ $group['title'] }}
                                     </h2>
                                 </div>
-                                <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-[#003366] group-hover:bg-[#003366] group-hover:text-white transition-all duration-300 shadow-inner">
-                                    <svg id="icon-{{ $group['id'] }}" class="w-5 h-5 md:w-6 md:h-6 transition-transform duration-500 {{ $group['id'] !== 'ipb' ? 'rotate-0' : 'rotate-180' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-[#003366] group-hover:bg-[#003366] group-hover:text-white transition-all duration-300">
+                                    <svg id="icon-{{ $group['id'] }}" class="w-4 h-4 transition-transform duration-500 {{ $group['id'] !== 'ipb' ? 'rotate-0' : 'rotate-180' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path>
                                     </svg>
                                 </div>
@@ -38,7 +38,7 @@
 
                             {{-- Accordion Content --}}
                             <div id="content-{{ $group['id'] }}" class="transition-all duration-500 ease-in-out {{ $group['id'] !== 'ipb' ? 'max-h-0 opacity-0' : 'max-h-[5000px] opacity-100' }} overflow-hidden">
-                                <div class="px-4 md:px-12 pb-8 md:pb-12">
+                                <div class="px-4 md:px-6 pb-6">
                                     <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
                                         @foreach ($group['data'] as $ticket)
                                             @php $qty = $ticket->qty - $ticket->participants_count; @endphp
