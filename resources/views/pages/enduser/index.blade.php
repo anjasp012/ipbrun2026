@@ -8,38 +8,56 @@
         <div
             class="max-w-auto w-full max-h-[98vh] bg-white rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 relative flex flex-col p-10 md:p-12 overflow-hidden">
             <!-- Header / Auth Navigation -->
-            <div class="absolute top-0 left-0 right-0 h-20 px-10 md:px-12 flex items-center justify-between border-b border-slate-100 bg-white/80 backdrop-blur-md z-30">
+            <div
+                class="absolute top-0 left-0 right-0 h-20 px-10 md:px-12 flex items-center justify-between border-b border-slate-100 bg-white/80 backdrop-blur-md z-30">
                 <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-blue-200">I</div>
+                    <div
+                        class="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-blue-200">
+                        I</div>
                     <div class="hidden sm:block">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[3px] leading-tight">Official Platform</p>
-                        <h1 class="text-lg font-black text-[#003366] uppercase leading-tight tracking-tighter">IPB RUN 2026</h1>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[3px] leading-tight">Official
+                            Platform</p>
+                        <h1 class="text-lg font-black text-[#003366] uppercase leading-tight tracking-tighter">IPB RUN
+                            2026</h1>
                     </div>
                 </div>
-                
+
                 <div class="flex items-center gap-4">
                     @auth
                         <div class="flex items-center gap-4 px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl">
                             <div class="text-right hidden md:block">
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Signed in as</p>
-                                <p class="text-xs font-black text-[#003366] truncate max-w-[150px]">{{ auth()->user()->name }}</p>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                                    Signed in as</p>
+                                <p class="text-xs font-black text-[#003366] truncate max-w-[150px]">
+                                    {{ auth()->user()->name }}</p>
                             </div>
-                            <div class="w-8 h-8 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-black text-xs border border-orange-200 shadow-inner">
+                            <div
+                                class="w-8 h-8 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-black text-xs border border-orange-200 shadow-inner">
                                 {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
                             </div>
-                            @if(auth()->user()->role === 'admin')
-                                <a href="{{ url('/admin/dashboard') }}" class="text-[10px] font-black text-blue-600 uppercase tracking-widest border border-blue-200 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-all">Dashboard</a>
+                            @if (auth()->user()->role === 'admin')
+                                <a href="{{ url('/admin/dashboard') }}"
+                                    class="text-[10px] font-black text-blue-600 uppercase tracking-widest border border-blue-200 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-all">Dashboard</a>
                             @endif
                             <form action="{{ route('logout') }}" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" class="p-2 text-slate-400 hover:text-red-600 transition-colors">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                        </path>
+                                    </svg>
                                 </button>
                             </form>
                         </div>
                     @else
-                        <a href="{{ route('login') }}" class="flex items-center gap-3 px-6 h-12 bg-[#003366] hover:bg-[#002244] text-white rounded-2xl font-black text-[11px] uppercase tracking-[2px] shadow-xl shadow-blue-900/10 transition-all active:scale-95">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        <a href="{{ route('login') }}"
+                            class="flex items-center gap-3 px-6 h-12 bg-[#003366] hover:bg-[#002244] text-white rounded-2xl font-black text-[11px] uppercase tracking-[2px] shadow-xl shadow-blue-900/10 transition-all active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                </path>
+                            </svg>
                             Masuk Akun
                         </a>
                     @endauth
@@ -47,17 +65,30 @@
             </div>
 
             <!-- Content Area (Added Pt-20 for header space) -->
-            <div class="relative space-y-10 overflow-y-auto pr-2 custom-scrollbar pt-24 pb-10 flex-grow">
+            <div class="relative space-y-6 overflow-y-auto pr-2 custom-scrollbar pt-24 pb-10 flex-grow">
+                <!-- Category Switcher -->
+                <div class="flex justify-center mb-4 px-2">
+                    <div class="inline-flex p-1 bg-slate-100/80 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-sm w-full sm:w-auto overflow-x-auto no-scrollbar">
+                        <button onclick="switchCategory('ipb')" id="tab-ipb"
+                            class="flex-1 sm:flex-none category-tab px-4 sm:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-[2px] transition-all duration-300 active:scale-95 whitespace-nowrap bg-[#003366] text-white shadow-lg shadow-blue-900/20">
+                            Keluarga IPB
+                        </button>
+                        <button onclick="switchCategory('umum')" id="tab-umum"
+                            class="flex-1 sm:flex-none category-tab px-4 sm:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-[2px] transition-all duration-300 active:scale-95 whitespace-nowrap text-slate-500 hover:text-[#003366]">
+                            Kategori Umum
+                        </button>
+                    </div>
+                </div>
                 @php
                     $ticketGroups = [
-                        ['data' => $tickets_ipb, 'title' => 'Mahasiswa & Alumni IPB'],
-                        ['data' => $tickets_public, 'title' => 'Pendaftaran Umum (Public)'],
+                        ['data' => $tickets_ipb, 'title' => 'Keluarga Besar IPB', 'id' => 'ipb'],
+                        ['data' => $tickets_public, 'title' => 'Umum', 'id' => 'umum'],
                     ];
                 @endphp
 
                 @foreach ($ticketGroups as $group)
                     @if (count($group['data']) > 0)
-                        <section>
+                        <section class="ticket-section {{ $group['id'] !== 'ipb' ? 'hidden' : '' }}" id="section-{{ $group['id'] }}">
                             <div class="text-center mb-6">
                                 <h2
                                     class="text-xl font-[800] text-[#003366] font-['Plus_Jakarta_Sans'] tracking-tight uppercase">
@@ -66,92 +97,96 @@
                                 <div class="mx-auto w-12 h-1 mt-2 bg-[#E8630A] rounded-full"></div>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 px-1">
                                 @foreach ($group['data'] as $ticket)
                                     @php $qty = $ticket->qty - $ticket->participants_count; @endphp
                                     <div
-                                        class="relative bg-white border border-slate-100 rounded-2xl flex flex-col transition-all duration-300 overflow-hidden">
+                                        class="relative bg-white border border-slate-100 rounded-2xl flex flex-col transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md">
                                         <!-- Card Content -->
-                                        <div class="p-6 pb-2 text-[16px]">
-                                            <div class="flex justify-between items-start gap-4 mb-2">
+                                        <div class="p-3 md:p-6 pb-2">
+                                            <div class="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
                                                 <h3
-                                                    class="text-[17px] font-[800] text-[#003366] leading-[1.3] font-['Plus_Jakarta_Sans']">
-                                                    {{ $ticket->category->name }} {{ $ticket->name ?: strtoupper($ticket->type) }}
+                                                    class="text-[13px] md:text-[17px] font-[800] text-[#003366] leading-[1.3] font-['Plus_Jakarta_Sans']">
+                                                    {{ $ticket->category->name }}
+                                                    {{ $ticket->name ?: strtoupper($ticket->type) }}
                                                 </h3>
 
                                                 <div class="flex-shrink-0">
                                                     @if ($qty <= 0)
                                                         <span
-                                                            class="inline-flex items-center px-3 py-1 rounded text-[10px] font-black uppercase bg-slate-100 text-slate-500 border border-slate-200">Sold
+                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-slate-100 text-slate-500 border border-slate-200">Sold
                                                             Out</span>
                                                     @elseif($qty < 10)
                                                         <span
-                                                            class="inline-flex items-center px-3 py-1 rounded text-[10px] font-black uppercase bg-red-50 text-red-600 border border-red-100/50">Sisa:
+                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-red-50 text-red-600 border border-red-100/50">Sisa:
                                                             {{ $qty }}</span>
                                                     @elseif($qty < 30)
                                                         <span
-                                                            class="inline-flex items-center px-3 py-1 rounded text-[10px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-100/50">Sisa:
+                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-100/50">Sisa:
                                                             {{ $qty }}</span>
                                                     @else
                                                         <span
-                                                            class="inline-flex items-center px-3 py-1 rounded text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100/50">Sisa:
+                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100/50">Sisa:
                                                             {{ $qty }}</span>
                                                     @endif
                                                 </div>
                                             </div>
 
                                             <div
-                                                class="text-[11px] text-[#E8630A] font-[800] uppercase tracking-[0.5px] mb-3 opacity-80">
+                                                class="text-[9px] md:text-[11px] text-[#E8630A] font-[800] uppercase tracking-[0.5px] mb-3 opacity-80">
                                                 {{ $ticket->period->name ?? 'Standard' }}
                                             </div>
                                         </div>
 
                                         <!-- Perforation -->
                                         <div
-                                            class="relative flex items-center py-2 overflow-hidden pointer-events-none">
+                                            class="relative flex items-center py-1 md:py-2 overflow-hidden pointer-events-none">
                                             <div
                                                 class="absolute -left-3 w-6 h-6 bg-[#f1f5f9] rounded-full shadow-inner ring-1 ring-inset ring-slate-200/20">
                                             </div>
                                             <div
                                                 class="absolute -right-3 w-6 h-6 bg-[#f1f5f9] rounded-full shadow-inner ring-1 ring-inset ring-slate-200/20">
                                             </div>
-                                            <div class="w-full border-t-2 border-dashed border-slate-200 mx-5"></div>
+                                            <div class="w-full border-t-2 border-dashed border-slate-200 mx-3 md:mx-5"></div>
                                         </div>
 
                                         <!-- Price / Action -->
-                                        <div class="p-6 pt-4 bg-slate-50/40 rounded-b-2xl transition-colors">
-                                            <div class="mb-4">
+                                        <div class="p-3 md:p-6 pt-2 md:pt-4 bg-slate-50/40 rounded-b-2xl transition-colors mt-auto">
+                                            <div class="mb-3 md:mb-4">
                                                 <span
-                                                    class="text-[11px] text-slate-400 font-[800] uppercase tracking-wider block mb-1">Price
-                                                    Entry</span>
+                                                    class="text-[9px] md:text-[11px] text-slate-400 font-[800] uppercase tracking-wider block mb-0.5">Price Entry</span>
                                                 <span
-                                                    class="text-[21px] font-[900] text-[#003366] leading-none font-['Plus_Jakarta_Sans']">Rp
+                                                    class="text-[15px] md:text-[21px] font-[900] text-[#003366] leading-none font-['Plus_Jakarta_Sans']">Rp
                                                     {{ number_format($ticket->price, 0, ',', '.') }}</span>
                                             </div>
 
                                             @if ($qty > 0)
                                                 @auth
                                                     <a href="{{ route('participant.buy-more', $ticket->id) }}"
-                                                        class="w-full bg-orange-600 text-white py-2.5 rounded-xl font-[800] text-[15px] transition-all active:scale-95 hover:bg-orange-700 flex items-center justify-center gap-2">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                                                        class="w-full bg-orange-600 text-white py-2 md:py-2.5 rounded-lg md:rounded-xl font-[800] text-[12px] md:text-[15px] transition-all active:scale-95 hover:bg-orange-700 flex items-center justify-center gap-1 md:gap-2">
+                                                        <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                                                        </svg>
                                                         Beli Lagi
                                                     </a>
                                                 @else
                                                     <a href="{{ route('checkout', $ticket->id) }}"
-                                                        class="w-full bg-[#003366] text-white py-2.5 rounded-xl font-[800] text-[15px] transition-all active:scale-95 hover:bg-[#002244] flex items-center justify-center">
-                                                        Daftar Sekarang
+                                                        class="w-full bg-[#003366] text-white py-2 md:py-2.5 rounded-lg md:rounded-xl font-[800] text-[12px] md:text-[15px] transition-all active:scale-95 hover:bg-[#002244] flex items-center justify-center">
+                                                        Daftar
                                                     </a>
                                                 @endauth
                                             @else
                                                 <div
-                                                    class="w-full py-2.5 bg-slate-100 text-slate-400 text-center rounded-xl font-[900] text-[15px] uppercase tracking-wider cursor-not-allowed">
-                                                    Sold Out</div>
+                                                    class="w-full py-2 md:py-2.5 bg-slate-100 text-slate-400 text-center rounded-lg md:rounded-xl font-[900] text-[12px] md:text-[15px] uppercase tracking-wider cursor-not-allowed">
+                                                    Sold</div>
                                             @endif
                                         </div>
 
                                         <!-- BG Category Identity -->
                                         <div
-                                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[100px] font-black text-slate-400/5 select-none pointer-events-none -rotate-12 z-0 font-['Plus_Jakarta_Sans']">
+                                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[60px] md:text-[100px] font-black text-slate-400/5 select-none pointer-events-none -rotate-12 z-0 font-['Plus_Jakarta_Sans'] whitespace-nowrap">
                                             {{ $ticket->category->name }}
                                         </div>
                                     </div>
@@ -193,6 +228,15 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -225,6 +269,31 @@
                 });
             @endif
         });
+
+        function switchCategory(id) {
+            // Hide all sections
+            document.querySelectorAll('.ticket-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Show selected section
+            const selectedSection = document.getElementById('section-' + id);
+            if (selectedSection) {
+                selectedSection.classList.remove('hidden');
+            }
+
+            // Update tab styles
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('bg-[#003366]', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
+                tab.classList.add('text-slate-500', 'hover:text-[#003366]');
+            });
+
+            const activeTab = document.getElementById('tab-' + id);
+            if (activeTab) {
+                activeTab.classList.add('bg-[#003366]', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
+                activeTab.classList.remove('text-slate-500', 'hover:text-[#003366]');
+            }
+        }
     </script>
 
     @php
