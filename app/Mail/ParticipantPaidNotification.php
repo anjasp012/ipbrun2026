@@ -36,7 +36,7 @@ class ParticipantPaidNotification extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Konfirmasi Pembayaran & Akun IPB RUN 2026 - ' . $this->participant->order_code,
+            subject: 'Konfirmasi Pembayaran & Akun IPB RUN 2026 - ' . $this->order->order_code,
         );
     }
 

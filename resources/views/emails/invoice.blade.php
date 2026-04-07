@@ -161,13 +161,10 @@
         <div class="header">
             <h1 class="invoice-title">INVOICE</h1>
             <div class="invoice-info">
-                @php
-                    $mainEntry = $participant->raceEntries->where('status', 'paid')->last() ?? $participant->raceEntries->last();
-                @endphp
                 <table>
                     <tr>
                         <td>FULL NAME : <strong>{{ $participant->name }}</strong></td>
-                        <td>ORDER CODE : <strong>#{{ $mainEntry->order_code }}</strong></td>
+                        <td>ORDER CODE : <strong>#{{ $order->order_code }}</strong></td>
                     </tr>
                 </table>
             </div>
