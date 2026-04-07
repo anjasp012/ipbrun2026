@@ -18,14 +18,14 @@
                 @endphp
 
                 <!-- Tab Switcher (Mobile Only) -->
-                <div class="flex justify-center mb-8 px-2 md:hidden">
-                    <div class="inline-flex p-1 bg-slate-100/80 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-sm w-full overflow-x-auto no-scrollbar">
+                <div class="flex justify-center mb-10 px-2 md:hidden">
+                    <div class="inline-flex p-1.5 bg-slate-200/60 backdrop-blur-md rounded-[1.5rem] border-2 border-white shadow-xl w-full">
                         <button onclick="switchCategory('ipb')" id="tab-ipb"
-                            class="flex-1 category-tab px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-[2px] transition-all duration-300 active:scale-95 whitespace-nowrap bg-[#003366] text-white shadow-lg shadow-blue-900/20">
+                            class="flex-1 category-tab px-6 py-3.5 rounded-[1.2rem] text-[11px] font-[900] uppercase tracking-[2px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap bg-[#003366] text-white shadow-[0_10px_20px_-5px_rgba(0,51,102,0.4)]">
                             Keluarga IPB
                         </button>
                         <button onclick="switchCategory('umum')" id="tab-umum"
-                            class="flex-1 category-tab px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-[2px] transition-all duration-300 active:scale-95 whitespace-nowrap text-slate-500 hover:text-[#003366]">
+                            class="flex-1 category-tab px-6 py-3.5 rounded-[1.2rem] text-[11px] font-[900] uppercase tracking-[2px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap text-slate-500 hover:text-[#003366] hover:bg-white/50">
                             Kategori Umum
                         </button>
                     </div>
@@ -205,13 +205,13 @@
 
             // Update tab styles
             document.querySelectorAll('.category-tab').forEach(tab => {
-                tab.classList.remove('bg-[#003366]', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
+                tab.classList.remove('bg-[#003366]', 'text-white', 'shadow-[0_10px_20px_-5px_rgba(0,51,102,0.4)]');
                 tab.classList.add('text-slate-500', 'hover:text-[#003366]');
             });
 
             const activeTab = document.getElementById('tab-' + id);
             if (activeTab) {
-                activeTab.classList.add('bg-[#003366]', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
+                activeTab.classList.add('bg-[#003366]', 'text-white', 'shadow-[0_10px_20px_-5px_rgba(0,51,102,0.4)]');
                 activeTab.classList.remove('text-slate-500', 'hover:text-[#003366]');
             }
         }
