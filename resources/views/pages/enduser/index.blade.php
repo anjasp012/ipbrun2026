@@ -13,19 +13,19 @@
                 @php
                     $ticketGroups = [
                         ['data' => $tickets_ipb, 'title' => 'Keluarga Besar IPB', 'id' => 'ipb'],
-                        ['data' => $tickets_public, 'title' => 'Kategori Umum', 'id' => 'umum'],
+                        ['data' => $tickets_public, 'title' => 'Umum', 'id' => 'umum'],
                     ];
                 @endphp
 
                 <!-- Tab Switcher (Mobile Only) -->
-                <div class="flex justify-center mb-10 px-2 md:hidden">
-                    <div class="inline-flex p-1.5 bg-slate-200/60 backdrop-blur-md rounded-[1.5rem] border-2 border-white shadow-xl w-full">
+                <div class="flex justify-center mb-8 px-2 md:hidden">
+                    <div class="inline-flex p-1 bg-slate-50 rounded-xl border border-slate-200 shadow-sm w-full">
                         <button onclick="switchCategory('ipb')" id="tab-ipb"
-                            class="flex-1 category-tab px-6 py-3.5 rounded-[1.2rem] text-[11px] font-[900] uppercase tracking-[2px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap bg-[#003366] text-white shadow-[0_10px_20px_-5px_rgba(0,51,102,0.4)]">
+                            class="flex-1 category-tab px-4 py-3 rounded-lg text-xs font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap bg-[#003366] text-white shadow-md">
                             Keluarga IPB
                         </button>
                         <button onclick="switchCategory('umum')" id="tab-umum"
-                            class="flex-1 category-tab px-6 py-3.5 rounded-[1.2rem] text-[11px] font-[900] uppercase tracking-[2px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap text-slate-500 hover:text-[#003366] hover:bg-white/50">
+                            class="flex-1 category-tab px-4 py-3 rounded-lg text-xs font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap text-slate-500 hover:text-[#003366]">
                             Kategori Umum
                         </button>
                     </div>
@@ -33,11 +33,13 @@
 
                 @foreach ($ticketGroups as $group)
                     @if (count($group['data']) > 0)
-                        <div id="section-{{ $group['id'] }}" class="ticket-section md:!block {{ $group['id'] !== 'ipb' ? 'hidden' : '' }} mb-16 last:mb-0">
+                        <div id="section-{{ $group['id'] }}"
+                            class="ticket-section md:!block {{ $group['id'] !== 'ipb' ? 'hidden' : '' }} mb-16 last:mb-0">
                             {{-- Section Header --}}
                             <div class="flex items-center gap-4 mb-8">
                                 <div class="w-1.5 h-8 bg-[#003366] rounded-full"></div>
-                                <h2 class="text-xl md:text-2xl font-[900] text-[#003366] font-['Plus_Jakarta_Sans'] tracking-tight uppercase">
+                                <h2
+                                    class="text-xl md:text-2xl font-[900] text-[#003366] font-['Plus_Jakarta_Sans'] tracking-tight uppercase">
                                     {{ $group['title'] }}
                                 </h2>
                             </div>
@@ -45,53 +47,78 @@
                             <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
                                 @foreach ($group['data'] as $ticket)
                                     @php $qty = $ticket->qty - $ticket->participants_count; @endphp
-                                    <div class="relative bg-white border border-slate-100 rounded-2xl flex flex-col transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md group/card hover:-translate-y-1">
+                                    <div
+                                        class="relative bg-white border border-slate-100 rounded-2xl flex flex-col transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md group/card hover:-translate-y-1">
                                         <!-- Card Content -->
                                         <div class="p-3 md:p-6 pb-2">
-                                            <div class="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
-                                                <h3 class="text-[13px] md:text-[17px] font-[800] text-[#003366] leading-[1.3] font-['Plus_Jakarta_Sans']">
+                                            <div
+                                                class="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
+                                                <h3
+                                                    class="text-[13px] md:text-[17px] font-[800] text-[#003366] leading-[1.3] font-['Plus_Jakarta_Sans']">
                                                     {{ $ticket->category->name }}
                                                     {{ $ticket->name ?: strtoupper($ticket->type) }}
                                                 </h3>
 
                                                 <div class="flex-shrink-0">
                                                     @if ($qty <= 0)
-                                                        <span class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-slate-100 text-slate-500 border border-slate-200">Sold Out</span>
+                                                        <span
+                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-slate-100 text-slate-500 border border-slate-200">Sold
+                                                            Out</span>
                                                     @elseif($qty < 10)
-                                                        <span class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-red-50 text-red-600 border border-red-100/50">Sisa: {{ $qty }}</span>
+                                                        <span
+                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-red-50 text-red-600 border border-red-100/50">Sisa:
+                                                            {{ $qty }}</span>
                                                     @elseif($qty < 30)
-                                                        <span class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-100/50">Sisa: {{ $qty }}</span>
+                                                        <span
+                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-100/50">Sisa:
+                                                            {{ $qty }}</span>
                                                     @else
-                                                        <span class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100/50">Sisa: {{ $qty }}</span>
+                                                        <span
+                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100/50">Sisa:
+                                                            {{ $qty }}</span>
                                                     @endif
                                                 </div>
                                             </div>
 
-                                            <div class="text-[9px] md:text-[11px] text-[#E8630A] font-[800] uppercase tracking-[0.5px] mb-3 opacity-80">
+                                            <div
+                                                class="text-[9px] md:text-[11px] text-[#E8630A] font-[800] uppercase tracking-[0.5px] mb-3 opacity-80">
                                                 {{ $ticket->period->name ?? 'Standard' }}
                                             </div>
                                         </div>
 
                                         <!-- Perforation -->
-                                        <div class="relative flex items-center py-1 md:py-2 overflow-hidden pointer-events-none">
-                                            <div class="absolute -left-3 w-6 h-6 bg-[#f1f5f9] rounded-full shadow-inner ring-1 ring-inset ring-slate-200/20"></div>
-                                            <div class="absolute -right-3 w-6 h-6 bg-[#f1f5f9] rounded-full shadow-inner ring-1 ring-inset ring-slate-200/20"></div>
-                                            <div class="w-full border-t-2 border-dashed border-slate-200 mx-3 md:mx-5"></div>
+                                        <div
+                                            class="relative flex items-center py-1 md:py-2 overflow-hidden pointer-events-none">
+                                            <div
+                                                class="absolute -left-3 w-6 h-6 bg-[#f1f5f9] rounded-full shadow-inner ring-1 ring-inset ring-slate-200/20">
+                                            </div>
+                                            <div
+                                                class="absolute -right-3 w-6 h-6 bg-[#f1f5f9] rounded-full shadow-inner ring-1 ring-inset ring-slate-200/20">
+                                            </div>
+                                            <div class="w-full border-t-2 border-dashed border-slate-200 mx-3 md:mx-5">
+                                            </div>
                                         </div>
 
                                         <!-- Price / Action -->
-                                        <div class="p-3 md:p-6 pt-2 md:pt-4 bg-slate-50/40 rounded-b-2xl transition-colors mt-auto">
+                                        <div
+                                            class="p-3 md:p-6 pt-2 md:pt-4 bg-slate-50/40 rounded-b-2xl transition-colors mt-auto">
                                             <div class="mb-3 md:mb-4">
-                                                <span class="text-[9px] md:text-[11px] text-slate-400 font-[800] uppercase tracking-wider block mb-0.5">Price Entry</span>
-                                                <span class="text-[15px] md:text-[21px] font-[900] text-[#003366] leading-none font-['Plus_Jakarta_Sans']">Rp {{ number_format($ticket->price, 0, ',', '.') }}</span>
+                                                <span
+                                                    class="text-[9px] md:text-[11px] text-slate-400 font-[800] uppercase tracking-wider block mb-0.5">Price
+                                                    Entry</span>
+                                                <span
+                                                    class="text-[15px] md:text-[21px] font-[900] text-[#003366] leading-none font-['Plus_Jakarta_Sans']">Rp
+                                                    {{ number_format($ticket->price, 0, ',', '.') }}</span>
                                             </div>
 
                                             @if ($qty > 0)
                                                 @auth
                                                     <a href="{{ route('participant.buy-more', $ticket->id) }}"
                                                         class="w-full bg-orange-600 text-white py-2 md:py-2.5 rounded-lg md:rounded-xl font-[800] text-[12px] md:text-[15px] transition-all active:scale-95 hover:bg-orange-700 flex items-center justify-center gap-1 md:gap-2">
-                                                        <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                                                        <svg class="w-3 h-3 md:w-4 md:h-4" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2.5" d="M12 4v16m8-8H4"></path>
                                                         </svg>
                                                         Beli Lagi
                                                     </a>
@@ -102,12 +129,15 @@
                                                     </a>
                                                 @endauth
                                             @else
-                                                <div class="w-full py-2 md:py-2.5 bg-slate-100 text-slate-400 text-center rounded-lg md:rounded-xl font-[900] text-[12px] md:text-[15px] uppercase tracking-wider cursor-not-allowed">Sold</div>
+                                                <div
+                                                    class="w-full py-2 md:py-2.5 bg-slate-100 text-slate-400 text-center rounded-lg md:rounded-xl font-[900] text-[12px] md:text-[15px] uppercase tracking-wider cursor-not-allowed">
+                                                    Sold</div>
                                             @endif
                                         </div>
 
                                         <!-- BG Category Identity -->
-                                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[60px] md:text-[100px] font-black text-slate-400/5 select-none pointer-events-none -rotate-12 z-0 font-['Plus_Jakarta_Sans'] whitespace-nowrap">
+                                        <div
+                                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[60px] md:text-[100px] font-black text-slate-400/5 select-none pointer-events-none -rotate-12 z-0 font-['Plus_Jakarta_Sans'] whitespace-nowrap">
                                             {{ $ticket->category->name }}
                                         </div>
                                     </div>
@@ -205,13 +235,13 @@
 
             // Update tab styles
             document.querySelectorAll('.category-tab').forEach(tab => {
-                tab.classList.remove('bg-[#003366]', 'text-white', 'shadow-[0_10px_20px_-5px_rgba(0,51,102,0.4)]');
+                tab.classList.remove('bg-[#003366]', 'text-white', 'shadow-md');
                 tab.classList.add('text-slate-500', 'hover:text-[#003366]');
             });
 
             const activeTab = document.getElementById('tab-' + id);
             if (activeTab) {
-                activeTab.classList.add('bg-[#003366]', 'text-white', 'shadow-[0_10px_20px_-5px_rgba(0,51,102,0.4)]');
+                activeTab.classList.add('bg-[#003366]', 'text-white', 'shadow-md');
                 activeTab.classList.remove('text-slate-500', 'hover:text-[#003366]');
             }
         }
