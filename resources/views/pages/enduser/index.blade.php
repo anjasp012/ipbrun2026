@@ -6,7 +6,7 @@
 
     <div class="py-12 md:py-20 flex items-center justify-center p-4">
         <div
-            class="max-w-7xl mx-auto w-full bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 relative flex flex-col p-6 md:p-16 overflow-hidden">
+            class="max-w-7xl mx-auto w-full bg-white rounded-xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 relative flex flex-col p-6 md:p-16 overflow-hidden">
 
             <!-- Content Area -->
             <div class="relative pr-2 custom-scrollbar flex-grow">
@@ -26,7 +26,7 @@
                         </button>
                         <button onclick="switchCategory('umum')" id="tab-umum"
                             class="flex-1 category-tab px-4 py-3 rounded-lg text-xs font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap text-slate-500 hover:text-[#003366]">
-                            Kategori Umum
+                            Umum
                         </button>
                     </div>
                 </div>
