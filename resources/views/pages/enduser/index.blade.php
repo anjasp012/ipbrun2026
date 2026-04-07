@@ -4,7 +4,7 @@
         style="background-image: url('{{ asset('assets/images/bg.png') }}')"></div>
     <div class="fixed inset-0 bg-blue-950/25 z-[-1]"></div>
 
-    <div class="py-12 md:py-20 flex items-center justify-center p-4">
+    <div class="py-12 flex items-center justify-center p-4">
         <div
             class="max-w-7xl mx-auto w-full bg-white/95 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 relative flex flex-col p-6 md:p-16 overflow-hidden">
 
