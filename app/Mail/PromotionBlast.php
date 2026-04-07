@@ -15,14 +15,16 @@ class PromotionBlast extends Mailable implements ShouldQueue
 
     public $subjectStr;
     public $messageStr;
+    public $attachmentPath;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($subjectStr, $messageStr)
+    public function __construct($subjectStr, $messageStr, $attachmentPath = null)
     {
         $this->subjectStr = $subjectStr;
         $this->messageStr = $messageStr;
+        $this->attachmentPath = $attachmentPath;
     }
 
     /**
@@ -52,6 +54,11 @@ class PromotionBlast extends Mailable implements ShouldQueue
      */
     public function attachments(): array
     {
+        if ($this->attachmentPath && file_exists(storage_path('app/' . $this->attachmentPath))) {
+            return [
+                \Illuminate\Mail\Mailables\Attachment::fromPath(storage_path('app/' . $this->attachmentPath))
+            ];
+        }
         return [];
     }
 }

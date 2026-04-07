@@ -19,7 +19,7 @@
             </div>
             @endif
 
-            <form id="blastForm" method="POST" class="space-y-6">
+            <form id="blastForm" method="POST" class="space-y-6" enctype="multipart/form-data">
                 @csrf
                 <div class="space-y-3">
                     <label class="text-[13px] font-black text-slate-400 uppercase tracking-widest ml-6">Recipients (Manual Input)</label>
@@ -50,9 +50,18 @@
                         name="message" 
                         id="form-message"
                         required
-                        rows="10"
+                        rows="8"
                         placeholder="Type your promotional message here..."
                         class="w-full bg-slate-50 border-2 border-slate-100 rounded-[2rem] px-8 py-5 text-base font-bold text-[#003366] outline-none focus:border-[#E8630A] focus:bg-white transition-all"></textarea>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="text-[13px] font-black text-slate-400 uppercase tracking-widest ml-6">Attachment (Optional)</label>
+                    <div class="relative group">
+                        <input type="file" name="attachment" id="form-attachment"
+                            class="w-full bg-slate-50 border-2 border-slate-100 rounded-[2rem] px-8 py-4 text-sm font-bold text-[#003366] outline-none focus:border-[#E8630A] focus:bg-white transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
+                    </div>
+                    <p class="text-[11px] text-slate-400 font-bold ml-6 uppercase opacity-60">Max size: 5MB (JPG, PNG, PDF, DOCX)</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-6 pt-6">

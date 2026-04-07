@@ -22,8 +22,14 @@ class BlastController extends Controller
         $request->validate([
             'targets' => 'required|string',
             'subject' => 'required|string|max:255',
-            'message' => 'required|string'
+            'message' => 'required|string',
+            'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx|max:5120'
         ]);
+
+        $attachmentPath = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentPath = $request->file('attachment')->store('attachments');
+        }
 
         $recipients = array_filter(preg_split("/[\s,]+/", $request->targets));
         $count = 0;
@@ -31,7 +37,7 @@ class BlastController extends Controller
         foreach ($recipients as $recipient) {
             $recipient = trim($recipient);
             if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
-                Mail::to($recipient)->queue(new PromotionBlast($request->subject, $request->message));
+                Mail::to($recipient)->queue(new PromotionBlast($request->subject, $request->message, $attachmentPath));
                 $count++;
             }
         }
