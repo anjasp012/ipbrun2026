@@ -28,7 +28,7 @@ class BlastController extends Controller
 
         $attachmentPath = null;
         if ($request->hasFile('attachment')) {
-            $attachmentPath = $request->file('attachment')->store('attachments');
+            $attachmentPath = $request->file('attachment')->store('attachments', 'public');
         }
 
         $recipients = array_filter(preg_split("/[\s,]+/", $request->targets));
