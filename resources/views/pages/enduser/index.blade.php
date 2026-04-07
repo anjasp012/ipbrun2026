@@ -9,134 +9,110 @@
             class="max-w-7xl mx-auto w-full bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 relative flex flex-col p-6 md:p-16 overflow-hidden">
 
             <!-- Content Area -->
-            <div class="relative space-y-6 pr-2 custom-scrollbar pb-10 flex-grow">
-                <!-- Category Switcher -->
-                <div class="flex justify-center mb-4 px-2">
-                    <div class="inline-flex p-1 bg-slate-100/80 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-sm w-full sm:w-auto overflow-x-auto no-scrollbar">
-                        <button onclick="switchCategory('ipb')" id="tab-ipb"
-                            class="flex-1 sm:flex-none category-tab px-4 sm:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-[2px] transition-all duration-300 active:scale-95 whitespace-nowrap bg-[#003366] text-white shadow-lg shadow-blue-900/20">
-                            Keluarga IPB
-                        </button>
-                        <button onclick="switchCategory('umum')" id="tab-umum"
-                            class="flex-1 sm:flex-none category-tab px-4 sm:px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-[2px] transition-all duration-300 active:scale-95 whitespace-nowrap text-slate-500 hover:text-[#003366]">
-                            Kategori Umum
-                        </button>
-                    </div>
-                </div>
+            <div class="relative space-y-4 pr-2 custom-scrollbar pb-10 flex-grow">
                 @php
                     $ticketGroups = [
                         ['data' => $tickets_ipb, 'title' => 'Keluarga Besar IPB', 'id' => 'ipb'],
-                        ['data' => $tickets_public, 'title' => 'Umum', 'id' => 'umum'],
+                        ['data' => $tickets_public, 'title' => 'Kategori Umum', 'id' => 'umum'],
                     ];
                 @endphp
 
                 @foreach ($ticketGroups as $group)
                     @if (count($group['data']) > 0)
-                        <section class="ticket-section {{ $group['id'] !== 'ipb' ? 'hidden' : '' }}" id="section-{{ $group['id'] }}">
-                            <div class="text-center mb-6">
-                                <h2
-                                    class="text-xl font-[800] text-[#003366] font-['Plus_Jakarta_Sans'] tracking-tight uppercase">
-                                    {{ $group['title'] }}
-                                </h2>
-                                <div class="mx-auto w-12 h-1 mt-2 bg-[#E8630A] rounded-full"></div>
-                            </div>
+                        <div class="border border-slate-100 rounded-[2.5rem] bg-white shadow-sm overflow-hidden transition-all duration-500">
+                            {{-- Accordion Header --}}
+                            <button onclick="toggleAccordion('{{ $group['id'] }}')" 
+                                class="w-full px-8 md:px-12 py-6 md:py-8 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors group">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-2 h-8 bg-[#003366] rounded-full group-hover:scale-y-125 transition-transform duration-300"></div>
+                                    <h2 class="text-lg md:text-2xl font-[900] text-[#003366] font-['Plus_Jakarta_Sans'] tracking-tight uppercase">
+                                        {{ $group['title'] }}
+                                    </h2>
+                                </div>
+                                <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-[#003366] group-hover:bg-[#003366] group-hover:text-white transition-all duration-300 shadow-inner">
+                                    <svg id="icon-{{ $group['id'] }}" class="w-5 h-5 md:w-6 md:h-6 transition-transform duration-500 {{ $group['id'] !== 'ipb' ? 'rotate-0' : 'rotate-180' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                            </button>
 
-                            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 px-1">
-                                @foreach ($group['data'] as $ticket)
-                                    @php $qty = $ticket->qty - $ticket->participants_count; @endphp
-                                    <div
-                                        class="relative bg-white border border-slate-100 rounded-2xl flex flex-col transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md">
-                                        <!-- Card Content -->
-                                        <div class="p-3 md:p-6 pb-2">
-                                            <div class="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
-                                                <h3
-                                                    class="text-[13px] md:text-[17px] font-[800] text-[#003366] leading-[1.3] font-['Plus_Jakarta_Sans']">
-                                                    {{ $ticket->category->name }}
-                                                    {{ $ticket->name ?: strtoupper($ticket->type) }}
-                                                </h3>
+                            {{-- Accordion Content --}}
+                            <div id="content-{{ $group['id'] }}" class="transition-all duration-500 ease-in-out {{ $group['id'] !== 'ipb' ? 'max-h-0 opacity-0' : 'max-h-[5000px] opacity-100' }} overflow-hidden">
+                                <div class="px-4 md:px-12 pb-8 md:pb-12">
+                                    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+                                        @foreach ($group['data'] as $ticket)
+                                            @php $qty = $ticket->qty - $ticket->participants_count; @endphp
+                                            <div class="relative bg-white border border-slate-100 rounded-2xl flex flex-col transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md group/card hover:-translate-y-1">
+                                                <!-- Card Content -->
+                                                <div class="p-3 md:p-6 pb-2">
+                                                    <div class="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
+                                                        <h3 class="text-[13px] md:text-[17px] font-[800] text-[#003366] leading-[1.3] font-['Plus_Jakarta_Sans']">
+                                                            {{ $ticket->category->name }}
+                                                            {{ $ticket->name ?: strtoupper($ticket->type) }}
+                                                        </h3>
 
-                                                <div class="flex-shrink-0">
-                                                    @if ($qty <= 0)
-                                                        <span
-                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-slate-100 text-slate-500 border border-slate-200">Sold
-                                                            Out</span>
-                                                    @elseif($qty < 10)
-                                                        <span
-                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-red-50 text-red-600 border border-red-100/50">Sisa:
-                                                            {{ $qty }}</span>
-                                                    @elseif($qty < 30)
-                                                        <span
-                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-100/50">Sisa:
-                                                            {{ $qty }}</span>
+                                                        <div class="flex-shrink-0">
+                                                            @if ($qty <= 0)
+                                                                <span class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-slate-100 text-slate-500 border border-slate-200">Sold Out</span>
+                                                            @elseif($qty < 10)
+                                                                <span class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-red-50 text-red-600 border border-red-100/50">Sisa: {{ $qty }}</span>
+                                                            @elseif($qty < 30)
+                                                                <span class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-100/50">Sisa: {{ $qty }}</span>
+                                                            @else
+                                                                <span class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100/50">Sisa: {{ $qty }}</span>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="text-[9px] md:text-[11px] text-[#E8630A] font-[800] uppercase tracking-[0.5px] mb-3 opacity-80">
+                                                        {{ $ticket->period->name ?? 'Standard' }}
+                                                    </div>
+                                                </div>
+
+                                                <!-- Perforation -->
+                                                <div class="relative flex items-center py-1 md:py-2 overflow-hidden pointer-events-none">
+                                                    <div class="absolute -left-3 w-6 h-6 bg-[#f1f5f9] rounded-full shadow-inner ring-1 ring-inset ring-slate-200/20"></div>
+                                                    <div class="absolute -right-3 w-6 h-6 bg-[#f1f5f9] rounded-full shadow-inner ring-1 ring-inset ring-slate-200/20"></div>
+                                                    <div class="w-full border-t-2 border-dashed border-slate-200 mx-3 md:mx-5"></div>
+                                                </div>
+
+                                                <!-- Price / Action -->
+                                                <div class="p-3 md:p-6 pt-2 md:pt-4 bg-slate-50/40 rounded-b-2xl transition-colors mt-auto">
+                                                    <div class="mb-3 md:mb-4">
+                                                        <span class="text-[9px] md:text-[11px] text-slate-400 font-[800] uppercase tracking-wider block mb-0.5">Price Entry</span>
+                                                        <span class="text-[15px] md:text-[21px] font-[900] text-[#003366] leading-none font-['Plus_Jakarta_Sans']">Rp {{ number_format($ticket->price, 0, ',', '.') }}</span>
+                                                    </div>
+
+                                                    @if ($qty > 0)
+                                                        @auth
+                                                            <a href="{{ route('participant.buy-more', $ticket->id) }}"
+                                                                class="w-full bg-orange-600 text-white py-2 md:py-2.5 rounded-lg md:rounded-xl font-[800] text-[12px] md:text-[15px] transition-all active:scale-95 hover:bg-orange-700 flex items-center justify-center gap-1 md:gap-2">
+                                                                <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                                                                </svg>
+                                                                Beli Lagi
+                                                            </a>
+                                                        @else
+                                                            <a href="{{ route('checkout', $ticket->id) }}"
+                                                                class="w-full bg-[#003366] text-white py-2 md:py-2.5 rounded-lg md:rounded-xl font-[800] text-[12px] md:text-[15px] transition-all active:scale-95 hover:bg-[#002244] flex items-center justify-center">
+                                                                Daftar
+                                                            </a>
+                                                        @endauth
                                                     @else
-                                                        <span
-                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100/50">Sisa:
-                                                            {{ $qty }}</span>
+                                                        <div class="w-full py-2 md:py-2.5 bg-slate-100 text-slate-400 text-center rounded-lg md:rounded-xl font-[900] text-[12px] md:text-[15px] uppercase tracking-wider cursor-not-allowed">Sold</div>
                                                     @endif
                                                 </div>
-                                            </div>
 
-                                            <div
-                                                class="text-[9px] md:text-[11px] text-[#E8630A] font-[800] uppercase tracking-[0.5px] mb-3 opacity-80">
-                                                {{ $ticket->period->name ?? 'Standard' }}
+                                                <!-- BG Category Identity -->
+                                                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[60px] md:text-[100px] font-black text-slate-400/5 select-none pointer-events-none -rotate-12 z-0 font-['Plus_Jakarta_Sans'] whitespace-nowrap">
+                                                    {{ $ticket->category->name }}
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        <!-- Perforation -->
-                                        <div
-                                            class="relative flex items-center py-1 md:py-2 overflow-hidden pointer-events-none">
-                                            <div
-                                                class="absolute -left-3 w-6 h-6 bg-[#f1f5f9] rounded-full shadow-inner ring-1 ring-inset ring-slate-200/20">
-                                            </div>
-                                            <div
-                                                class="absolute -right-3 w-6 h-6 bg-[#f1f5f9] rounded-full shadow-inner ring-1 ring-inset ring-slate-200/20">
-                                            </div>
-                                            <div class="w-full border-t-2 border-dashed border-slate-200 mx-3 md:mx-5"></div>
-                                        </div>
-
-                                        <!-- Price / Action -->
-                                        <div class="p-3 md:p-6 pt-2 md:pt-4 bg-slate-50/40 rounded-b-2xl transition-colors mt-auto">
-                                            <div class="mb-3 md:mb-4">
-                                                <span
-                                                    class="text-[9px] md:text-[11px] text-slate-400 font-[800] uppercase tracking-wider block mb-0.5">Price Entry</span>
-                                                <span
-                                                    class="text-[15px] md:text-[21px] font-[900] text-[#003366] leading-none font-['Plus_Jakarta_Sans']">Rp
-                                                    {{ number_format($ticket->price, 0, ',', '.') }}</span>
-                                            </div>
-
-                                            @if ($qty > 0)
-                                                @auth
-                                                    <a href="{{ route('participant.buy-more', $ticket->id) }}"
-                                                        class="w-full bg-orange-600 text-white py-2 md:py-2.5 rounded-lg md:rounded-xl font-[800] text-[12px] md:text-[15px] transition-all active:scale-95 hover:bg-orange-700 flex items-center justify-center gap-1 md:gap-2">
-                                                        <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2.5" d="M12 4v16m8-8H4"></path>
-                                                        </svg>
-                                                        Beli Lagi
-                                                    </a>
-                                                @else
-                                                    <a href="{{ route('checkout', $ticket->id) }}"
-                                                        class="w-full bg-[#003366] text-white py-2 md:py-2.5 rounded-lg md:rounded-xl font-[800] text-[12px] md:text-[15px] transition-all active:scale-95 hover:bg-[#002244] flex items-center justify-center">
-                                                        Daftar
-                                                    </a>
-                                                @endauth
-                                            @else
-                                                <div
-                                                    class="w-full py-2 md:py-2.5 bg-slate-100 text-slate-400 text-center rounded-lg md:rounded-xl font-[900] text-[12px] md:text-[15px] uppercase tracking-wider cursor-not-allowed">
-                                                    Sold</div>
-                                            @endif
-                                        </div>
-
-                                        <!-- BG Category Identity -->
-                                        <div
-                                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[60px] md:text-[100px] font-black text-slate-400/5 select-none pointer-events-none -rotate-12 z-0 font-['Plus_Jakarta_Sans'] whitespace-nowrap">
-                                            {{ $ticket->category->name }}
-                                        </div>
+                                        @endforeach
                                     </div>
-                                @endforeach
+                                </div>
                             </div>
-                        </section>
+                        </div>
                     @endif
                 @endforeach
 
@@ -214,28 +190,21 @@
             @endif
         });
 
-        function switchCategory(id) {
-            // Hide all sections
-            document.querySelectorAll('.ticket-section').forEach(section => {
-                section.classList.add('hidden');
-            });
-
-            // Show selected section
-            const selectedSection = document.getElementById('section-' + id);
-            if (selectedSection) {
-                selectedSection.classList.remove('hidden');
-            }
-
-            // Update tab styles
-            document.querySelectorAll('.category-tab').forEach(tab => {
-                tab.classList.remove('bg-[#003366]', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
-                tab.classList.add('text-slate-500', 'hover:text-[#003366]');
-            });
-
-            const activeTab = document.getElementById('tab-' + id);
-            if (activeTab) {
-                activeTab.classList.add('bg-[#003366]', 'text-white', 'shadow-lg', 'shadow-blue-900/20');
-                activeTab.classList.remove('text-slate-500', 'hover:text-[#003366]');
+        function toggleAccordion(id) {
+            const content = document.getElementById('content-' + id);
+            const icon = document.getElementById('icon-' + id);
+            
+            // Toggle current one
+            if (content.classList.contains('max-h-0')) {
+                // Open it
+                content.classList.remove('max-h-0', 'opacity-0');
+                content.classList.add('max-h-[5000px]', 'opacity-100');
+                icon.classList.add('rotate-180');
+            } else {
+                // Close it
+                content.classList.add('max-h-0', 'opacity-0');
+                content.classList.remove('max-h-[5000px]', 'opacity-100');
+                icon.classList.remove('rotate-180');
             }
         }
     </script>
