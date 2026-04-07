@@ -11,14 +11,10 @@
         <div class="flex justify-between h-20">
             <!-- Logo & Brand -->
             <div class="flex items-center gap-4">
-                <a href="{{ url('/') }}" class="flex items-center gap-3 group transition-all">
-                    <div
-                        class="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform">
-                        I</div>
-                    <div class="hidden sm:block">
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-[3px] leading-tight mb-0.5">Official Platform</p>
-                        <h1 class="text-lg font-black text-[#003366] uppercase leading-tight tracking-tighter">IPB RUN 2026</h1>
-                    </div>
+                <a href="{{ url('/') }}" class="hover:scale-105 transition-transform duration-300">
+                    <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" 
+                         alt="IPB RUN 2026" 
+                         class="h-10 md:h-12 w-auto drop-shadow-sm">
                 </a>
             </div>
 
