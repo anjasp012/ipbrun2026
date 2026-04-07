@@ -56,8 +56,14 @@ class PromotionBlast extends Mailable implements ShouldQueue
     public function attachments(): array
     {
         if ($this->attachmentPath && Storage::disk('public')->exists($this->attachmentPath)) {
+            $extension = pathinfo(Storage::disk('public')->path($this->attachmentPath), PATHINFO_EXTENSION);
+            // Construct filename from subject, cleaned for safety
+            $safeName = \Illuminate\Support\Str::slug($this->subjectStr) ?: 'attachment';
+            $displayName = $safeName . '.' . $extension;
+
             return [
                 \Illuminate\Mail\Mailables\Attachment::fromPath(Storage::disk('public')->path($this->attachmentPath))
+                    ->as($displayName)
             ];
         }
         return [];
