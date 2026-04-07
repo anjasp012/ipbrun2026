@@ -1,25 +1,6 @@
 <x-layouts.app title="Dashboard Peserta - IPB RUN 2026">
     <div class="fixed inset-0 bg-[#f4f6f9] z-[-2]"></div>
     
-    <!-- Official Header -->
-    <div class="h-20 border-b border-slate-200 bg-white sticky top-0 z-50 px-6 sm:px-12 flex items-center justify-between shadow-sm">
-        <div class="flex items-center gap-6">
-             <div class="flex flex-col">
-                 <h1 class="text-lg font-black text-[#003366] uppercase tracking-tighter leading-none mb-1">IPB RUN 2026</h1>
-                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Official Participant Portal</p>
-             </div>
-        </div>
-        <div class="flex items-center gap-6">
-             <div class="hidden sm:flex flex-col text-right border-r border-slate-100 pr-6 mr-2">
-                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Halaman Akun</span>
-                 <span class="text-xs font-black text-[#003366] uppercase">{{ auth()->user()->name }}</span>
-             </div>
-             <form action="{{ route('logout') }}" method="POST" class="inline">
-                @csrf
-                <button type="submit" class="text-[11px] font-black text-white bg-[#003366] px-6 h-11 rounded-xl uppercase tracking-widest hover:bg-blue-900 transition-all shadow-lg shadow-blue-900/10 active:scale-95">Keluar</button>
-             </form>
-        </div>
-    </div>
 
     <div class="max-w-[1000px] mx-auto py-12 px-6">
         

@@ -4,68 +4,12 @@
         style="background-image: url('{{ asset('assets/images/bg.png') }}')"></div>
     <div class="fixed inset-0 bg-blue-950/25 z-[-1]"></div>
 
-    <div class="h-screen overflow-hidden flex items-center justify-center p-4">
+    <div class="py-12 md:py-20 flex items-center justify-center p-4">
         <div
-            class="max-w-auto w-full max-h-[98vh] bg-white rounded-3xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 relative flex flex-col p-10 md:p-12 overflow-hidden">
-            <!-- Header / Auth Navigation -->
-            <div
-                class="absolute top-0 left-0 right-0 h-20 px-10 md:px-12 flex items-center justify-between border-b border-slate-100 bg-white/80 backdrop-blur-md z-30">
-                <div class="flex items-center gap-4">
-                    <div
-                        class="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center font-black text-white text-lg shadow-lg shadow-blue-200">
-                        I</div>
-                    <div class="hidden sm:block">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-[3px] leading-tight">Official
-                            Platform</p>
-                        <h1 class="text-lg font-black text-[#003366] uppercase leading-tight tracking-tighter">IPB RUN
-                            2026</h1>
-                    </div>
-                </div>
+            class="max-w-7xl mx-auto w-full bg-white rounded-[2.5rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 relative flex flex-col p-6 md:p-16 overflow-hidden">
 
-                <div class="flex items-center gap-4">
-                    @auth
-                        <div class="flex items-center gap-4 px-5 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl">
-                            <div class="text-right hidden md:block">
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
-                                    Signed in as</p>
-                                <p class="text-xs font-black text-[#003366] truncate max-w-[150px]">
-                                    {{ auth()->user()->name }}</p>
-                            </div>
-                            <div
-                                class="w-8 h-8 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-black text-xs border border-orange-200 shadow-inner">
-                                {{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}
-                            </div>
-                            @if (auth()->user()->role === 'admin')
-                                <a href="{{ url('/admin/dashboard') }}"
-                                    class="text-[10px] font-black text-blue-600 uppercase tracking-widest border border-blue-200 bg-blue-50 px-3 py-1.5 rounded-lg hover:bg-blue-100 transition-all">Dashboard</a>
-                            @endif
-                            <form action="{{ route('logout') }}" method="POST" class="inline">
-                                @csrf
-                                <button type="submit" class="p-2 text-slate-400 hover:text-red-600 transition-colors">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
-                    @else
-                        <a href="{{ route('login') }}"
-                            class="flex items-center gap-3 px-6 h-12 bg-[#003366] hover:bg-[#002244] text-white rounded-2xl font-black text-[11px] uppercase tracking-[2px] shadow-xl shadow-blue-900/10 transition-all active:scale-95">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                                </path>
-                            </svg>
-                            Masuk Akun
-                        </a>
-                    @endauth
-                </div>
-            </div>
-
-            <!-- Content Area (Added Pt-20 for header space) -->
-            <div class="relative space-y-6 overflow-y-auto pr-2 custom-scrollbar pt-24 pb-10 flex-grow">
+            <!-- Content Area -->
+            <div class="relative space-y-6 pr-2 custom-scrollbar pb-10 flex-grow">
                 <!-- Category Switcher -->
                 <div class="flex justify-center mb-4 px-2">
                     <div class="inline-flex p-1 bg-slate-100/80 backdrop-blur-sm rounded-2xl border border-slate-200 shadow-sm w-full sm:w-auto overflow-x-auto no-scrollbar">
