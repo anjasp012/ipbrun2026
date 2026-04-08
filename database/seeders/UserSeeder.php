@@ -14,33 +14,33 @@ class UserSeeder extends Seeder
     {
         // 1. Super Admin
         \App\Models\User::updateOrCreate(
-            ['email' => 'superadmin@ipbrun.com'],
+            ['email' => 'superadmin@ipbrun2026.com'],
             [
                 'name' => 'Super Admin',
                 'username' => 'superadmin',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'password' => \Illuminate\Support\Facades\Hash::make('supersuper'),
                 'role' => 'superadmin',
             ]
         );
 
         // 2. Admin
         \App\Models\User::updateOrCreate(
-            ['email' => 'admin@ipbrun.com'],
+            ['email' => 'admin@ipbrun2026.com'],
             [
                 'name' => 'Admin Staff',
                 'username' => 'admin',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'password' => \Illuminate\Support\Facades\Hash::make('adminadmin'),
                 'role' => 'admin',
             ]
         );
 
         // 3. PIC
         \App\Models\User::updateOrCreate(
-            ['email' => 'pic@ipbrun.com'],
+            ['email' => 'pic@ipbrun2026.com'],
             [
                 'name' => 'PIC Field',
                 'username' => 'pic',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'password' => \Illuminate\Support\Facades\Hash::make('picpicpic'),
                 'role' => 'pic',
             ]
         );
