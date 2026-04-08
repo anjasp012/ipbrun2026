@@ -147,9 +147,15 @@ class AdminController extends Controller
         ];
 
         $columns = [
-            'Order Code', 'Name', 'Email', 'Phone', 'NIK', 'Gender', 'Blood Type', 
-            'Jersey Size', 'NIM/NRP', 'Nationality', 'Address', 'Category', 
-            'Ticket Name', 'Type', 'Period', 'Status', 'Registered At'
+            // Participant Data
+            'Name', 'Email', 'Phone', 'NIK', 'Birth Date', 'Gender', 'Blood Type', 
+            'Jersey Size', 'NIM/NRP', 'Nationality', 'Address', 
+            'Emergency Contact Name', 'Emergency Contact Phone', 'Emergency Relationship',
+            'Community', 'Best Time', 'Previous Events', 'Shuttle Bus',
+            // Order Data
+            'Order Code', 'Order Status', 'Total Order Price', 'Registered At',
+            // Ticket Data
+            'Ticket Name', 'Category', 'Ticket Type', 'Registration Period'
         ];
 
         $callback = function() use($participants, $columns) {
@@ -157,46 +163,39 @@ class AdminController extends Controller
             fputcsv($file, $columns);
 
             foreach ($participants as $p) {
-                // Gabungkan Order Codes
-                $orderCodes = $p->raceEntries->pluck('order.order_code')->filter()->unique()->implode(' | ');
-                
-                // Gabungkan Informasi Tiket (Kategori + Nama)
-                $ticketDetails = $p->raceEntries->map(function($entry) {
-                    $cat = $entry->ticket->category->name ?? '-';
-                    $tkt = $entry->ticket->name ?? ($entry->ticket->type ? strtoupper($entry->ticket->type) : '-');
-                    return "$cat ($tkt)";
-                })->implode(' | ');
-
-                // Gabungkan Tipe Tiket
-                $ticketTypes = $p->raceEntries->pluck('ticket.type')->filter()->map(fn($t) => strtoupper($t))->unique()->implode(' | ');
-
-                // Gabungkan Period
-                $periods = $p->raceEntries->pluck('ticket.period.name')->filter()->unique()->implode(' | ');
-
-                // Gabungkan Status (Jika ada yang beda statusnya)
-                $statuses = $p->raceEntries->map(function($e) {
-                    return $e->order->status ?? ($e->status ?? '-');
-                })->unique()->implode(' | ');
-
-                fputcsv($file, [
-                    $orderCodes ?: '-',
-                    $p->name,
-                    $p->email,
-                    $p->phone_number,
-                    $p->nik,
-                    $p->sex,
-                    $p->blood_type,
-                    $p->jersey_size,
-                    $p->nim_nrp,
-                    $p->nationality,
-                    $p->address,
-                    $ticketDetails, // Category & Ticket Name combined logic
-                    $ticketDetails, // Re-using combined for simplicity as requested
-                    $ticketTypes,
-                    $periods,
-                    $statuses,
-                    $p->created_at->format('Y-m-d H:i')
-                ]);
+                foreach ($p->raceEntries as $entry) {
+                    fputcsv($file, [
+                        // Participant
+                        $p->name,
+                        $p->email,
+                        $p->phone_number,
+                        $p->nik,
+                        $p->date_birth,
+                        strtoupper($p->sex),
+                        $p->blood_type,
+                        $p->jersey_size,
+                        $p->nim_nrp ?: '-',
+                        $p->nationality,
+                        $p->address,
+                        $p->emergency_contact_name,
+                        $p->emergency_contact_phone_number,
+                        $p->emergency_contact_relationship,
+                        $p->running_community ?: '-',
+                        $p->best_time ?: '-',
+                        $p->previous_events ?: '-',
+                        $p->shuttle_bus ?: 'No',
+                        // Order
+                        $entry->order->order_code ?? '-',
+                        strtoupper($entry->order->status ?? ($entry->status ?? 'unknown')),
+                        $entry->order->total_price ?? 0,
+                        $p->created_at->format('Y-m-d H:i'),
+                        // Ticket
+                        $entry->ticket->name ?? ($entry->ticket->type ? strtoupper($entry->ticket->type) : '-'),
+                        $entry->ticket->category->name ?? '-',
+                        strtoupper($entry->ticket->type ?? '-'),
+                        $entry->ticket->period->name ?? 'Standard'
+                    ]);
+                }
             }
 
             fclose($file);
