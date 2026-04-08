@@ -418,7 +418,7 @@
                             </div>
                             {{-- Length Indicator (B) --}}
                             <div class="absolute top-4 left-1/2 w-[1px] h-[calc(100%-24px)] border-l-2 border-dashed border-white/80">
-                                <span class="absolute bottom-0 right-4 bg-[#003366] text-white text-[10px] font-black px-1.5 py-2 rounded-sm shadow-lg whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg) translateX(-50%);">BODY LENGTH</span>
+                                <span class="absolute bottom-0 right-4 bg-[#003366] text-white text-[10px] font-black px-1.5 py-1 rounded-sm shadow-lg whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg) translateX(-50%);">BODY LENGTH</span>
                             </div>
                         </div>
                     </div>
