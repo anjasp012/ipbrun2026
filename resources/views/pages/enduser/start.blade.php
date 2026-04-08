@@ -1,4 +1,4 @@
-<x-layouts.app title="Registration Start - Tool">
+<x-layouts.app title="Registration Start - Tool" :withoutNavbar="true">
     <div class="fixed inset-0 bg-[#001A33] flex items-center justify-center p-6 select-none overflow-hidden">
         <!-- Background Elements -->
         <div class="fixed inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>

@@ -11,6 +11,10 @@ class ToolController extends Controller
 {
     public function startPage()
     {
+        $isRunning = Setting::getValue('is_running', '0') === '1';
+        if ($isRunning) {
+            return redirect('/');
+        }
         return view('pages.enduser.start');
     }
 
@@ -18,6 +22,11 @@ class ToolController extends Controller
     {
         if ($request->password !== 'IpbRun2026#') {
             return response()->json(['success' => false, 'message' => 'Password salah!'], 403);
+        }
+
+        $isRunning = Setting::getValue('is_running', '0') === '1';
+        if ($isRunning) {
+            return response()->json(['success' => false, 'message' => 'Sistem sudah aktif!'], 403);
         }
 
         // Setting: 24h from now (+3 seconds for the countdown room)
