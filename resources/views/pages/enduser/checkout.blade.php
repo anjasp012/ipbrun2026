@@ -144,8 +144,17 @@
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg> Size Chart </button> </div> <x-select id="jersey_size" name="jersey_size"
-                            required :options="['S' => 'S', 'M' => 'M', 'L' => 'L', 'XL' => 'XL', 'XXL' => 'XXL']" :selected="old('jersey_size')"
+                        <x-select id="jersey_size" name="jersey_size" required :options="[
+                            'XS' => 'XS',
+                            'S' => 'S',
+                            'M' => 'M',
+                            'L' => 'L',
+                            'XL' => 'XL',
+                            '2XL' => '2XL',
+                            '3XL' => '3XL',
+                            '4XL' => '4XL',
+                            '5XL' => '5XL',
+                        ]" :selected="old('jersey_size')"
                             class="{{ $errors->has('jersey_size') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
                         @error('jersey_size')
                             <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
@@ -372,62 +381,90 @@
                 return;
             }
             Swal.fire({
-                title: '<span class="text-[#003366] font-black uppercase tracking-tight">Jersey Size Chart</span>',
+                title: '<span class="text-[#003366] font-black uppercase tracking-tight text-2xl">Race Tee Size Chart</span>',
                 html: `
-                <div class="mt-6 flex flex-col md:flex-row items-center gap-8 px-2">
-                    <div class="flex items-center gap-6 bg-slate-50 p-6 rounded-3xl border border-slate-100 flex-1 w-full">
-                        <div class="relative w-20 h-20 shrink-0">
-                            <svg class="w-full h-full text-[#FF7A21]" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M7 3L4 7V9H6V21H18V9H20V7L17 3H7Z" />
-                            </svg>
-                            <div class="absolute top-[45%] left-1 w-full h-[1px] border-t border-dashed border-white/80"></div>
-                            <div class="absolute top-1 left-1/2 w-[1px] h-[80%] border-l border-dashed border-white/80"></div>
+                <div class="mt-6 flex flex-col md:flex-row items-center gap-8 px-2 text-left">
+                    <div class="flex items-center gap-6 bg-slate-50 p-6 rounded-3xl border border-slate-100 flex-1 w-full relative overflow-hidden">
+                        {{-- Motif Background --}}
+                        <div class="absolute -right-4 -top-4 opacity-[0.03] scale-150">
+                            <svg class="w-24 h-24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l8 4v8.64l-8 4-8-4V8.18l8-4z"/></svg>
                         </div>
-                        <div class="text-left space-y-2">
-                            <div class="flex items-start gap-2">
-                                <span class="bg-[#003366] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5">A</span>
-                                <p class="text-[11px] font-bold text-slate-700 leading-tight">
-                                    <span class="text-[#003366]">Lebar Dada:</span><br>Dari ketiak ke ketiak.
-                                </p>
+
+                        <div class="relative w-24 h-24 shrink-0">
+                            {{-- T-Shirt SVG --}}
+                            <svg class="w-full h-full text-[#FF7A21]" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12,2L4.5,4.7V9H6V22H18V9H19.5V4.7L12,2Z" />
+                            </svg>
+                            {{-- Chest Indicator (A) --}}
+                            <div class="absolute top-[45%] left-2 w-[calc(100%-16px)] h-[1px] border-t-2 border-dashed border-white/80">
+                                <div class="absolute -left-1 -top-[3px] w-1.5 h-1.5 bg-white rounded-full"></div>
+                                <div class="absolute -right-1 -top-[3px] w-1.5 h-1.5 bg-white rounded-full"></div>
+                                <span class="absolute top-1 left-1/2 -translate-x-1/2 bg-[#003366] text-white text-[8px] font-black px-1 rounded-sm">CHEST</span>
                             </div>
-                            <div class="flex items-start gap-2">
-                                <span class="bg-[#003366] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5">B</span>
-                                <p class="text-[11px] font-bold text-slate-700 leading-tight">
-                                    <span class="text-[#003366]">Panjang:</span><br>Dari kerah ke bawah.
-                                </p>
+                            {{-- Length Indicator (B) --}}
+                            <div class="absolute top-2 left-1/2 w-[1px] h-[calc(100%-12px)] border-l-2 border-dashed border-white/80">
+                                <div class="absolute -left-[3px] -top-1 w-1.5 h-1.5 bg-white rounded-full"></div>
+                                <div class="absolute -left-[3px] -bottom-1 w-1.5 h-1.5 bg-white rounded-full"></div>
+                                <span class="absolute top-1/2 right-2 -translate-y-1/2 bg-[#003366] text-white text-[8px] font-black px-1 rounded-sm flex items-center h-4 whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg) translateX(-50%);">BODY LENGTH</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-3">
+                                <div class="bg-[#003366] text-white text-[10px] font-black w-5 h-5 rounded-lg flex items-center justify-center shrink-0 shadow-sm mt-0.5">A</div>
+                                <div>
+                                    <p class="text-[11px] font-black text-[#003366] leading-none uppercase tracking-wider mb-1">Chest</p>
+                                    <p class="text-[10px] font-bold text-slate-500 leading-tight italic">Lebar dari ketiak kiri ke ketiak kanan.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="bg-[#003366] text-white text-[10px] font-black w-5 h-5 rounded-lg flex items-center justify-center shrink-0 shadow-sm mt-0.5">B</div>
+                                <div>
+                                    <p class="text-[11px] font-black text-[#003366] leading-none uppercase tracking-wider mb-1">Body Length</p>
+                                    <p class="text-[10px] font-bold text-slate-500 leading-tight italic">Panjang dari bahu ke ujung bawah baju.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="overflow-hidden rounded-2xl border border-slate-100 flex-1 w-full">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-[#003366] text-white font-black uppercase tracking-wider">
+
+                    <div class="overflow-hidden rounded-2xl border border-slate-100 flex-1 w-full bg-white shadow-sm font-['Plus_Jakarta_Sans']">
+                        <table class="w-full text-center text-xs">
+                            <thead class="bg-[#003366] text-white font-black uppercase tracking-widest leading-none">
                                 <tr>
-                                    <th class="px-4 py-3">Size</th>
-                                    <th class="px-4 py-3">A (cm)</th>
-                                    <th class="px-4 py-3">B (cm)</th>
+                                    <th class="px-3 py-4 text-[10px]">Size</th>
+                                    <th class="px-3 py-4 text-[10px]">Chest (cm)</th>
+                                    <th class="px-3 py-4 text-[10px]">Length (cm)</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-50 font-bold text-slate-600">
-                                <tr><td class="px-4 py-3 bg-slate-50/30">S</td><td class="px-4 py-3">47</td><td class="px-4 py-3">67</td></tr>
-                                <tr><td class="px-4 py-3 bg-slate-50/30">M</td><td class="px-4 py-3">50</td><td class="px-4 py-3">70</td></tr>
-                                <tr><td class="px-4 py-3 bg-slate-50/30">L</td><td class="px-4 py-3">53</td><td class="px-4 py-3">73</td></tr>
-                                <tr><td class="px-4 py-3 bg-slate-50/30">XL</td><td class="px-4 py-3">56</td><td class="px-4 py-3">75</td></tr>
-                                <tr><td class="px-4 py-3 bg-slate-50/30">XXL</td><td class="px-4 py-3">59</td><td class="px-4 py-3">77</td></tr>
+                            <tbody class="divide-y divide-slate-50 font-black text-slate-700">
+                                <tr><td class="px-3 py-3 bg-slate-50/50">XS</td><td class="px-3 py-3">47</td><td class="px-3 py-3">64</td></tr>
+                                <tr class="bg-white"><td class="px-3 py-3 bg-slate-50/50">S</td><td class="px-3 py-3">49</td><td class="px-3 py-3">66</td></tr>
+                                <tr><td class="px-3 py-3 bg-slate-50/50">M</td><td class="px-3 py-3">51</td><td class="px-3 py-3">68</td></tr>
+                                <tr class="bg-white"><td class="px-3 py-3 bg-slate-50/50">L</td><td class="px-3 py-3">53</td><td class="px-3 py-3">70</td></tr>
+                                <tr><td class="px-3 py-3 bg-slate-50/30 font-black text-blue-600 italic">XL</td><td class="px-3 py-3">55</td><td class="px-3 py-3">72</td></tr>
+                                <tr class="bg-white"><td class="px-3 py-3 bg-slate-50/50">2XL</td><td class="px-3 py-3">57</td><td class="px-3 py-3">74</td></tr>
+                                <tr><td class="px-3 py-3 bg-slate-50/50">3XL</td><td class="px-3 py-3">59</td><td class="px-3 py-3">76</td></tr>
+                                <tr class="bg-white"><td class="px-3 py-3 bg-slate-50/50">4XL</td><td class="px-3 py-3">61</td><td class="px-3 py-3">78</td></tr>
+                                <tr><td class="px-3 py-3 bg-slate-50/50">5XL</td><td class="px-3 py-3">64</td><td class="px-3 py-3">80</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <p class="mt-6 text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">
-                    * Toleransi ukuran ±1-2 cm. <br> Pastikan ukuran yang Anda pilih sudah sesuai.
-                </p>
+                <div class="mt-8 px-4 py-3 bg-blue-50/50 rounded-xl border border-blue-100 flex items-center justify-center gap-3">
+                    <svg class="w-4 h-4 text-[#003366] opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <p class="text-[9.5px] text-[#003366] font-black uppercase tracking-widest opacity-80 italic leading-snug">
+                        * Toleransi ukuran ±1-2 cm. Pastikan ukuran yang Anda pilih sudah sesuai.
+                    </p>
+                </div>
                 `,
                 showConfirmButton: true,
-                confirmButtonText: 'TUTUP',
+                confirmButtonText: 'KONFIRMASI UKURAN',
                 confirmButtonColor: '#003366',
-                width: '600px',
+                width: '740px',
+                padding: '1.5rem',
                 customClass: {
-                    popup: 'rounded-[3rem] border border-slate-100 shadow-2xl',
-                    confirmButton: 'rounded-xl px-12 py-4 font-black uppercase tracking-widest text-[11px]'
+                    popup: 'rounded-[1.5rem] border border-slate-100 shadow-2xl',
+                    confirmButton: 'rounded-xl px-12 py-4 font-black uppercase tracking-widest text-[11px] transition-all hover:scale-105'
                 }
             });
         }

@@ -161,7 +161,7 @@ class TicketController extends Controller
             'date_birth' => 'required',
             'sex' => 'required|in:male,female',
             'blood_type' => 'required|in:A,A+,A-,B,B+,B-,AB,AB+,AB-,O,O+,O-,-',
-            'jersey_size' => 'required|in:S,M,L,XL,XXL',
+            'jersey_size' => 'required|in:XS,S,M,L,XL,2XL,3XL,4XL,5XL',
             'nim_nrp' => $nimRule,
             'nationality' => 'required',
             'address' => 'required|string',
