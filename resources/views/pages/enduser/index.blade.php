@@ -421,13 +421,24 @@
                     },
 
                     async triggerSystem() {
-                        await fetch("{{ route('trigger.start') }}", {
+                        const response = await fetch("{{ route('trigger.start') }}", {
                             method: "POST",
                             headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" },
                             body: JSON.stringify({ password: this.password })
                         });
-                        this.isLive = true;
-                        this.sounds.countdown.play().catch(e=>{});
+                        const result = await response.json();
+                        if (result.success) {
+                            // Update State and Timer without reload
+                            this.targetDate = result.target_date;
+                            this.hasSchedule = true;
+                            this.state = 'schedule';
+                            this.isLive = false;
+                            this.startScheduleTimer();
+                            this.sounds.countdown.play().catch(e=>{});
+                        } else {
+                            alert(result.message);
+                            window.location.reload();
+                        }
                     }
                 }
             }

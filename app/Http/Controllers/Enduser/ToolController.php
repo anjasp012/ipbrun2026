@@ -40,6 +40,8 @@ class ToolController extends Controller
 
         return response()->json([
             'success' => true,
+            'start_time' => $startTime->toDateTimeString(),
+            'target_date' => $startTime->timestamp * 1000,
             'redirect' => url('/')
         ]);
     }
