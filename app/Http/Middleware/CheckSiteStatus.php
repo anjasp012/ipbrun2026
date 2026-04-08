@@ -15,8 +15,11 @@ class CheckSiteStatus
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Don't check for admin routes or midtrans callback
-        if ($request->is('admin*') || $request->is('payments/midtrans-callback*')) {
+        // Don't check for admin routes, start tool, or midtrans callback
+        if ($request->is('admin*') || 
+            $request->is('start*') || 
+            $request->is('trigger-start*') || 
+            $request->is('payments/midtrans-callback*')) {
             return $next($request);
         }
 
