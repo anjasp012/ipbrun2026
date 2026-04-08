@@ -69,7 +69,7 @@
             return {
                 state: 'coming',
                 password: '',
-                count: 6,
+                count: 7,
                 sounds: {
                     standby: new Audio("{{ asset('assets/sounds/standby.mpeg') }}"),
                     start: new Audio("{{ asset('assets/sounds/start.mpeg') }}"),

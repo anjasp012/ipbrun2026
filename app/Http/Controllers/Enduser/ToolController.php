@@ -24,20 +24,15 @@ class ToolController extends Controller
             return response()->json(['success' => false, 'message' => 'Password salah!'], 403);
         }
 
-        $isRunning = Setting::getValue('is_running', '0') === '1';
-        if ($isRunning) {
-            return response()->json(['success' => false, 'message' => 'Sistem sudah aktif!'], 403);
-        }
-
-        // Setting: 24h from now (+3 seconds for the countdown room)
-        $startTime = Carbon::now('Asia/Jakarta')->addHours(24)->addSeconds(3);
+        // Set start time to NOW
+        $startTime = Carbon::now('Asia/Jakarta');
 
         Setting::updateOrCreate(
             ['key' => 'ticket_sale_start'],
             ['value' => $startTime->toDateTimeString()]
         );
 
-        // Disable maintenance mode
+        // Disable maintenance mode (is_running = 1)
         Setting::updateOrCreate(
             ['key' => 'is_running'],
             ['value' => '1']

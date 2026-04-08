@@ -343,7 +343,7 @@
                     targetDate: {{ ($ticketSaleStartValue->timestamp ?? 0) * 1000 }},
                     state: @json(!empty($ticketSaleStart) ? 'schedule' : 'manual'),
                     password: '',
-                    count: 6,
+                    count: 7,
                     time: { d: '00', h: '00', m: '00', s: '00' },
                     sounds: {
                         standby: new Audio("{{ asset('assets/sounds/standby.mpeg') }}"),
