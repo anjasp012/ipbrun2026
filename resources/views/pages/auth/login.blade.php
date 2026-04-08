@@ -31,7 +31,8 @@
 
                 <!-- Admin/Support Notice -->
                 <div class="mb-10 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center leading-relaxed">
+                    <p
+                        class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center leading-relaxed">
                         Silakan masukkan email dan password yang Anda terima melalui WhatsApp/Email.
                     </p>
                 </div>
@@ -43,10 +44,11 @@
                             class="block text-[11px] font-black text-slate-400 uppercase tracking-[2px] ml-1">Email
                             Address</label>
                         <div class="relative">
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
+                            <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                                autofocus
                                 class="w-full h-14 bg-slate-50/50 border border-slate-100 rounded-2xl px-6 font-bold text-[#003366] placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-200 focus:bg-white transition-all">
-                            <svg class="absolute right-5 top-4.5 w-5 h-5 text-slate-300 pointer-events-none" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="absolute right-5 top-4.5 w-5 h-5 text-slate-300 pointer-events-none"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-12H12">
                                 </path>
@@ -67,15 +69,16 @@
                         <div class="relative">
                             <input id="password" type="password" name="password" required
                                 class="w-full h-14 bg-slate-50/50 border border-slate-100 rounded-2xl px-6 font-bold text-[#003366] placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-200 focus:bg-white transition-all text-left">
-                            <svg class="absolute right-5 top-4.5 w-5 h-5 text-slate-300 pointer-events-none" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="absolute right-5 top-4.5 w-5 h-5 text-slate-300 pointer-events-none"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
                                 </path>
                             </svg>
                         </div>
                         @error('password')
-                            <p class="text-red-500 text-[10px] font-black uppercase italic mt-2 ml-1 tracking-wider text-left">
+                            <p
+                                class="text-red-500 text-[10px] font-black uppercase italic mt-2 ml-1 tracking-wider text-left">
                                 {{ $message }}</p>
                         @enderror
                     </div>
@@ -109,7 +112,7 @@
                     </button>
                 </form>
 
-                <div class="mt-12 text-center text-left">
+                <div class="mt-12 text-center">
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[2px] leading-relaxed">
                         Belum mendaftar? <br>
                         <a href="{{ url('/') }}"
