@@ -46,6 +46,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/participants', [AdminDashboard::class, 'participants']);
     Route::get('/participants/{participant}', [AdminDashboard::class, 'participantShow']);
     Route::get('/participants/{participant}/resend-invoice', [AdminDashboard::class, 'resendInvoice'])->name('participants.resend-invoice');
+    Route::put('/participants/{participant}', [AdminDashboard::class, 'participantUpdate'])->name('participants.update');
     Route::get('/tickets', [AdminTicket::class, 'index']);
     Route::post('/tickets', [AdminTicket::class, 'store'])->name('tickets.store');
     Route::put('/tickets/{ticket}', [AdminTicket::class, 'update'])->name('tickets.update');

@@ -211,7 +211,7 @@
                     </div>
                 </td>
             </tr> <!-- Dashboard Access Account Box -->
-            @if (!($userExists ?? false))
+            @if (!($userExists ?? false) && !($resendNoCredentials ?? false))
                 <tr>
                     <td style="padding:0 40px 40px;">
                         <div

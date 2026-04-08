@@ -18,10 +18,7 @@ class ParticipantInvoiceResend extends Mailable implements ShouldQueue
     public $orders;
     public $password;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct($participant, $orders, $password)
+    public function __construct($participant, $orders, $password = null)
     {
         $this->participant = $participant;
         $this->orders = $orders;
@@ -46,8 +43,9 @@ class ParticipantInvoiceResend extends Mailable implements ShouldQueue
         return new Content(
             view: 'emails.participant_paid',
             with: [
-                'userExists' => false, // ALWAYS show login details for resend (contains NEW password)
-                'order' => $this->orders->first() // For simple summary in body
+                'userExists'      => false,
+                'order'           => $this->orders->first(),
+                'resendNoCredentials' => true, // Flag to hide login credentials section
             ]
         );
     }

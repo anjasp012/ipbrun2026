@@ -103,27 +103,46 @@ class AdminController extends Controller
         return view('pages.admin.participants.show', compact('participant'));
     }
 
+    public function participantUpdate(Request $request, Participant $participant)
+    {
+        $validated = $request->validate([
+            'name'                          => 'required|string|max:255',
+            'phone_number'                  => 'required|string|max:20',
+            'nik'                           => 'required|string|max:16',
+            'date_birth'                    => 'required|string',
+            'sex'                           => 'required|in:male,female',
+            'blood_type'                    => 'required|string',
+            'jersey_size'                   => 'required|string',
+            'nim_nrp'                       => 'nullable|string|max:20',
+            'nationality'                   => 'required|string',
+            'address'                       => 'required|string',
+            'emergency_contact_name'        => 'required|string',
+            'emergency_contact_phone_number'=> 'required|string',
+            'emergency_contact_relationship'=> 'required|string',
+            'running_community'             => 'nullable|string',
+            'best_time'                     => 'nullable|string',
+            'previous_events'               => 'nullable|string',
+            'shuttle_bus'                   => 'nullable|string',
+        ]);
+
+        $participant->update($validated);
+
+        return back()->with('success', 'Data peserta berhasil diperbarui.');
+    }
+
     public function resendInvoice(Participant $participant)
     {
         try {
-            $password = \Illuminate\Support\Str::random(8);
             $orders = \App\Models\Order::where('participant_id', $participant->id)->where('status', 'paid')->latest()->get();
             
             if ($orders->isEmpty()) {
-                return back()->with('error', 'No paid orders found for this participant. Cannot resend invoice.');
+                return back()->with('error', 'Tidak ada order yang sudah dibayar. Tidak bisa mengirim ulang invoice.');
             }
 
-            $user = $participant->user ?: \App\Models\User::where('email', $participant->email)->first();
-            
-            if ($user) {
-                $user->password = \Illuminate\Support\Facades\Hash::make($password);
-                $user->save();
-            }
-
-            \Illuminate\Support\Facades\Mail::to($participant->email)->send(new \App\Mail\ParticipantInvoiceResend($participant, $orders, $password));
-            return back()->with('success', 'E-Invoices and New Password have been resent to ' . $participant->email);
+            \Illuminate\Support\Facades\Mail::to($participant->email)->send(new \App\Mail\ParticipantInvoiceResend($participant, $orders));
+            return back()->with('success', 'E-Invoice berhasil dikirim ulang ke ' . $participant->email);
         } catch (\Exception $e) {
-            return back()->with('error', 'Failed to send email: ' . $e->getMessage());
+            return back()->with('error', 'Gagal mengirim email: ' . $e->getMessage());
         }
     }
 }

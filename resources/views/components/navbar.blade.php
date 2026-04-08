@@ -6,8 +6,7 @@
     @endphp
 @endauth
 
-<nav x-data="{ mobileMenuOpen: false, desktopDropdownOpen: false }"
-    class="sticky top-0 z-50 bg-white border-b border-slate-100 font-['Outfit']">
+<nav x-data="{ mobileMenuOpen: false, desktopDropdownOpen: false }" class="sticky top-0 z-50 bg-white border-b border-slate-100 font-['Outfit']">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 md:h-20">
             <!-- Left: Logo -->
@@ -26,7 +25,8 @@
                 </a>
 
                 <!-- Dropdown Race Info -->
-                <div class="relative" @mouseenter="desktopDropdownOpen = true" @mouseleave="desktopDropdownOpen = false">
+                <div class="relative" @mouseenter="desktopDropdownOpen = true"
+                    @mouseleave="desktopDropdownOpen = false">
                     <button @click="desktopDropdownOpen = !desktopDropdownOpen"
                         class="px-5 py-2 rounded-xl text-[13px] font-black uppercase tracking-widest text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-all flex items-center gap-2">
                         Race Info
@@ -39,24 +39,25 @@
                     </button>
 
                     <div x-show="desktopDropdownOpen" x-cloak style="display: none"
-                        x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 translate-y-2"
                         x-transition:enter-end="opacity-100 translate-y-0"
                         x-transition:leave="transition ease-in duration-150"
                         x-transition:leave-start="opacity-100 translate-y-0"
                         x-transition:leave-end="opacity-0 translate-y-2"
                         class="absolute top-full left-0 w-52 py-2 mt-1 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden"
                         @click.away="desktopDropdownOpen = false">
-                        <a href="{{ url('/route') }}"
+                        <a href="#"
                             class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest">Route</a>
-                        <a href="{{ url('/faq') }}"
+                        <a href="#"
                             class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest">FAQ</a>
-                        <a href="{{ url('/rules') }}"
+                        <a href="#"
                             class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest">Rules
                             & Regulations</a>
                     </div>
                 </div>
 
-                <a href="{{ url('/surat-kuasa') }}"
+                <a href="#"
                     class="px-5 py-2 rounded-xl text-[13px] font-black uppercase tracking-widest text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-all">
                     Surat Kuasa
                 </a>
@@ -120,13 +121,16 @@
                 <!-- Mobile Menu Button -->
                 <button @click="mobileMenuOpen = !mobileMenuOpen"
                     class="md:hidden p-2 rounded-xl bg-slate-50 text-[#003366] border border-slate-100 transition-all active:scale-90">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16m-7 6h7">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        x-show="!mobileMenuOpen">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M4 6h16M4 12h16m-7 6h7">
                         </path>
                     </svg>
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="mobileMenuOpen"
-                        x-cloak style="display: none">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        x-show="mobileMenuOpen" x-cloak style="display: none">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M6 18L18 6M6 6l12 12">
                         </path>
                     </svg>
                 </button>
@@ -161,9 +165,11 @@
                         <div class="overflow-hidden">
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">
                                 Signed in as</p>
-                            <h3 class="text-base font-black text-[#003366] truncate leading-tight">{{ $user->name }}</h3>
+                            <h3 class="text-base font-black text-[#003366] truncate leading-tight">{{ $user->name }}
+                            </h3>
                             @if ($is_admin)
-                                <span class="inline-flex mt-1 text-[8px] font-black bg-blue-100 text-blue-600 px-2 py-0.5 rounded uppercase tracking-widest">Administrator</span>
+                                <span
+                                    class="inline-flex mt-1 text-[8px] font-black bg-blue-100 text-blue-600 px-2 py-0.5 rounded uppercase tracking-widest">Administrator</span>
                             @endif
                         </div>
                     </div>
@@ -180,12 +186,14 @@
             <div class="flex-1 px-6 py-8 overflow-y-auto space-y-8">
                 <!-- Navigation Group -->
                 <div>
-                    <h4 class="px-4 mb-4 text-[10px] font-black text-slate-400 uppercase tracking-[3px] opacity-70">Main Menu
+                    <h4 class="px-4 mb-4 text-[10px] font-black text-slate-400 uppercase tracking-[3px] opacity-70">
+                        Main Menu
                     </h4>
                     <div class="space-y-1">
                         <a href="{{ url('/') }}"
                             class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-[13px] font-black uppercase tracking-widest {{ request()->is('/') ? 'bg-blue-50 text-[#003366]' : 'text-slate-600 hover:bg-slate-50/80 active:scale-[0.98]' }} transition-all">
-                            <svg class="w-5 h-5 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 opacity-40" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
                                 </path>
@@ -197,7 +205,8 @@
                             <button @click="open = !open"
                                 class="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl text-[13px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50/80 transition-all">
                                 <div class="flex items-center gap-4">
-                                    <svg class="w-5 h-5 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 opacity-40" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                     </svg>
@@ -223,7 +232,8 @@
 
                         <a href="{{ url('/surat-kuasa') }}"
                             class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-[13px] font-black uppercase tracking-widest {{ request()->is('surat-kuasa*') ? 'bg-blue-50 text-[#003366]' : 'text-slate-600 hover:bg-slate-50/80' }} transition-all">
-                            <svg class="w-5 h-5 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 opacity-40" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                 </path>
@@ -236,7 +246,8 @@
                 @auth
                     <!-- User Account Actions -->
                     <div>
-                        <h4 class="px-4 mb-4 text-[10px] font-black text-slate-400 uppercase tracking-[3px] opacity-70">Your
+                        <h4 class="px-4 mb-4 text-[10px] font-black text-slate-400 uppercase tracking-[3px] opacity-70">
+                            Your
                             Account</h4>
                         <div class="space-y-4 px-2">
                             <a href="{{ $is_admin ? url('/admin/dashboard') : route('participant.dashboard') }}"
