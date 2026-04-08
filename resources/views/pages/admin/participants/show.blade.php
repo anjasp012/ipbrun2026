@@ -1,5 +1,51 @@
 <x-layouts.admin title="Participant Profile & Logistics">
-    <div x-data="{ editing: false }">
+    <div x-data="{ 
+        editing: false,
+        formatBestTime(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 6) value = value.slice(0, 6);
+            let formattedValue = '';
+            if (value.length > 0) {
+                formattedValue = value.slice(0, 2);
+                if (value.length > 2) {
+                    formattedValue += ':' + value.slice(2, 4);
+                    if (value.length > 4) {
+                        formattedValue += ':' + value.slice(4, 6);
+                    }
+                }
+            }
+            e.target.value = formattedValue;
+        },
+        confirmResend() {
+            Swal.fire({
+                title: 'Resend Invoice?',
+                text: 'Sistem akan mengirim ulang E-Invoice ke {{ $participant->email }} tanpa mengubah password yang sudah ada.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#003366',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'YA, KIRIM ULANG',
+                cancelButtonText: 'BATAL',
+                customClass: {
+                    popup: 'rounded-[2.5rem]',
+                    confirmButton: 'rounded-xl font-black px-8 py-4',
+                    cancelButton: 'rounded-xl font-black px-8 py-4'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Sending...',
+                        text: 'Mohon tunggu sebentar',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading()
+                        }
+                    });
+                    window.location.href = '{{ route('participants.resend-invoice', $participant) }}';
+                }
+            });
+        }
+    }">
         <form action="{{ route('participants.update', $participant) }}" method="POST">
             @csrf
             @method('PUT')
@@ -52,7 +98,7 @@
                                     </button>
                                 </template>
                                 <template x-if="!editing">
-                                    <button type="button" id="btn-resend-invoice"
+                                    <button type="button" @click="confirmResend()"
                                         class="h-14 px-10 bg-slate-50 hover:bg-slate-100 text-slate-800 text-sm font-black uppercase tracking-widest rounded-2xl transition-all border border-slate-100 flex items-center shadow-sm">
                                         Resend Invoice
                                     </button>
@@ -296,8 +342,9 @@
                                         <template x-if="editing">
                                             <input type="text" name="best_time"
                                                 value="{{ $participant->best_time }}"
+                                                @input="formatBestTime($event)"
                                                 class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 font-bold text-[#003366]"
-                                                placeholder="00:00:00" id="best_time_input">
+                                                placeholder="00:00:00">
                                         </template>
                                     </div>
                                     <div class="md:col-span-2">
@@ -494,63 +541,4 @@
             </div>
         </form>
     </div>
-
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Resend Invoice Confirmation
-                const resendBtn = document.getElementById('btn-resend-invoice');
-                if (resendBtn) {
-                    resendBtn.addEventListener('click', function() {
-                        Swal.fire({
-                            title: 'Resend Invoice?',
-                            text: "Sistem akan mengirim ulang E-Invoice ke {{ $participant->email }} tanpa mengubah password yang sudah ada.",
-                            icon: 'question',
-                            showCancelButton: true,
-                            confirmButtonColor: '#003366',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'YA, KIRIM ULANG',
-                            cancelButtonText: 'BATAL',
-                            borderRadius: '2rem'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Show loading
-                                Swal.fire({
-                                    title: 'Sending...',
-                                    text: 'Mohon tunggu sebentar',
-                                    allowOutsideClick: false,
-                                    didOpen: () => {
-                                        Swal.showLoading()
-                                    }
-                                });
-                                // Execute redirect
-                                window.location.href = "{{ route('participants.resend-invoice', $participant) }}";
-                            }
-                        });
-                    });
-                }
-
-                // Best Time Formatting
-                const bestTimeInput = document.getElementById('best_time_input');
-                if (bestTimeInput) {
-                    bestTimeInput.addEventListener('input', function(e) {
-                        let value = e.target.value.replace(/\D/g, '');
-                        if (value.length > 6) value = value.slice(0, 6);
-
-                        let formattedValue = '';
-                        if (value.length > 0) {
-                            formattedValue = value.slice(0, 2);
-                            if (value.length > 2) {
-                                formattedValue += ':' + value.slice(2, 4);
-                                if (value.length > 4) {
-                                    formattedValue += ':' + value.slice(4, 6);
-                                }
-                            }
-                        }
-                        e.target.value = formattedValue;
-                    });
-                }
-            });
-        </script>
-    @endpush
 </x-layouts.admin>
