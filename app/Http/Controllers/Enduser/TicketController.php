@@ -38,12 +38,12 @@ class TicketController extends Controller
         }
 
         // 3. Fetch tickets (Standard Landing Page)
-        $tickets = Ticket::whereHas('period', function($query) {
+        $tickets = Ticket::whereHas('period', function ($query) {
             $query->where('is_active', true);
         })->with(['category', 'period'])
-        ->withCount(['raceEntries as participants_count' => function($query) {
-            $query->whereIn('status', ['pending', 'paid']);
-        }])->get();
+            ->withCount(['raceEntries as participants_count' => function ($query) {
+                $query->whereIn('status', ['pending', 'paid']);
+            }])->get();
 
         $tickets_ipb = $tickets->filter(fn($t) => $t->type === 'ipb');
         $tickets_public = $tickets->filter(fn($t) => $t->type === 'umum');
@@ -67,10 +67,10 @@ class TicketController extends Controller
         }
 
         $orders = Order::where('participant_id', $participant->id)->with('raceEntries.ticket.category')->latest()->get();
-        
+
         $firstEntry = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->with('ticket.category')->first();
         $ownedCategoryNames = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->get()->pluck('ticket.category.name')->map(fn($n) => strtoupper($n))->toArray();
-        
+
         $pairTarget = '';
         if ($firstEntry) {
             $firstCatName = strtoupper($firstEntry->ticket->category->name);
@@ -139,7 +139,7 @@ class TicketController extends Controller
         if ($pairTarget) {
             $pairTicket = Ticket::where('period_id', $ticket->period_id)
                 ->where('type', $ticket->type) // Must match the same type (IPB/Umum)
-                ->whereHas('category', function($q) use ($pairTarget) {
+                ->whereHas('category', function ($q) use ($pairTarget) {
                     $q->where('name', 'LIKE', "%$pairTarget%");
                 })
                 ->where('id', '!=', $ticket->id)
@@ -184,11 +184,19 @@ class TicketController extends Controller
             'digits' => ':attribute harus berjumlah :digits digit.',
             'in' => 'Pilihan :attribute tidak valid.',
         ], [
-            'name' => 'Nama Lengkap', 'email' => 'Alamat Email', 'email_confirmation' => 'Konfirmasi Email',
-            'phone_number' => 'Nomor WhatsApp', 'nik' => 'NIK KTP', 'date_birth' => 'Tanggal Lahir',
-            'sex' => 'Jenis Kelamin', 'blood_type' => 'Golongan Darah', 'jersey_size' => 'Ukuran Jersey',
-            'address' => 'Alamat Lengkap', 'emergency_contact_name' => 'Nama Kontak Darurat',
-            'emergency_contact_phone_number' => 'Nomor HP Darurat', 'emergency_contact_relationship' => 'Hubungan Kontak',
+            'name' => 'Nama Lengkap',
+            'email' => 'Alamat Email',
+            'email_confirmation' => 'Konfirmasi Email',
+            'phone_number' => 'Nomor WhatsApp',
+            'nik' => 'NIK KTP',
+            'date_birth' => 'Tanggal Lahir',
+            'sex' => 'Jenis Kelamin',
+            'blood_type' => 'Golongan Darah',
+            'jersey_size' => 'Ukuran Jersey',
+            'address' => 'Alamat Lengkap',
+            'emergency_contact_name' => 'Nama Kontak Darurat',
+            'emergency_contact_phone_number' => 'Nomor HP Darurat',
+            'emergency_contact_relationship' => 'Hubungan Kontak',
             'nim_nrp' => 'NIM / NRP',
         ]);
 
@@ -229,11 +237,11 @@ class TicketController extends Controller
         return \Illuminate\Support\Facades\DB::transaction(function () use ($request, $validated, $ticket) {
             // 1. Lock the ticket record to prevent race conditions
             $ticket->lockForUpdate()->first();
-            
+
             // 2. Check current stock accurately
             // 2. Check current stock accurately
             $usedQty = RaceEntry::where('ticket_id', $ticket->id)
-                ->whereHas('participant', function($q) {
+                ->whereHas('participant', function ($q) {
                     $q->whereIn('status', ['pending', 'paid']);
                 })->count();
 
@@ -243,17 +251,16 @@ class TicketController extends Controller
 
             // 3. Duplicate check for entry (One NIK cannot buy SAME ticket category twice)
             // This allows users to register for DIFFERENT days/categories in separate orders later.
-            $duplicateCheck = RaceEntry::whereHas('participant', function($q) use ($request) {
-                    $q->where('nik', $request->nik)
-                      ->whereIn('status', ['pending', 'paid']);
-                })
+            $duplicateCheck = RaceEntry::whereHas('participant', function ($q) use ($request) {
+                $q->where('nik', $request->nik)
+                    ->whereIn('status', ['pending', 'paid']);
+            })
                 ->where('ticket_id', $ticket->id)
                 ->first();
 
             if ($duplicateCheck) {
                 return back()->withInput()->withErrors([
                     'nik' => "Peserta dengan NIK ini sudah terdaftar atau memiliki pesanan tertunda untuk kategori ({$ticket->category->name}).",
-                    'duplicate' => "Anda diperbolehkan mendaftar kategori lain (hari berbeda), namun tidak diperbolehkan mendaftar kategori yang sama dua kali."
                 ]);
             }
 
@@ -280,12 +287,12 @@ class TicketController extends Controller
                 if ($pairTarget) {
                     $pairTicket = Ticket::where('period_id', $ticket->period_id)
                         ->where('type', $ticket->type)
-                        ->whereHas('category', function($q) use ($pairTarget) {
+                        ->whereHas('category', function ($q) use ($pairTarget) {
                             $q->where('name', 'LIKE', "%$pairTarget%");
                         })
                         ->where('id', '!=', $ticket->id)
                         ->first();
-                    
+
                     if ($pairTicket) {
                         $second_ticket_id = $pairTicket->id;
                         $totalPrice += $pairTicket->price;
@@ -345,9 +352,9 @@ class TicketController extends Controller
         }
 
         // 2. Duplicate check (NIK + Ticket)
-        $exists = RaceEntry::whereHas('participant', function($q) use ($latestParticipant) {
-                $q->where('nik', $latestParticipant->nik);
-            })->where('ticket_id', $ticket->id)
+        $exists = RaceEntry::whereHas('participant', function ($q) use ($latestParticipant) {
+            $q->where('nik', $latestParticipant->nik);
+        })->where('ticket_id', $ticket->id)
             ->whereIn('status', ['pending', 'paid'])
             ->count();
 
@@ -358,7 +365,7 @@ class TicketController extends Controller
         // 3. Create new Participant row (Cloning Profile)
         $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
         $adminFee = 4500;
-        
+
         $order = Order::create([
             'participant_id' => $latestParticipant->id,
             'order_code' => $orderCode,
@@ -381,7 +388,7 @@ class TicketController extends Controller
         $participant = $order->participant;
         $itemDetails = [];
 
-        foreach($order->raceEntries as $entry) {
+        foreach ($order->raceEntries as $entry) {
             $itemDetails[] = [
                 'id' => $entry->ticket_id,
                 'price' => $entry->ticket->price,
@@ -414,7 +421,7 @@ class TicketController extends Controller
                 'snap_token' => $snapResponse->token,
                 'payment_url' => $snapResponse->redirect_url
             ]);
-            
+
             // Send WhatsApp notification
             try {
                 $fonnte = new \App\Services\FonnteService();
