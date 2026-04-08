@@ -12,6 +12,7 @@ class ToolController extends Controller
     public function startPage()
     {
         $isRunning = Setting::getValue('is_running', '0') === '1';
+        dd($isRunning, Setting::all()->toArray());
         if ($isRunning) {
             return redirect('/');
         }
