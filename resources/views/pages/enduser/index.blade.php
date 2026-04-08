@@ -54,7 +54,8 @@
 
                                         <!-- Card Content -->
                                         <div class="p-3 md:p-6 pb-2">
-                                            <div class="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
+                                            <div
+                                                class="flex flex-col sm:flex-row justify-between items-start gap-2 mb-2">
                                                 <h3
                                                     class="text-[13px] md:text-[17px] font-[800] text-[#003366] leading-[1.3] font-['Plus_Jakarta_Sans']">
                                                     {{ $ticket->category->name }}
@@ -87,7 +88,8 @@
                                         </div>
 
                                         <!-- Perforation -->
-                                        <div class="relative flex items-center py-1 md:py-2 overflow-hidden pointer-events-none">
+                                        <div
+                                            class="relative flex items-center py-1 md:py-2 overflow-hidden pointer-events-none">
                                             <div
                                                 class="absolute -left-3 w-6 h-6 bg-[#f1f5f9] rounded-full shadow-inner ring-1 ring-inset ring-slate-200/20">
                                             </div>
@@ -99,7 +101,8 @@
                                         </div>
 
                                         <!-- Price / Action -->
-                                        <div class="p-3 md:p-6 pt-2 md:pt-4 bg-slate-50/40 rounded-b-2xl transition-colors mt-auto">
+                                        <div
+                                            class="p-3 md:p-6 pt-2 md:pt-4 bg-slate-50/40 rounded-b-2xl transition-colors mt-auto">
                                             <div class="mb-3 md:mb-4">
                                                 <span
                                                     class="text-[9px] md:text-[11px] text-slate-400 font-[800] uppercase tracking-wider block mb-0.5">Price
@@ -113,8 +116,8 @@
                                                 @auth
                                                     <a href="{{ route('participant.buy-more', $ticket->id) }}"
                                                         class="w-full bg-orange-600 text-white py-2 md:py-2.5 rounded-lg md:rounded-xl font-[800] text-[12px] md:text-[15px] transition-all active:scale-95 hover:bg-orange-700 flex items-center justify-center gap-1 md:gap-2">
-                                                        <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor"
-                                                            viewBox="0 0 24 24">
+                                                        <svg class="w-3 h-3 md:w-4 md:h-4" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                 stroke-width="2.5" d="M12 4v16m8-8H4"></path>
                                                         </svg>
@@ -268,32 +271,38 @@
                         <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" alt="IPB Run 2026"
                             class="h-24 md:h-32 mx-auto drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
                         <div>
-                            <h2 class="text-[13px] font-[900] text-[#FF7A21] uppercase tracking-[0.6em] mb-4 drop-shadow-md">
+                            <h2
+                                class="text-[13px] font-[900] text-[#FF7A21] uppercase tracking-[0.6em] mb-4 drop-shadow-md">
                                 OFFICIAL REGISTRATION OPENS IN</h2>
                             <div class="w-16 h-1 bg-[#FF7A21] mx-auto rounded-full"></div>
                         </div>
                     </div>
 
-                    <div id="index-countdown" class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 max-w-3xl mx-auto items-center">
+                    <div id="index-countdown"
+                        class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 max-w-3xl mx-auto items-center">
                         <div class="flex flex-col group">
                             <span id="idx-days"
                                 class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
-                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Days</span>
+                            <span
+                                class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Days</span>
                         </div>
                         <div class="flex flex-col group">
                             <span id="idx-hours"
                                 class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
-                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Hours</span>
+                            <span
+                                class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Hours</span>
                         </div>
                         <div class="flex flex-col group">
                             <span id="idx-minutes"
                                 class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
-                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Minutes</span>
+                            <span
+                                class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Minutes</span>
                         </div>
                         <div class="flex flex-col group">
                             <span id="idx-seconds"
                                 class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-[#FF7A21] tracking-tighter drop-shadow-[0_0_25px_rgba(255,122,33,0.3)] transition-all group-hover:scale-110">00</span>
-                            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF7A21]/60 mt-3">Seconds</span>
+                            <span
+                                class="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF7A21]/60 mt-3">Seconds</span>
                         </div>
                     </div>
 
@@ -304,7 +313,8 @@
                         <div
                             class="flex items-center gap-4 py-3 px-6 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
                             <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                            <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Countdown Active •
+                            <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Countdown
+                                Active •
                                 Live Update</span>
                         </div>
                     </div>
@@ -313,7 +323,7 @@
         </div>
         <script>
             const targetDate = {{ $ticketSaleStartValue->timestamp * 1000 }};
-            const countdownSound = new Audio("{{ asset('assets/sound/countdown.mp3') }}");
+            const countdownSound = new Audio("{{ asset('assets/sound/countdown.mpeg') }}");
             countdownSound.loop = true;
 
             function updateIndexCountdown() {
@@ -328,7 +338,9 @@
                 // Play sound on first interaction
                 document.addEventListener('click', () => {
                     countdownSound.play().catch(e => {});
-                }, { once: true });
+                }, {
+                    once: true
+                });
 
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
