@@ -111,7 +111,21 @@
                                     value="{{ $settings['ticket_sale_start'] ?? '' }}"
                                     class="w-full pl-16 pr-40 py-5 bg-slate-50 border border-slate-100 rounded-xl text-base font-bold text-slate-700 focus:bg-white focus:border-blue-300 focus:ring-4 focus:ring-blue-50 transition-all outline-none">
                                 <button type="button"
-                                    onclick="if(confirm('Reset jadwal pendaftaran?')){ document.getElementById('ticket_sale_start').value=''; this.form.submit(); }"
+                                    onclick="Swal.fire({
+                                        title: 'Reset Jadwal?',
+                                        text: 'Pendaftaran akan dialihkan kembali ke mode manual START TOOL.',
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#E8630A',
+                                        cancelButtonColor: '#6B7280',
+                                        confirmButtonText: 'Ya, Reset!',
+                                        cancelButtonText: 'Batal'
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            document.getElementById('ticket_sale_start').value='';
+                                            this.form.submit();
+                                        }
+                                    })"
                                     class="absolute inset-y-0 right-0 px-6 flex items-center text-[10px] font-black text-slate-400 hover:text-red-600 uppercase tracking-widest transition-colors">
                                     RESET </button>
                             </div>
