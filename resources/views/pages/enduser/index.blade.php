@@ -313,6 +313,8 @@
         </div>
         <script>
             const targetDate = {{ $ticketSaleStartValue->timestamp * 1000 }};
+            const countdownSound = new Audio("{{ asset('assets/sound/countdown.mp3') }}");
+            countdownSound.loop = true;
 
             function updateIndexCountdown() {
                 const now = Date.now();
@@ -322,6 +324,11 @@
                     window.location.reload();
                     return;
                 }
+
+                // Play sound on first interaction
+                document.addEventListener('click', () => {
+                    countdownSound.play().catch(e => {});
+                }, { once: true });
 
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));

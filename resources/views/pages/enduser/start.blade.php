@@ -14,6 +14,7 @@
                     <div class="space-y-4">
                         <label class="text-[10px] font-black text-[#FF7A21] uppercase tracking-[5px] block">SECURITY CLEARANCE</label>
                         <input type="password" x-model="password" 
+                            @focus="playStandby()"
                             @keyup.enter="checkPass()"
                             placeholder="••••••••••••"
                             class="w-full bg-white/5 border border-white/10 rounded-2xl h-16 text-center text-white text-xl font-bold tracking-[4px] focus:outline-none focus:border-[#FF7A21]/50 focus:bg-white/10 transition-all">
@@ -63,7 +64,19 @@
                 state: 'password', // password, ready, count, finish
                 password: '',
                 error: '',
-                count: 3,
+                count: 6,
+                sounds: {
+                    standby: new Audio("{{ asset('assets/sound/standby.mp3') }}"),
+                    start: new Audio("{{ asset('assets/sound/start.mp3') }}")
+                },
+
+                init() {
+                    this.sounds.standby.loop = true;
+                },
+
+                playStandby() {
+                    this.sounds.standby.play().catch(e => console.log('Autoplay blocked'));
+                },
 
                 checkPass() {
                     if (this.password === 'IpbRun2026#') {
@@ -76,6 +89,10 @@
                 },
 
                 startCountdown() {
+                    this.playStandby(); // Ensure audio context
+                    this.sounds.standby.pause();
+                    this.sounds.start.play();
+                    
                     this.state = 'count';
                     const timer = setInterval(() => {
                         this.count--;
