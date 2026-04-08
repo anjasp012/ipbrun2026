@@ -250,108 +250,101 @@
         }
     </script>
 
-    @if ($isMaintenance)
+    @if (!$isMaintenance)
         <div class="fixed inset-0 z-[100] flex items-center justify-center p-6 overflow-hidden select-none"
-             x-data="startTool()"
-             x-show="state !== 'finish'"
+             x-data="launchControl()"
+             x-show="!isLive"
              x-transition:leave="transition ease-in duration-1000"
-             x-transition:leave-start="opacity-100 scale-100"
-             x-transition:leave-end="opacity-0 scale-110">
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0">
             
-            <div class="fixed inset-0 bg-[#001A33] backdrop-blur-2xl"></div>
+            <div class="fixed inset-0 bg-[#001A33] backdrop-blur-3xl"></div>
             
             <!-- Background Elements -->
             <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
             <div class="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-y-1/2"></div>
             <div class="absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-[#FF7A21]/30 to-transparent -translate-x-1/2"></div>
 
-            <div class="relative w-full max-w-lg">
-                <!-- State 1: Coming Soon (Public View) -->
-                <template x-if="state === 'coming'">
-                    <div class="text-center space-y-12" x-transition:enter="transition ease-out duration-500">
-                        <div class="space-y-8">
-                            <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" 
-                                 @click="state = 'password'"
-                                 class="h-32 mx-auto drop-shadow-[0_0_30px_rgba(255,255,255,0.1)] cursor-pointer hover:scale-105 transition-transform" 
-                                 alt="IPB Run 2026">
-                            
-                            <div class="space-y-4">
-                                <h1 class="text-white text-4xl md:text-5xl font-[900] uppercase tracking-tighter italic leading-none">
-                                    REGISTRATION <br> <span class="text-[#FF7A21]">COMING SOON</span>
-                                </h1>
-                                <div class="w-20 h-1.5 bg-[#FF7A21] mx-auto rounded-full"></div>
-                            </div>
-
-                            <p class="text-white/40 text-sm font-bold uppercase tracking-[0.3em] max-w-xs mx-auto leading-relaxed">
-                                Persiapkan diri Anda untuk event lari terbesar IPB tahun ini.
-                            </p>
-                        </div>
-
-                        <div class="pt-10">
-                            <div class="inline-flex items-center gap-4 py-3 px-6 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
-                                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                                <span class="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">System Standby • Monitoring Active</span>
+            <div class="relative w-full max-w-4xl text-center">
+                
+                <!-- Registration Schedule Countdown -->
+                <template x-if="hasSchedule && state === 'schedule'">
+                    <div class="space-y-12">
+                        <div class="space-y-6">
+                            <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" alt="IPB Run 2026" class="h-24 md:h-32 mx-auto drop-shadow-2xl">
+                            <div>
+                                <h2 class="text-[13px] font-[900] text-[#FF7A21] uppercase tracking-[0.6em] mb-4">OFFICIAL REGISTRATION OPENS IN</h2>
+                                <div class="w-16 h-1 bg-[#FF7A21] mx-auto rounded-full"></div>
                             </div>
                         </div>
-                    </div>
-                </template>
 
-                <!-- State 2: Password Input (Admin Only) -->
-                <template x-if="state === 'password'">
-                    <div class="max-w-md mx-auto text-center space-y-10" x-transition:enter="transition ease-out duration-300">
-                        <div class="space-y-2">
-                            <label class="text-[10px] font-black text-[#FF7A21] uppercase tracking-[5px] block">SECURITY CLEARANCE</label>
-                            <input type="password" x-model="password" 
-                                @focus="playStandby()"
-                                @keyup.enter="checkPass()"
-                                placeholder="••••••••••••"
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl h-16 text-center text-white text-xl font-bold tracking-[4px] focus:outline-none focus:border-[#FF7A21]/50 focus:bg-white/10 transition-all">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 max-w-3xl mx-auto items-center">
+                            <div class="flex flex-col"><span class="text-6xl md:text-8xl font-black text-white tracking-tighter" x-text="time.d">00</span><span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Days</span></div>
+                            <div class="flex flex-col"><span class="text-6xl md:text-8xl font-black text-white tracking-tighter" x-text="time.h">00</span><span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Hours</span></div>
+                            <div class="flex flex-col"><span class="text-6xl md:text-8xl font-black text-white tracking-tighter" x-text="time.m">00</span><span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Minutes</span></div>
+                            <div class="flex flex-col"><span class="text-6xl md:text-8xl font-black text-[#FF7A21] tracking-tighter drop-shadow-[0_0_25px_rgba(255,122,33,0.3)]" x-text="time.s">00</span><span class="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF7A21]/60 mt-3">Seconds</span></div>
                         </div>
-                        <div class="flex flex-col gap-3">
-                            <button @click="checkPass()" 
-                                class="w-full h-16 bg-[#FF7A21] text-white rounded-2xl font-black text-xs uppercase tracking-[4px] shadow-lg shadow-orange-900/20 active:scale-95 transition-all">
-                                Verify Access
-                            </button>
-                            <button @click="state = 'coming'" class="text-white/20 text-[10px] font-bold uppercase tracking-widest hover:text-white/40 transition-colors">Cancel</button>
+
+                        <div class="pt-8 flex flex-col items-center gap-6">
+                            <p class="text-white/60 text-sm font-medium tracking-[0.1em] max-w-sm mx-auto leading-relaxed">Persiapkan diri Anda untuk pendaftaran tercepat.</p>
+                            <div class="flex items-center gap-4 py-3 px-6 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
+                                <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">LIVE MONITORING ACTIVE</span>
+                            </div>
                         </div>
                     </div>
                 </template>
 
-                <!-- State 3: Ready Button -->
-                <template x-if="state === 'ready'">
-                    <div class="text-center space-y-12" x-transition:enter="transition ease-out duration-500">
-                        <div class="space-y-4">
-                            <h2 class="text-white text-3xl font-[900] uppercase tracking-tighter italic">LAUNCH CONTROL READY</h2>
-                            <p class="text-[11px] font-bold text-white/40 uppercase tracking-[4px]">INITIATE FINAL COUNTDOWN SEQUENCE</p>
-                        </div>
+                <!-- Manual Start Tool (If No Schedule) -->
+                <template x-if="!hasSchedule && state !== 'count'">
+                    <div class="space-y-12">
+                         <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" class="h-32 mx-auto drop-shadow-2xl">
+                         
+                         <template x-if="state === 'manual'">
+                            <div class="space-y-6">
+                                <h2 class="text-white/50 font-bold uppercase tracking-widest text-sm">System Standby</h2>
+                                <button @click="state = 'password'" class="bg-[#FF7A21] text-white px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-[4px] shadow-xl shadow-orange-900/40 hover:scale-105 active:scale-95 transition-all">
+                                    INITIATE START TOOL
+                                </button>
+                            </div>
+                         </template>
 
-                        <div class="relative group">
-                            <div class="absolute inset-0 bg-red-600 blur-3xl opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity"></div>
-                            <button @click="startCountdown()" 
-                                class="relative w-48 h-48 bg-red-600 text-white rounded-full font-black text-2xl uppercase tracking-[2px] shadow-2xl shadow-red-950/50 border-8 border-red-500/50 hover:bg-red-500 hover:scale-105 active:scale-90 transition-all animate-pulse">
-                                LAUNCH
-                            </button>
-                        </div>
+                         <template x-if="state === 'password'">
+                            <div class="max-w-md mx-auto space-y-6">
+                                <input type="password" x-model="password" @keyup.enter="checkPass()" placeholder="••••••••" class="w-full bg-white/5 border border-white/10 rounded-2xl h-16 text-center text-white text-xl font-bold tracking-[4px] focus:outline-none focus:border-[#FF7A21]">
+                                <button @click="checkPass()" class="w-full h-16 bg-[#FF7A21] text-white rounded-2xl font-black uppercase tracking-widest">Verify Control</button>
+                            </div>
+                         </template>
+
+                         <template x-if="state === 'ready'">
+                            <div class="space-y-12">
+                                <button @click="startCountdown()" class="w-48 h-48 bg-red-600 text-white rounded-full font-black text-2xl shadow-2xl border-8 border-red-500/50 animate-pulse mx-auto">START</button>
+                            </div>
+                         </template>
                     </div>
                 </template>
 
-                <!-- State 4: Countdown -->
+                <!-- Manual Launch Countdown -->
                 <template x-if="state === 'count'">
-                    <div class="text-center" x-transition:enter="transition ease-out duration-300">
+                    <div class="text-center">
                         <div class="text-[200px] leading-none font-black text-[#FF7A21] drop-shadow-[0_0_50px_rgba(255,122,33,0.4)] animate-bounce" x-text="count"></div>
                         <p class="text-white font-[900] text-3xl uppercase tracking-[15px] opacity-40 mt-8">INITIATING</p>
                     </div>
                 </template>
+
             </div>
         </div>
 
         <script>
-            function startTool() {
+            function launchControl() {
                 return {
-                    state: 'coming', // coming, password, ready, count, finish
+                    isLive: false,
+                    hasSchedule: @json(!empty($ticketSaleStart)),
+                    targetDate: {{ ($ticketSaleStartValue->timestamp ?? 0) * 1000 }},
+                    state: @json(!empty($ticketSaleStart) ? 'schedule' : 'manual'),
                     password: '',
-                    error: '',
                     count: 6,
+                    time: { d: '00', h: '00', m: '00', s: '00' },
                     sounds: {
                         standby: new Audio("{{ asset('assets/sounds/standby.mpeg') }}"),
                         start: new Audio("{{ asset('assets/sounds/start.mpeg') }}"),
@@ -361,64 +354,68 @@
                     init() {
                         this.sounds.standby.loop = true;
                         this.sounds.countdown.loop = true;
-                        // For public "Coming Soon", try to play standby on first click anywhere
+
+                        // Try to start music on first interaction
                         document.addEventListener('click', () => {
-                            if(this.state === 'coming') this.playStandby();
+                            if(this.state === 'schedule') this.sounds.countdown.play().catch(e=>{});
+                            else if(this.state === 'manual') this.sounds.standby.play().catch(e=>{});
                         }, { once: true });
+
+                        if (this.hasSchedule) {
+                            this.startScheduleTimer();
+                        }
                     },
 
-                    playStandby() {
-                        this.sounds.standby.play().catch(e => {});
+                    startScheduleTimer() {
+                        const update = () => {
+                            const now = Date.now();
+                            const diff = this.targetDate - now;
+
+                            if (diff <= 0) {
+                                this.isLive = true;
+                                return;
+                            }
+
+                            this.time.d = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
+                            this.time.h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+                            this.time.m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+                            this.time.s = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+
+                            requestAnimationFrame(update);
+                        };
+                        update();
                     },
 
                     checkPass() {
                         if (this.password === 'IpbRun2026#') {
                             this.state = 'ready';
-                            this.error = '';
+                            this.sounds.standby.play().catch(e=>{});
                         } else {
-                            alert('Invalid Credentials');
-                            this.password = '';
+                            alert('Invalid Access');
                         }
                     },
 
                     startCountdown() {
-                        this.playStandby();
                         this.sounds.standby.pause();
                         this.sounds.start.play();
-                        
                         this.state = 'count';
                         const timer = setInterval(() => {
                             this.count--;
                             if (this.count <= 0) {
                                 clearInterval(timer);
-                                this.triggerAdminStart();
+                                this.triggerSystem();
                             }
                         }, 1000);
                     },
 
-                    async triggerAdminStart() {
-                        try {
-                            const response = await fetch("{{ route('trigger.start') }}", {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
-                                },
-                                body: JSON.stringify({ password: this.password })
-                            });
-
-                            const result = await response.json();
-                            if (result.success) {
-                                this.sounds.countdown.play().catch(e => {});
-                                this.state = 'finish';
-                            } else {
-                                alert(result.message);
-                                window.location.reload();
-                            }
-                        } catch (e) {
-                            alert("Error triggering system");
-                            window.location.reload();
-                        }
+                    async triggerSystem() {
+                        await fetch("{{ route('trigger.start') }}", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" },
+                            body: JSON.stringify({ password: this.password })
+                        });
+                        this.isLive = true;
+                        this.sounds.countdown.play().catch(e=>{});
                     }
                 }
             }

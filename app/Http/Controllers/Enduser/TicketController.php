@@ -27,6 +27,11 @@ class TicketController extends Controller
         $ticketSaleStart = Setting::getValue('ticket_sale_start');
         $isMaintenance = Setting::getValue('is_running', '0') !== '1';
 
+        // 1. Maintenance Mode
+        if ($isMaintenance) {
+            return view('pages.enduser.coming-soon');
+        }
+
         // 2. Auth Check: If Participant, redirect to Dashboard
         if (auth()->check() && auth()->user()->role === 'participant') {
             return redirect()->route('participant.dashboard');
