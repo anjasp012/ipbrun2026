@@ -18,12 +18,35 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials, $request->remember)) {
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        // Pre-check for Participant Role
+        if ($user && $user->role === 'participant') {
+            $isRunning = \App\Models\Setting::where('key', 'is_running')->first()?->value === '1';
+            $startTimeStr = \App\Models\Setting::where('key', 'ticket_sale_start')->first()?->value;
+            $isReady = false;
+
+            if ($isRunning && $startTimeStr) {
+                $now = \Carbon\Carbon::now('Asia/Jakarta');
+                $startTime = \Carbon\Carbon::parse($startTimeStr, 'Asia/Jakarta');
+                if ($now->greaterThanOrEqualTo($startTime)) {
+                    $isReady = true;
+                }
+            }
+
+            if (!$isReady) {
+                return back()->withErrors([
+                    'email' => 'Maaf, pendaftaran/dashboard peserta belum dibuka saat ini.',
+                ])->onlyInput('email');
+            }
+        }
+
+        if (Auth::attempt($request->only('email', 'password'), $request->remember)) {
             $request->session()->regenerate();
 
             if (Auth::user()->role === 'admin') {
