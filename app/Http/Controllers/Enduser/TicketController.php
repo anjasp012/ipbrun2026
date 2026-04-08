@@ -399,6 +399,10 @@ class TicketController extends Controller
             'transaction_details' => ['order_id' => $order->order_code, 'gross_amount' => $order->total_price],
             'customer_details' => ['first_name' => $participant->name, 'email' => $participant->email, 'phone' => $participant->phone_number],
             'item_details' => $itemDetails,
+            'expiry' => [
+                'unit' => 'minute',
+                'duration' => 10
+            ],
             'callbacks' => [
                 'finish' => route('payment.finish')
             ]
