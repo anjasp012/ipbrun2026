@@ -250,11 +250,7 @@
         }
     </script>
 
-    @php
-        $isFuture = isset($ticketSaleStartValue) && $ticketSaleStartValue->isFuture() && \App\Models\Setting::getValue('is_running', '0') !== '1';
-    @endphp
-
-    @if ($isFuture)
+    @if ($isMaintenance)
         <div class="fixed inset-0 z-[100] flex items-center justify-center p-6 overflow-hidden select-none"
              x-data="startTool()"
              x-show="state !== 'finish'"
@@ -270,52 +266,76 @@
             <div class="absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-[#FF7A21]/30 to-transparent -translate-x-1/2"></div>
 
             <div class="relative w-full max-w-lg">
-                <!-- State 1: Password Input -->
+                <!-- State 1: Coming Soon (Public View) -->
+                <template x-if="state === 'coming'">
+                    <div class="text-center space-y-12" x-transition:enter="transition ease-out duration-500">
+                        <div class="space-y-8">
+                            <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" 
+                                 @click="state = 'password'"
+                                 class="h-32 mx-auto drop-shadow-[0_0_30px_rgba(255,255,255,0.1)] cursor-pointer hover:scale-105 transition-transform" 
+                                 alt="IPB Run 2026">
+                            
+                            <div class="space-y-4">
+                                <h1 class="text-white text-4xl md:text-5xl font-[900] uppercase tracking-tighter italic leading-none">
+                                    REGISTRATION <br> <span class="text-[#FF7A21]">COMING SOON</span>
+                                </h1>
+                                <div class="w-20 h-1.5 bg-[#FF7A21] mx-auto rounded-full"></div>
+                            </div>
+
+                            <p class="text-white/40 text-sm font-bold uppercase tracking-[0.3em] max-w-xs mx-auto leading-relaxed">
+                                Persiapkan diri Anda untuk event lari terbesar IPB tahun ini.
+                            </p>
+                        </div>
+
+                        <div class="pt-10">
+                            <div class="inline-flex items-center gap-4 py-3 px-6 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
+                                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                <span class="text-[10px] font-black text-white/60 uppercase tracking-[0.2em]">System Standby • Monitoring Active</span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- State 2: Password Input (Admin Only) -->
                 <template x-if="state === 'password'">
-                    <div class="max-w-md mx-auto text-center space-y-10" 
-                         x-transition:enter="transition ease-out duration-500" 
-                         x-transition:enter-start="opacity-0 translate-y-8" 
-                         x-transition:enter-end="opacity-100 translate-y-0">
-                        <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" class="h-24 mx-auto drop-shadow-2xl" alt="">
-                        
-                        <div class="space-y-4">
+                    <div class="max-w-md mx-auto text-center space-y-10" x-transition:enter="transition ease-out duration-300">
+                        <div class="space-y-2">
                             <label class="text-[10px] font-black text-[#FF7A21] uppercase tracking-[5px] block">SECURITY CLEARANCE</label>
                             <input type="password" x-model="password" 
                                 @focus="playStandby()"
                                 @keyup.enter="checkPass()"
                                 placeholder="••••••••••••"
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl h-16 text-center text-white text-xl font-bold tracking-[4px] focus:outline-none focus:border-[#FF7A21]/50 focus:bg-white/10 transition-all">
-                            <template x-if="error">
-                                <p class="text-xs font-bold text-red-500 uppercase tracking-widest italic" x-text="error"></p>
-                            </template>
                         </div>
-
-                        <button @click="checkPass()" 
-                            class="w-full h-16 bg-[#FF7A21] text-white rounded-2xl font-black text-xs uppercase tracking-[4px] shadow-lg shadow-orange-900/20 active:scale-95 transition-all">
-                            Verify Control
-                        </button>
+                        <div class="flex flex-col gap-3">
+                            <button @click="checkPass()" 
+                                class="w-full h-16 bg-[#FF7A21] text-white rounded-2xl font-black text-xs uppercase tracking-[4px] shadow-lg shadow-orange-900/20 active:scale-95 transition-all">
+                                Verify Access
+                            </button>
+                            <button @click="state = 'coming'" class="text-white/20 text-[10px] font-bold uppercase tracking-widest hover:text-white/40 transition-colors">Cancel</button>
+                        </div>
                     </div>
                 </template>
 
-                <!-- State 2: Ready Button -->
+                <!-- State 3: Ready Button -->
                 <template x-if="state === 'ready'">
-                    <div class="text-center space-y-12" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100">
+                    <div class="text-center space-y-12" x-transition:enter="transition ease-out duration-500">
                         <div class="space-y-4">
-                            <h2 class="text-white text-3xl font-[900] uppercase tracking-tighter italic">SYSTEM READY</h2>
-                            <p class="text-[11px] font-bold text-white/40 uppercase tracking-[4px]">PRESS START TO TRIGGER COUNTDOWN</p>
+                            <h2 class="text-white text-3xl font-[900] uppercase tracking-tighter italic">LAUNCH CONTROL READY</h2>
+                            <p class="text-[11px] font-bold text-white/40 uppercase tracking-[4px]">INITIATE FINAL COUNTDOWN SEQUENCE</p>
                         </div>
 
                         <div class="relative group">
                             <div class="absolute inset-0 bg-red-600 blur-3xl opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity"></div>
                             <button @click="startCountdown()" 
                                 class="relative w-48 h-48 bg-red-600 text-white rounded-full font-black text-2xl uppercase tracking-[2px] shadow-2xl shadow-red-950/50 border-8 border-red-500/50 hover:bg-red-500 hover:scale-105 active:scale-90 transition-all animate-pulse">
-                                START
+                                LAUNCH
                             </button>
                         </div>
                     </div>
                 </template>
 
-                <!-- State 3: Countdown -->
+                <!-- State 4: Countdown -->
                 <template x-if="state === 'count'">
                     <div class="text-center" x-transition:enter="transition ease-out duration-300">
                         <div class="text-[200px] leading-none font-black text-[#FF7A21] drop-shadow-[0_0_50px_rgba(255,122,33,0.4)] animate-bounce" x-text="count"></div>
@@ -328,7 +348,7 @@
         <script>
             function startTool() {
                 return {
-                    state: 'password',
+                    state: 'coming', // coming, password, ready, count, finish
                     password: '',
                     error: '',
                     count: 6,
@@ -341,10 +361,14 @@
                     init() {
                         this.sounds.standby.loop = true;
                         this.sounds.countdown.loop = true;
+                        // For public "Coming Soon", try to play standby on first click anywhere
+                        document.addEventListener('click', () => {
+                            if(this.state === 'coming') this.playStandby();
+                        }, { once: true });
                     },
 
                     playStandby() {
-                        this.sounds.standby.play().catch(e => console.log('Autoplay blocked'));
+                        this.sounds.standby.play().catch(e => {});
                     },
 
                     checkPass() {
@@ -352,7 +376,7 @@
                             this.state = 'ready';
                             this.error = '';
                         } else {
-                            this.error = 'Invalid Credentials';
+                            alert('Invalid Credentials');
                             this.password = '';
                         }
                     },
@@ -387,7 +411,6 @@
                             if (result.success) {
                                 this.sounds.countdown.play().catch(e => {});
                                 this.state = 'finish';
-                                // Music will continue playing on the now-visible homepage
                             } else {
                                 alert(result.message);
                                 window.location.reload();

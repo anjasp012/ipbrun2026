@@ -27,17 +27,12 @@ class TicketController extends Controller
         $ticketSaleStart = Setting::getValue('ticket_sale_start');
         $isMaintenance = Setting::getValue('is_running', '0') !== '1';
 
-        // 1. Maintenance Mode
-        if ($isMaintenance) {
-            return view('pages.enduser.coming-soon');
-        }
-
         // 2. Auth Check: If Participant, redirect to Dashboard
         if (auth()->check() && auth()->user()->role === 'participant') {
             return redirect()->route('participant.dashboard');
         }
 
-        // 3. Fetch tickets (Standard Landing Page)
+        // 3. Fetch tickets
         $tickets = Ticket::whereHas('period', function ($query) {
             $query->where('is_active', true);
         })->with(['category', 'period'])
@@ -50,7 +45,13 @@ class TicketController extends Controller
 
         $ticketSaleStartValue = $ticketSaleStart ? \Illuminate\Support\Carbon::parse($ticketSaleStart, 'Asia/Jakarta') : null;
 
-        return view('pages.enduser.index', compact('tickets_ipb', 'tickets_public', 'ticketSaleStart', 'ticketSaleStartValue'));
+        return view('pages.enduser.index', compact(
+            'tickets_ipb', 
+            'tickets_public', 
+            'ticketSaleStart', 
+            'ticketSaleStartValue',
+            'isMaintenance'
+        ));
     }
 
     public function dashboard()
