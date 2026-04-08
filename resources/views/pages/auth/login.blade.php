@@ -40,13 +40,11 @@
                 <form id="loginForm" action="{{ route('login') }}" method="POST" class="space-y-6">
                     @csrf
                     <div class="space-y-2">
-                        <label for="email"
-                            class="block text-[11px] font-black text-slate-400 uppercase tracking-[2px] ml-1">Email
-                            Address</label>
+                        <x-label for="email" value="Email Address"
+                            class="text-[11px] font-black text-slate-400 uppercase tracking-[2px] ml-1 mb-0" />
                         <div class="relative">
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" required
-                                autofocus
-                                class="w-full h-14 bg-slate-50/50 border border-slate-100 rounded-2xl px-6 font-bold text-[#003366] placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-200 focus:bg-white transition-all">
+                            <x-input id="email" type="email" name="email" :value="old('email')" required autofocus
+                                class="w-full h-14 bg-slate-50/50 border-slate-100 rounded-2xl px-6 font-bold text-[#003366] focus:bg-white transition-all shadow-none" />
                             <svg class="absolute right-5 top-4.5 w-5 h-5 text-slate-300 pointer-events-none"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -62,13 +60,11 @@
                     </div>
 
                     <div class="space-y-2">
-                        <div class="flex justify-between items-center ml-1">
-                            <label for="password"
-                                class="text-[11px] font-black text-slate-400 uppercase tracking-[2px]">Password</label>
-                        </div>
+                        <x-label for="password" value="Password"
+                            class="text-[11px] font-black text-slate-400 uppercase tracking-[2px] ml-1 mb-0" />
                         <div class="relative">
-                            <input id="password" type="password" name="password" required
-                                class="w-full h-14 bg-slate-50/50 border border-slate-100 rounded-2xl px-6 font-bold text-[#003366] placeholder:text-slate-300 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-200 focus:bg-white transition-all text-left">
+                            <x-input id="password" type="password" name="password" required
+                                class="w-full h-14 bg-slate-50/50 border-slate-100 rounded-2xl px-6 font-bold text-[#003366] focus:bg-white transition-all shadow-none" />
                             <svg class="absolute right-5 top-4.5 w-5 h-5 text-slate-300 pointer-events-none"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -102,14 +98,14 @@
                         </label>
                     </div>
 
-                    <button type="submit"
-                        class="w-full h-16 bg-[#003366] hover:bg-[#002244] text-white rounded-2xl font-black text-sm uppercase tracking-[3px] shadow-xl shadow-blue-900/10 hover:shadow-blue-900/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                    <x-button variant="navy"
+                        class="w-full h-16 rounded-2xl text-sm tracking-[3px] shadow-xl shadow-blue-900/10 hover:shadow-blue-900/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3">
                         Masuk Sekarang
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                         </svg>
-                    </button>
+                    </x-button>
                 </form>
 
                 <div class="mt-12 text-center">
