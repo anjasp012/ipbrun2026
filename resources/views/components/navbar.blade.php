@@ -6,9 +6,9 @@
     @endphp
 @endauth
 
-<nav x-data="{ mobileMenuOpen: false, desktopDropdownOpen: false }" 
+<nav x-data="{ mobileMenuOpen: false, desktopDropdownOpen: false }"
     class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 font-['Outfit']">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-0">
         <div class="flex justify-between h-16 md:h-20">
             <!-- Left: Logo -->
             <div class="flex items-center">
@@ -20,38 +20,45 @@
 
             <!-- Center: Desktop Navigation -->
             <div class="hidden md:flex items-center gap-1">
-                <a href="{{ url('/') }}" 
+                <a href="{{ url('/') }}"
                     class="px-5 py-2 rounded-xl text-[13px] font-black uppercase tracking-widest text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-all {{ request()->is('/') ? 'text-[#003366] bg-slate-50' : '' }}">
                     Home
                 </a>
-                
+
                 <!-- Dropdown Race Info -->
-                <div class="relative" @mouseenter="desktopDropdownOpen = true" @mouseleave="desktopDropdownOpen = false">
-                    <button class="px-5 py-2 rounded-xl text-[13px] font-black uppercase tracking-widest text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-all flex items-center gap-2">
+                <div class="relative" @mouseenter="desktopDropdownOpen = true"
+                    @mouseleave="desktopDropdownOpen = false">
+                    <button @click="desktopDropdownOpen = !desktopDropdownOpen"
+                        class="px-5 py-2 rounded-xl text-[13px] font-black uppercase tracking-widest text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-all flex items-center gap-2">
                         Race Info
-                        <svg class="w-3.5 h-3.5 transition-transform duration-300" :class="{ 'rotate-180': desktopDropdownOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
+                        <svg class="w-3.5 h-3.5 transition-transform duration-300"
+                            :class="{ 'rotate-180': desktopDropdownOpen }" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7">
+                            </path>
                         </svg>
                     </button>
-                    
-                    <div x-show="desktopDropdownOpen" 
-                         x-cloak
-                         style="display: none"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 translate-y-2"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         x-transition:leave="transition ease-in duration-150"
-                         x-transition:leave-start="opacity-100 translate-y-0"
-                         x-transition:leave-end="opacity-0 translate-y-2"
-                         class="absolute top-full left-0 w-52 py-2 mt-1 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden"
-                         @click.away="desktopDropdownOpen = false">
-                        <a href="{{ url('/route') }}" class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest">Route</a>
-                        <a href="{{ url('/faq') }}" class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest">FAQ</a>
-                        <a href="{{ url('/rules') }}" class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest">Rules & Regulations</a>
+
+                    <div x-show="desktopDropdownOpen" x-cloak style="display: none"
+                        x-transition:enter="transition ease-out duration-200"
+                        x-transition:enter-start="opacity-0 translate-y-2"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-150"
+                        x-transition:leave-start="opacity-100 translate-y-0"
+                        x-transition:leave-end="opacity-0 translate-y-2"
+                        class="absolute top-full left-0 w-52 py-2 mt-1 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden"
+                        @click.away="desktopDropdownOpen = false">
+                        <a href="{{ url('/route') }}"
+                            class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest">Route</a>
+                        <a href="{{ url('/faq') }}"
+                            class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest">FAQ</a>
+                        <a href="{{ url('/rules') }}"
+                            class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest">Rules
+                            & Regulations</a>
                     </div>
                 </div>
 
-                <a href="{{ url('/surat-kuasa') }}" 
+                <a href="{{ url('/surat-kuasa') }}"
                     class="px-5 py-2 rounded-xl text-[13px] font-black uppercase tracking-widest text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-all">
                     Surat Kuasa
                 </a>
@@ -68,7 +75,8 @@
                         </div>
 
                         <div class="relative group hidden sm:block">
-                            <div class="w-8 h-8 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-black text-[11px] border border-orange-200 shadow-inner overflow-hidden">
+                            <div
+                                class="w-8 h-8 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center font-black text-[11px] border border-orange-200 shadow-inner overflow-hidden">
                                 {{ $initials }}
                             </div>
                         </div>
@@ -91,7 +99,9 @@
                                 class="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
                                 title="Logout">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                    </path>
                                 </svg>
                             </button>
                         </form>
@@ -99,21 +109,28 @@
                 @else
                     <a href="{{ route('login') }}"
                         class="hidden md:flex items-center gap-2.5 px-6 h-11 bg-[#003366] hover:bg-[#002244] text-white rounded-xl font-black text-[11px] uppercase tracking-[1.5px] shadow-lg shadow-blue-900/10 transition-all active:scale-95 group">
-                        <svg class="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        <svg class="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                            </path>
                         </svg>
                         Masuk Akun
                     </a>
                 @endauth
 
                 <!-- Mobile Menu Button -->
-                <button @click="mobileMenuOpen = !mobileMenuOpen" 
+                <button @click="mobileMenuOpen = !mobileMenuOpen"
                     class="md:hidden p-2 rounded-xl bg-slate-50 text-[#003366] border border-slate-100 transition-all active:scale-90">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        x-show="!mobileMenuOpen">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M4 6h16M4 12h16m-7 6h7"></path>
                     </svg>
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="mobileMenuOpen" x-cloak style="display: none">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        x-show="mobileMenuOpen" x-cloak style="display: none">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
@@ -121,70 +138,77 @@
     </div>
 
     <!-- Mobile Menu Overlay -->
-    <div x-show="mobileMenuOpen" 
-         x-cloak
-         style="display: none"
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-[60] bg-blue-950/40 backdrop-blur-sm md:hidden"
-         @click="mobileMenuOpen = false">
+    <div x-show="mobileMenuOpen" x-cloak style="display: none" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0" class="fixed inset-0 z-[60] bg-blue-950/40 backdrop-blur-sm md:hidden"
+        @click="mobileMenuOpen = false">
     </div>
 
     <!-- Mobile Menu Side Panel -->
-    <div x-show="mobileMenuOpen" 
-         x-cloak
-         style="display: none"
-         x-transition:enter="transition ease-out duration-300 transform"
-         x-transition:enter-start="translate-x-full"
-         x-transition:enter-end="translate-x-0"
-         x-transition:leave="transition ease-in duration-200 transform"
-         x-transition:leave-start="translate-x-0"
-         x-transition:leave-end="translate-x-full"
-         class="fixed inset-y-0 right-0 z-[70] w-72 bg-white shadow-2xl flex flex-col md:hidden">
-        
+    <div x-show="mobileMenuOpen" x-cloak style="display: none"
+        x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="translate-x-full"
+        x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-200 transform"
+        x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
+        class="fixed inset-y-0 right-0 z-[70] w-72 bg-white shadow-2xl flex flex-col md:hidden">
+
         <div class="p-6 border-b border-slate-100 flex items-center justify-between">
             <span class="text-sm font-black text-[#003366] uppercase tracking-widest">Menu Navigasi</span>
             <button @click="mobileMenuOpen = false" class="p-2 text-slate-400">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
             </button>
         </div>
 
         <div class="flex-1 overflow-y-auto p-6 space-y-2">
-            <a href="{{ url('/') }}" class="block px-6 py-4 rounded-xl text-sm font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition-all">Home</a>
-            
+            <a href="{{ url('/') }}"
+                class="block px-6 py-4 rounded-xl text-sm font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition-all">Home</a>
+
             <div x-data="{ open: false }">
-                <button @click="open = !open" class="w-full flex items-center justify-between px-6 py-4 rounded-xl text-sm font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition-all">
+                <button @click="open = !open"
+                    class="w-full flex items-center justify-between px-6 py-4 rounded-xl text-sm font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition-all">
                     Race Info
-                    <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                    <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7">
+                        </path>
+                    </svg>
                 </button>
-                <div x-show="open" x-cloak style="display: none" class="ml-4 mt-2 space-y-1 mb-2 border-l-2 border-slate-100 pl-4">
-                    <a href="{{ url('/route') }}" class="block px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-[#003366]">Route</a>
-                    <a href="{{ url('/faq') }}" class="block px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-[#003366]">FAQ</a>
-                    <a href="{{ url('/rules') }}" class="block px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-[#003366]">Rules & Regulations</a>
+                <div x-show="open" x-cloak style="display: none"
+                    class="ml-4 mt-2 space-y-1 mb-2 border-l-2 border-slate-100 pl-4">
+                    <a href="{{ url('/route') }}"
+                        class="block px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-[#003366]">Route</a>
+                    <a href="{{ url('/faq') }}"
+                        class="block px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-[#003366]">FAQ</a>
+                    <a href="{{ url('/rules') }}"
+                        class="block px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-[#003366]">Rules
+                        & Regulations</a>
                 </div>
             </div>
 
-            <a href="{{ url('/surat-kuasa') }}" class="block px-6 py-4 rounded-xl text-sm font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition-all">Surat Kuasa</a>
+            <a href="{{ url('/surat-kuasa') }}"
+                class="block px-6 py-4 rounded-xl text-sm font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 transition-all">Surat
+                Kuasa</a>
         </div>
 
         <div class="p-6 border-t border-slate-100">
             @auth
-                <a href="{{ $is_admin ? url('/admin/dashboard') : route('participant.dashboard') }}" 
-                   class="w-full flex items-center justify-center h-12 bg-slate-50 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest mb-3">
+                <a href="{{ $is_admin ? url('/admin/dashboard') : route('participant.dashboard') }}"
+                    class="w-full flex items-center justify-center h-12 bg-slate-50 text-slate-600 rounded-xl font-black text-xs uppercase tracking-widest mb-3">
                     Dashboard
                 </a>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="w-full flex items-center justify-center h-12 bg-red-50 text-red-600 rounded-xl font-black text-xs uppercase tracking-widest">
+                    <button type="submit"
+                        class="w-full flex items-center justify-center h-12 bg-red-50 text-red-600 rounded-xl font-black text-xs uppercase tracking-widest">
                         Logout
                     </button>
                 </form>
             @else
-                <a href="{{ route('login') }}" class="w-full flex items-center justify-center h-14 bg-[#003366] text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-900/10">
+                <a href="{{ route('login') }}"
+                    class="w-full flex items-center justify-center h-14 bg-[#003366] text-white rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-900/10">
                     Masuk Akun
                 </a>
             @endauth

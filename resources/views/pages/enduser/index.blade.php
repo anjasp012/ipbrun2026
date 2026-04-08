@@ -18,7 +18,7 @@
                 @endphp
 
                 <!-- Tab Switcher (Mobile Only) -->
-                <div class="flex justify-center mb-8 px-2 md:hidden">
+                <div class="flex justify-center mb-8 md:hidden">
                     <div class="inline-flex p-1 bg-slate-50 rounded-xl border border-slate-200 shadow-sm w-full">
                         <button onclick="switchCategory('ipb')" id="tab-ipb"
                             class="flex-1 category-tab px-4 py-3 rounded-lg text-xs font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap bg-[#003366] text-white shadow-md">
