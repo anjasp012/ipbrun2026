@@ -111,6 +111,7 @@ class AdminController extends Controller
     {
         $query = Participant::with(['raceEntries.ticket.category', 'raceEntries.ticket.period', 'raceEntries.order']);
 
+        // Filter Status
         if ($request->filled('status')) {
             $status = $request->status;
             $query->whereHas('raceEntries.order', function($rq) use ($status) {
@@ -118,11 +119,20 @@ class AdminController extends Controller
             });
         }
 
+        // Filter Ticket Type
         if ($request->filled('ticket_type')) {
             $type = $request->ticket_type;
             $query->whereHas('raceEntries.ticket', function($rq) use ($type) {
                 $rq->where('type', $type);
             });
+        }
+
+        // Filter Date Range
+        if ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('created_at', '<=', $request->end_date);
         }
 
         $participants = $query->latest()->get();
@@ -148,6 +158,10 @@ class AdminController extends Controller
 
             foreach ($participants as $p) {
                 foreach ($p->raceEntries as $entry) {
+                    // Pastikan data tiket ada
+                    $categoryName = $entry->ticket?->category?->name ?? '-';
+                    $ticketName = $entry->ticket?->name ?? ($entry->ticket?->type ? strtoupper($entry->ticket->type) : '-');
+                    
                     fputcsv($file, [
                         $entry->order->order_code ?? '-',
                         $p->name,
@@ -160,11 +174,11 @@ class AdminController extends Controller
                         $p->nim_nrp,
                         $p->nationality,
                         $p->address,
-                        $entry->ticket->category->name ?? '-',
-                        $entry->ticket->name ?? '-',
-                        strtoupper($entry->ticket->type),
+                        $categoryName,
+                        $ticketName,
+                        strtoupper($entry->ticket->type ?? '-'),
                         $entry->ticket->period->name ?? '-',
-                        $entry->order->status ?? '-',
+                        $entry->order->status ?? ($entry->status ?? '-'),
                         $p->created_at->format('Y-m-d H:i')
                     ]);
                 }

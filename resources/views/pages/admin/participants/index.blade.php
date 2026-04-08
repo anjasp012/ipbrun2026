@@ -161,6 +161,17 @@
 
                 <form action="{{ route('participants.export') }}" method="GET" @submit="showExportModal = false">
                     <div class="p-10 space-y-8">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Start Date</label>
+                                <input type="date" name="start_date" class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">End Date</label>
+                                <input type="date" name="end_date" class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
+                            </div>
+                        </div>
+
                         <div>
                             <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Payment Status</label>
                             <select name="status" class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
