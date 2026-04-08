@@ -338,4 +338,4 @@
             updateIndexCountdown();
         </script>
     @endif
-</x-app>
+</x-layouts.app>
