@@ -19,7 +19,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Enduser Routes
 Route::get('/', [EnduserTicket::class, 'home']);
-Route::get('/start', [ToolController::class, 'startPage'])->name('start.tool');
+// Route::get('/start', [ToolController::class, 'startPage'])->name('start.tool');
 Route::post('/trigger-start', [ToolController::class, 'triggerStart'])->name('trigger.start');
 Route::get('/checkout/{ticket}', [EnduserTicket::class, 'checkout'])->name('checkout');
 Route::post('/register', [EnduserTicket::class, 'register'])->name('register');

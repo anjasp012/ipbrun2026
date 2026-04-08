@@ -40,22 +40,28 @@
 
                     <!-- State: Ready Button -->
                     <template x-if="state === 'ready'">
-                        <div class="text-center space-y-12" x-transition:enter="transition ease-out duration-500">
+                        <div class="text-center space-y-12" x-transition:enter="transition ease-out duration-500"
+                            x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100">
                             <div class="space-y-4">
-                                <h2 class="text-white text-3xl font-[900] uppercase tracking-tighter italic text-center">LAUNCH READY</h2>
-                                <p class="text-[11px] font-bold text-white/40 uppercase tracking-[4px]">INITIATE FINAL SEQUENCE</p>
+                                <h2 class="text-white text-3xl font-[900] uppercase tracking-tighter italic">SYSTEM READY</h2>
+                                <p class="text-[11px] font-bold text-white/40 uppercase tracking-[4px]">PRESS START TO TRIGGER COUNTDOWN</p>
                             </div>
-                            <button @click="startCountdown()" 
-                                class="relative w-48 h-48 bg-red-600 text-white rounded-full font-black text-2xl uppercase tracking-[2px] shadow-2xl shadow-red-950/50 border-8 border-red-500/50 hover:bg-red-500 hover:scale-105 transition-all animate-pulse mx-auto block">
-                                START
-                            </button>
+
+                            <div class="relative group">
+                                <div class="absolute inset-0 bg-red-600 blur-3xl opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity"></div>
+                                <button @click="startCountdown()"
+                                    class="relative w-48 h-48 bg-red-600 text-white rounded-full font-black text-2xl uppercase tracking-[2px] shadow-2xl shadow-red-950/50 border-8 border-red-500/50 hover:bg-red-500 hover:scale-105 active:scale-90 transition-all animate-pulse mx-auto flex items-center justify-center">
+                                    START
+                                </button>
+                            </div>
                         </div>
                     </template>
 
                     <!-- State: Countdown -->
                     <template x-if="state === 'count'">
-                        <div class="text-center">
-                            <div class="text-[200px] leading-none font-black text-[#FF7A21] drop-shadow-[0_0_50px_rgba(255,122,33,0.4)] animate-bounce" x-text="count"></div>
+                        <div class="text-center" x-transition:enter="transition ease-out duration-300">
+                            <div class="text-[200px] leading-none font-black text-[#FF7A21] drop-shadow-[0_0_50px_rgba(255,122,33,0.4)] animate-bounce"
+                                x-text="count"></div>
                             <p class="text-white font-[900] text-3xl uppercase tracking-[15px] opacity-40 mt-8">INITIATING</p>
                         </div>
                     </template>
