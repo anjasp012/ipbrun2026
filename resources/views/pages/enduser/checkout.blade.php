@@ -101,7 +101,7 @@
                     </div>
                     <div> <x-label for="date_birth">Tanggal Lahir *</x-label> <x-input id="date_birth" name="date_birth"
                             class="datepicker bg-white {{ $errors->has('date_birth') ? '!border-red-500 ring-4 ring-red-50' : '' }}"
-                            placeholder="DD-MM-YYYY" readonly required value="{{ old('date_birth') }}" />
+                            placeholder="DD-MM-YYYY" required value="{{ old('date_birth') }}" />
                         @error('date_birth')
                             <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
                             </p>
@@ -393,22 +393,22 @@
                             <svg class="w-24 h-24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l8 4v8.64l-8 4-8-4V8.18l8-4z"/></svg>
                         </div>
 
-                        <div class="relative w-40 h-40 shrink-0">
+                        <div class="relative w-64 h-64 shrink-0">
                             {{-- T-Shirt SVG --}}
                             <svg class="w-full h-full text-[#FF7A21]" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12,2L4.5,4.7V9H6V22H18V9H19.5V4.7L12,2Z" />
                             </svg>
                             {{-- Chest Indicator (A) --}}
-                            <div class="absolute top-[45%] left-3 w-[calc(100%-24px)] h-[1px] border-t-2 border-dashed border-white/80">
-                                <div class="absolute -left-1 -top-[3.5px] w-2 h-2 bg-white rounded-full border border-[#FF7A21]"></div>
-                                <div class="absolute -right-1 -top-[3.5px] w-2 h-2 bg-white rounded-full border border-[#FF7A21]"></div>
-                                <span class="absolute top-1 left-1/2 -translate-x-1/2 bg-[#003366] text-white text-[9px] font-black px-1.5 py-0.5 rounded-sm shadow-sm">CHEST</span>
+                            <div class="absolute top-[45%] left-5 w-[calc(100%-40px)] h-[1px] border-t-2 border-dashed border-white/80">
+                                <div class="absolute -left-1.5 -top-[4px] w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
+                                <div class="absolute -right-1.5 -top-[4px] w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
+                                <span class="absolute top-2 left-1/2 -translate-x-1/2 bg-[#003366] text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-sm whitespace-nowrap">CHEST</span>
                             </div>
                             {{-- Length Indicator (B) --}}
-                            <div class="absolute top-2.5 left-1/2 w-[1px] h-[calc(100%-18px)] border-l-2 border-dashed border-white/80">
-                                <div class="absolute -left-[3.5px] -top-1 w-2 h-2 bg-white rounded-full border border-[#FF7A21]"></div>
-                                <div class="absolute -left-[3.5px] -bottom-1 w-2 h-2 bg-white rounded-full border border-[#FF7A21]"></div>
-                                <span class="absolute top-1/2 right-2 -translate-y-1/2 bg-[#003366] text-white text-[9px] font-black px-1.5 py-0.5 rounded-sm shadow-sm flex items-center h-5 whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg) translateX(-50%);">BODY LENGTH</span>
+                            <div class="absolute top-4 left-1/2 w-[1px] h-[calc(100%-24px)] border-l-2 border-dashed border-white/80">
+                                <div class="absolute -left-[4px] -top-1.5 w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
+                                <div class="absolute -left-[4px] -bottom-1.5 w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
+                                <span class="absolute top-1/2 right-3 -translate-y-1/2 bg-[#003366] text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-sm flex items-center h-6 whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg) translateX(-50%);">BODY LENGTH</span>
                             </div>
                         </div>
                     </div>
@@ -480,6 +480,7 @@
                 locale: "id",
                 dateFormat: "d-m-Y",
                 maxDate: "today",
+                allowInput: true,
                 disableMobile: "true"
             });
 
