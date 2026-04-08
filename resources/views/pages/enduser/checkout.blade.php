@@ -209,18 +209,18 @@
                             class="text-sm font-black text-[#003366] uppercase tracking-[2px] pb-2 border-b border-slate-100">
                             Optional Running Data</h3>
                     </div>
-                    <div> <x-label for="running_community">Dari komunitas lari apa? (Optional)</x-label> <x-input
-                            id="running_community" name="running_community" placeholder="Nama komunitas (jika ada)"
-                            value="{{ old('running_community') }}" /> </div>
+                    <div> <x-label for="running_community">Tergabung dalam komunitas lari? Sebutkan.
+                            (Optional)</x-label> <x-input id="running_community" name="running_community"
+                            placeholder="Nama komunitas (jika ada)" value="{{ old('running_community') }}" /> </div>
                     <div> <x-label for="best_time">Best time yang pernah didapat? (Optional)</x-label> <x-input
-                            id="best_time" name="best_time" placeholder="Contoh: 55:20 (10K)"
-                            value="{{ old('best_time') }}" /> </div>
+                            id="best_time" name="best_time" placeholder="HH:MM:SS (Contoh: 00:55:20)"
+                            value="{{ old('best_time') }}" maxlength="8" /> </div>
                     <div class="md:col-span-2"> <x-label for="previous_events">Pernah mengikuti event lari dan
                             kategori apa saja? (Optional)</x-label> <x-textarea id="previous_events"
                             name="previous_events" rows="2"
                             placeholder="Sebutkan event yang pernah diikuti sebelumnya">{{ old('previous_events') }}</x-textarea>
                     </div>
-                    <div> <x-label for="shuttle_bus">Menggunakan shuttle bus dari terminal? (Optional)</x-label>
+                    <div> <x-label for="shuttle_bus">Pilih terminal untuk naik shuttle bus? (Optional)</x-label>
                         <x-select id="shuttle_bus" name="shuttle_bus" :options="[
                             '' => 'Tidak Menggunakan',
                             'Terminal Barangsiang' => 'Terminal Barangsiang',
@@ -251,14 +251,20 @@
                                 {{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="md:col-span-2"> <x-label for="emergency_contact_relationship">Hubungan Kontak
-                            *</x-label> <x-input id="emergency_contact_relationship"
-                            name="emergency_contact_relationship" placeholder="Misal: Orang Tua, Pasangan" required
-                            value="{{ old('emergency_contact_relationship') }}"
+                    <div class="md:col-span-2">
+                        <x-label for="emergency_contact_relationship">Hubungan Kontak Darurat *</x-label>
+                        <x-select id="emergency_contact_relationship" name="emergency_contact_relationship" required
+                            :options="[
+                                'Orang Tua' => 'Orang Tua',
+                                'Suami' => 'Suami',
+                                'Istri' => 'Istri',
+                                'Anak' => 'Anak',
+                                'Saudara' => 'Saudara',
+                                'Teman' => 'Teman',
+                            ]" :selected="old('emergency_contact_relationship')"
                             class="{{ $errors->has('emergency_contact_relationship') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
                         @error('emergency_contact_relationship')
-                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
-                                {{ $message }}</p>
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>
                         @enderror
                     </div>
                 </div> <!-- Other Race Interest Section --> @php
@@ -497,6 +503,46 @@
                 clickOpens: false,
                 disableMobile: "true"
             });
+
+            const birthInput = document.getElementById('date_birth');
+            if (birthInput) {
+                birthInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length > 8) value = value.slice(0, 8);
+
+                    let formattedValue = '';
+                    if (value.length > 0) {
+                        formattedValue = value.slice(0, 2);
+                        if (value.length > 2) {
+                            formattedValue += '-' + value.slice(2, 4);
+                            if (value.length > 4) {
+                                formattedValue += '-' + value.slice(4, 8);
+                            }
+                        }
+                    }
+                    e.target.value = formattedValue;
+                });
+            }
+
+            const bestTimeInput = document.getElementById('best_time');
+            if (bestTimeInput) {
+                bestTimeInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length > 6) value = value.slice(0, 6);
+                    
+                    let formattedValue = '';
+                    if (value.length > 0) {
+                        formattedValue = value.slice(0, 2);
+                        if (value.length > 2) {
+                            formattedValue += ':' + value.slice(2, 4);
+                            if (value.length > 4) {
+                                formattedValue += ':' + value.slice(4, 6);
+                            }
+                        }
+                    }
+                    e.target.value = formattedValue;
+                });
+            }
 
             const ticketPrice = {{ $ticket->price }};
             const adminFee = 4500;
