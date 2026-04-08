@@ -387,13 +387,13 @@
                 title: '<span class="text-[#003366] font-black uppercase tracking-tight text-2xl">Race Tee Size Chart</span>',
                 html: `
                 <div class="mt-6 flex flex-col md:flex-row items-center gap-8 px-2 text-left">
-                    <div class="flex items-center gap-6 bg-slate-50 p-6 rounded-3xl border border-slate-100 flex-1 w-full relative overflow-hidden">
+                    <div class="flex items-center justify-center bg-slate-50 p-6 rounded-3xl border border-slate-100 flex-1 w-full relative overflow-hidden">
                         {{-- Motif Background --}}
                         <div class="absolute -right-4 -top-4 opacity-[0.03] scale-150">
                             <svg class="w-24 h-24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18l8 4v8.64l-8 4-8-4V8.18l8-4z"/></svg>
                         </div>
 
-                        <div class="relative w-36 h-36 shrink-0 lg:ml-4">
+                        <div class="relative w-40 h-40 shrink-0">
                             {{-- T-Shirt SVG --}}
                             <svg class="w-full h-full text-[#FF7A21]" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12,2L4.5,4.7V9H6V22H18V9H19.5V4.7L12,2Z" />
@@ -409,23 +409,6 @@
                                 <div class="absolute -left-[3.5px] -top-1 w-2 h-2 bg-white rounded-full border border-[#FF7A21]"></div>
                                 <div class="absolute -left-[3.5px] -bottom-1 w-2 h-2 bg-white rounded-full border border-[#FF7A21]"></div>
                                 <span class="absolute top-1/2 right-2 -translate-y-1/2 bg-[#003366] text-white text-[9px] font-black px-1.5 py-0.5 rounded-sm shadow-sm flex items-center h-5 whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg) translateX(-50%);">BODY LENGTH</span>
-                            </div>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div class="flex items-start gap-3">
-                                <div class="bg-[#003366] text-white text-[10px] font-black w-5 h-5 rounded-lg flex items-center justify-center shrink-0 shadow-sm mt-0.5">A</div>
-                                <div>
-                                    <p class="text-[11px] font-black text-[#003366] leading-none uppercase tracking-wider mb-1">Chest</p>
-                                    <p class="text-[10px] font-bold text-slate-500 leading-tight italic">Lebar dari ketiak kiri ke ketiak kanan.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start gap-3">
-                                <div class="bg-[#003366] text-white text-[10px] font-black w-5 h-5 rounded-lg flex items-center justify-center shrink-0 shadow-sm mt-0.5">B</div>
-                                <div>
-                                    <p class="text-[11px] font-black text-[#003366] leading-none uppercase tracking-wider mb-1">Body Length</p>
-                                    <p class="text-[10px] font-bold text-slate-500 leading-tight italic">Panjang dari bahu ke ujung bawah baju.</p>
-                                </div>
                             </div>
                         </div>
                     </div>
