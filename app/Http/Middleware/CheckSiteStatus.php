@@ -28,24 +28,26 @@ class CheckSiteStatus
         }
 
         // Check if registration is running (Master Switch)
-        $isRunning = \App\Models\Setting::getValue('is_running', '0') === '1';
+        // We use Setting::where instead of getValue to be 100% sure about the query
+        $isRunning = \App\Models\Setting::where('key', 'is_running')->first()?->value === '1';
         if (!$isRunning) {
             return redirect('/');
         }
 
         // Check for Registration Schedule
-        $startTimeStr = \App\Models\Setting::getValue('ticket_sale_start');
+        $startTimeStr = \App\Models\Setting::where('key', 'ticket_sale_start')->first()?->value;
         if ($startTimeStr) {
             try {
-                // Parse correctly and compare with current app time (UTC)
-                $startTime = \Carbon\Carbon::parse($startTimeStr);
+                // Ensure we compare using Asia/Jakarta to match user's local context
+                $now = \Carbon\Carbon::now('Asia/Jakarta');
+                $startTime = \Carbon\Carbon::parse($startTimeStr, 'Asia/Jakarta');
                 
-                if ($startTime->isFuture()) {
+                if ($now->lessThan($startTime)) {
                     // It's still in countdown period, block access to internal pages
                     return redirect('/');
                 }
             } catch (\Exception $e) {
-                // If invalid date, we assume it's NOT ready
+                // If invalid date format, block to be safe
                 return redirect('/');
             }
         } else {

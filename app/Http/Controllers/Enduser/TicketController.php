@@ -105,20 +105,6 @@ class TicketController extends Controller
 
     public function checkout(Ticket $ticket)
     {
-        $ticketSaleStart = Setting::getValue('ticket_sale_start');
-        $isMaintenance = Setting::getValue('is_running', '0') !== '1';
-
-        if ($isMaintenance) {
-            return redirect('/');
-        }
-
-        if ($ticketSaleStart) {
-            $ticketSaleStartValue = \Illuminate\Support\Carbon::parse($ticketSaleStart, 'Asia/Jakarta');
-            if (now()->lessThan($ticketSaleStartValue)) {
-                return redirect('/')->with('error', 'Pendaftaran belum dibuka!');
-            }
-        }
-
         // 1. Check if the ticket's period is active
         if (!$ticket->period || !$ticket->period->is_active) {
             return redirect('/')->with('error', 'Maaf, periode pendaftaran untuk tiket ini tidak aktif.');
