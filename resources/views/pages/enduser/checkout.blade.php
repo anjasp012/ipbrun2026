@@ -108,12 +108,15 @@
                             <div class="absolute inset-y-0 right-0 flex items-center pr-4 cursor-pointer text-slate-400 hover:text-[#003366] transition-colors"
                                 onclick="document.getElementById('date_birth')._flatpickr.open()">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
                                 </svg>
                             </div>
                         </div>
                         @error('date_birth')
-                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                            </p>
                         @enderror
                     </div>
                     <div> <x-label for="sex">Jenis Kelamin *</x-label> <x-select id="sex" name="sex"
@@ -141,7 +144,8 @@
                             ]" :selected="old('blood_type')"
                             class="{{ $errors->has('blood_type') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
                         @error('blood_type')
-                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
+                                {{ $message }}
                             </p>
                         @enderror
                     </div>
@@ -170,7 +174,8 @@
                         ]" :selected="old('jersey_size')"
                             class="{{ $errors->has('jersey_size') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
                         @error('jersey_size')
-                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
+                                {{ $message }}</p>
                         @enderror
                     </div>
                     <div id="nimSection" class="hidden"> <x-label for="nim_nrp">NIM/NRP (Optional)</x-label>
@@ -417,7 +422,7 @@
                             <div class="absolute top-4 left-1/2 w-[1px] h-[calc(100%-24px)] border-l-2 border-dashed border-white/80">
                                 <div class="absolute -left-[4px] -top-1.5 w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
                                 <div class="absolute -left-[4px] -bottom-1.5 w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
-                                <span class="absolute bottom-10 right-4 bg-[#003366] text-white text-[10px] font-black px-1.5 py-3 rounded-sm shadow-lg whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg) translateX(-50%);">BODY LENGTH</span>
+                                <span class="absolute bottom-0 right-4 bg-[#003366] text-white text-[10px] font-black px-1.5 py-2 rounded-sm shadow-lg whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg) translateX(-50%);">BODY LENGTH</span>
                             </div>
                         </div>
                     </div>
@@ -481,7 +486,10 @@
                     confirmButtonText: 'OKE, SAYA MENGERTI'
                 }).then(() => {
                     const firstError = document.querySelector('.text-red-500, .border-red-500');
-                    if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if (firstError) firstError.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
                 });
             @endif
 
