@@ -22,8 +22,11 @@ class CheckSiteStatus
             return $next($request);
         }
 
-        // Allow Home Page and Login Page
-        if ($request->path() === '/' || $request->path() === '' || $request->is('login*')) {
+        // Allow Home Page, Login Page, and Logout
+        if ($request->path() === '/' || 
+            $request->path() === '' || 
+            $request->is('login*') || 
+            $request->is('logout*')) {
             return $next($request);
         }
 

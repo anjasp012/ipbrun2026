@@ -49,7 +49,8 @@ class AuthController extends Controller
         if (Auth::attempt($request->only('email', 'password'), $request->remember)) {
             $request->session()->regenerate();
 
-            if (Auth::user()->role === 'admin') {
+            // Redirect to admin dashboard if staff
+            if (in_array(Auth::user()->role, ['superadmin', 'admin', 'pic'])) {
                 return redirect()->intended('/admin/dashboard');
             }
 
