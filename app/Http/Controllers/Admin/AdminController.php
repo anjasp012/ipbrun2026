@@ -157,31 +157,46 @@ class AdminController extends Controller
             fputcsv($file, $columns);
 
             foreach ($participants as $p) {
-                foreach ($p->raceEntries as $entry) {
-                    // Pastikan data tiket ada
-                    $categoryName = $entry->ticket?->category?->name ?? '-';
-                    $ticketName = $entry->ticket?->name ?? ($entry->ticket?->type ? strtoupper($entry->ticket->type) : '-');
-                    
-                    fputcsv($file, [
-                        $entry->order->order_code ?? '-',
-                        $p->name,
-                        $p->email,
-                        $p->phone_number,
-                        $p->nik,
-                        $p->sex,
-                        $p->blood_type,
-                        $p->jersey_size,
-                        $p->nim_nrp,
-                        $p->nationality,
-                        $p->address,
-                        $categoryName,
-                        $ticketName,
-                        strtoupper($entry->ticket->type ?? '-'),
-                        $entry->ticket->period->name ?? '-',
-                        $entry->order->status ?? ($entry->status ?? '-'),
-                        $p->created_at->format('Y-m-d H:i')
-                    ]);
-                }
+                // Gabungkan Order Codes
+                $orderCodes = $p->raceEntries->pluck('order.order_code')->filter()->unique()->implode(' | ');
+                
+                // Gabungkan Informasi Tiket (Kategori + Nama)
+                $ticketDetails = $p->raceEntries->map(function($entry) {
+                    $cat = $entry->ticket->category->name ?? '-';
+                    $tkt = $entry->ticket->name ?? ($entry->ticket->type ? strtoupper($entry->ticket->type) : '-');
+                    return "$cat ($tkt)";
+                })->implode(' | ');
+
+                // Gabungkan Tipe Tiket
+                $ticketTypes = $p->raceEntries->pluck('ticket.type')->filter()->map(fn($t) => strtoupper($t))->unique()->implode(' | ');
+
+                // Gabungkan Period
+                $periods = $p->raceEntries->pluck('ticket.period.name')->filter()->unique()->implode(' | ');
+
+                // Gabungkan Status (Jika ada yang beda statusnya)
+                $statuses = $p->raceEntries->map(function($e) {
+                    return $e->order->status ?? ($e->status ?? '-');
+                })->unique()->implode(' | ');
+
+                fputcsv($file, [
+                    $orderCodes ?: '-',
+                    $p->name,
+                    $p->email,
+                    $p->phone_number,
+                    $p->nik,
+                    $p->sex,
+                    $p->blood_type,
+                    $p->jersey_size,
+                    $p->nim_nrp,
+                    $p->nationality,
+                    $p->address,
+                    $ticketDetails, // Category & Ticket Name combined logic
+                    $ticketDetails, // Re-using combined for simplicity as requested
+                    $ticketTypes,
+                    $periods,
+                    $statuses,
+                    $p->created_at->format('Y-m-d H:i')
+                ]);
             }
 
             fclose($file);
