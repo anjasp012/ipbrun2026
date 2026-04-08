@@ -251,109 +251,154 @@
     </script>
 
     @php
-        $isFuture = isset($ticketSaleStartValue) && $ticketSaleStartValue->isFuture();
+        $isFuture = isset($ticketSaleStartValue) && $ticketSaleStartValue->isFuture() && \App\Models\Setting::getValue('is_running', '0') !== '1';
     @endphp
 
     @if ($isFuture)
-        <div class="fixed inset-0 z-[100] flex items-center justify-center p-6 overflow-hidden">
-            <div class="fixed inset-0 bg-[#001A33]/90 backdrop-blur-2xl"></div>
-            <div class="relative w-full max-w-4xl text-center">
-                {{-- Decorative Lines --}}
-                <div
-                    class="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-y-1/2">
-                </div>
-                <div
-                    class="absolute top-1/2 left-1/2 w-[1px] h-32 bg-gradient-to-b from-transparent via-[#FF7A21]/30 to-transparent -translate-x-1/2 -translate-y-1/2">
-                </div>
+        <div class="fixed inset-0 z-[100] flex items-center justify-center p-6 overflow-hidden select-none"
+             x-data="startTool()"
+             x-show="state !== 'finish'"
+             x-transition:leave="transition ease-in duration-1000"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-110">
+            
+            <div class="fixed inset-0 bg-[#001A33] backdrop-blur-2xl"></div>
+            
+            <!-- Background Elements -->
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+            <div class="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-y-1/2"></div>
+            <div class="absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-[#FF7A21]/30 to-transparent -translate-x-1/2"></div>
 
-                <div class="relative space-y-12">
-                    <div class="space-y-6">
-                        <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" alt="IPB Run 2026"
-                            class="h-24 md:h-32 mx-auto drop-shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                        <div>
-                            <h2
-                                class="text-[13px] font-[900] text-[#FF7A21] uppercase tracking-[0.6em] mb-4 drop-shadow-md">
-                                OFFICIAL REGISTRATION OPENS IN</h2>
-                            <div class="w-16 h-1 bg-[#FF7A21] mx-auto rounded-full"></div>
+            <div class="relative w-full max-w-lg">
+                <!-- State 1: Password Input -->
+                <template x-if="state === 'password'">
+                    <div class="max-w-md mx-auto text-center space-y-10" 
+                         x-transition:enter="transition ease-out duration-500" 
+                         x-transition:enter-start="opacity-0 translate-y-8" 
+                         x-transition:enter-end="opacity-100 translate-y-0">
+                        <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" class="h-24 mx-auto drop-shadow-2xl" alt="">
+                        
+                        <div class="space-y-4">
+                            <label class="text-[10px] font-black text-[#FF7A21] uppercase tracking-[5px] block">SECURITY CLEARANCE</label>
+                            <input type="password" x-model="password" 
+                                @focus="playStandby()"
+                                @keyup.enter="checkPass()"
+                                placeholder="••••••••••••"
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl h-16 text-center text-white text-xl font-bold tracking-[4px] focus:outline-none focus:border-[#FF7A21]/50 focus:bg-white/10 transition-all">
+                            <template x-if="error">
+                                <p class="text-xs font-bold text-red-500 uppercase tracking-widest italic" x-text="error"></p>
+                            </template>
+                        </div>
+
+                        <button @click="checkPass()" 
+                            class="w-full h-16 bg-[#FF7A21] text-white rounded-2xl font-black text-xs uppercase tracking-[4px] shadow-lg shadow-orange-900/20 active:scale-95 transition-all">
+                            Verify Control
+                        </button>
+                    </div>
+                </template>
+
+                <!-- State 2: Ready Button -->
+                <template x-if="state === 'ready'">
+                    <div class="text-center space-y-12" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100">
+                        <div class="space-y-4">
+                            <h2 class="text-white text-3xl font-[900] uppercase tracking-tighter italic">SYSTEM READY</h2>
+                            <p class="text-[11px] font-bold text-white/40 uppercase tracking-[4px]">PRESS START TO TRIGGER COUNTDOWN</p>
+                        </div>
+
+                        <div class="relative group">
+                            <div class="absolute inset-0 bg-red-600 blur-3xl opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity"></div>
+                            <button @click="startCountdown()" 
+                                class="relative w-48 h-48 bg-red-600 text-white rounded-full font-black text-2xl uppercase tracking-[2px] shadow-2xl shadow-red-950/50 border-8 border-red-500/50 hover:bg-red-500 hover:scale-105 active:scale-90 transition-all animate-pulse">
+                                START
+                            </button>
                         </div>
                     </div>
+                </template>
 
-                    <div id="index-countdown"
-                        class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 max-w-3xl mx-auto items-center">
-                        <div class="flex flex-col group">
-                            <span id="idx-days"
-                                class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
-                            <span
-                                class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Days</span>
-                        </div>
-                        <div class="flex flex-col group">
-                            <span id="idx-hours"
-                                class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
-                            <span
-                                class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Hours</span>
-                        </div>
-                        <div class="flex flex-col group">
-                            <span id="idx-minutes"
-                                class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-white tracking-tighter transition-all group-hover:scale-110">00</span>
-                            <span
-                                class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Minutes</span>
-                        </div>
-                        <div class="flex flex-col group">
-                            <span id="idx-seconds"
-                                class="text-6xl md:text-8xl font-black font-outfit tabular-nums text-[#FF7A21] tracking-tighter drop-shadow-[0_0_25px_rgba(255,122,33,0.3)] transition-all group-hover:scale-110">00</span>
-                            <span
-                                class="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF7A21]/60 mt-3">Seconds</span>
-                        </div>
+                <!-- State 3: Countdown -->
+                <template x-if="state === 'count'">
+                    <div class="text-center" x-transition:enter="transition ease-out duration-300">
+                        <div class="text-[200px] leading-none font-black text-[#FF7A21] drop-shadow-[0_0_50px_rgba(255,122,33,0.4)] animate-bounce" x-text="count"></div>
+                        <p class="text-white font-[900] text-3xl uppercase tracking-[15px] opacity-40 mt-8">INITIATING</p>
                     </div>
-
-                    <div class="pt-8 flex flex-col items-center gap-6">
-                        <p class="text-white/60 text-sm font-medium tracking-[0.1em] max-w-sm mx-auto leading-relaxed">
-                            Pastikan koneksi internet Anda stabil dan data diri sudah siap untuk pendaftaran tercepat.
-                        </p>
-                        <div
-                            class="flex items-center gap-4 py-3 px-6 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
-                            <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                            <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Countdown
-                                Active •
-                                Live Update</span>
-                        </div>
-                    </div>
-                </div>
+                </template>
             </div>
         </div>
+
         <script>
-            const targetDate = {{ $ticketSaleStartValue->timestamp * 1000 }};
-            
-            // Force immediate playback
-            const countdownSound = new Audio("{{ asset('assets/sounds/countdown.mpeg') }}");
-            countdownSound.loop = true;
-            countdownSound.autoplay = true;
-            countdownSound.play().catch(e => {
-                console.log("Autoplay context: Manual trigger still required by browser policy");
-            });
+            function startTool() {
+                return {
+                    state: 'password',
+                    password: '',
+                    error: '',
+                    count: 6,
+                    sounds: {
+                        standby: new Audio("{{ asset('assets/sounds/standby.mpeg') }}"),
+                        start: new Audio("{{ asset('assets/sounds/start.mpeg') }}"),
+                        countdown: new Audio("{{ asset('assets/sounds/countdown.mpeg') }}")
+                    },
 
-            function updateIndexCountdown() {
-                const now = Date.now();
-                const distance = targetDate - now;
+                    init() {
+                        this.sounds.standby.loop = true;
+                        this.sounds.countdown.loop = true;
+                    },
 
-                if (distance <= 0) {
-                    window.location.reload();
-                    return;
+                    playStandby() {
+                        this.sounds.standby.play().catch(e => console.log('Autoplay blocked'));
+                    },
+
+                    checkPass() {
+                        if (this.password === 'IpbRun2026#') {
+                            this.state = 'ready';
+                            this.error = '';
+                        } else {
+                            this.error = 'Invalid Credentials';
+                            this.password = '';
+                        }
+                    },
+
+                    startCountdown() {
+                        this.playStandby();
+                        this.sounds.standby.pause();
+                        this.sounds.start.play();
+                        
+                        this.state = 'count';
+                        const timer = setInterval(() => {
+                            this.count--;
+                            if (this.count <= 0) {
+                                clearInterval(timer);
+                                this.triggerAdminStart();
+                            }
+                        }, 1000);
+                    },
+
+                    async triggerAdminStart() {
+                        try {
+                            const response = await fetch("{{ route('trigger.start') }}", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                                },
+                                body: JSON.stringify({ password: this.password })
+                            });
+
+                            const result = await response.json();
+                            if (result.success) {
+                                this.sounds.countdown.play().catch(e => {});
+                                this.state = 'finish';
+                                // Music will continue playing on the now-visible homepage
+                            } else {
+                                alert(result.message);
+                                window.location.reload();
+                            }
+                        } catch (e) {
+                            alert("Error triggering system");
+                            window.location.reload();
+                        }
+                    }
                 }
-
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                document.getElementById("idx-days").innerText = days.toString().padStart(2, '0');
-                document.getElementById("idx-hours").innerText = hours.toString().padStart(2, '0');
-                document.getElementById("idx-minutes").innerText = minutes.toString().padStart(2, '0');
-                document.getElementById("idx-seconds").innerText = seconds.toString().padStart(2, '0');
             }
-
-            setInterval(updateIndexCountdown, 1000);
-            updateIndexCountdown();
         </script>
     @endif
 </x-layouts.app>
