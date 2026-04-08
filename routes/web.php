@@ -44,6 +44,7 @@ Route::prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboard::class, 'dashboard']);
     Route::post('/toggle-running', [AdminDashboard::class, 'toggleRunning']);
     Route::get('/participants', [AdminDashboard::class, 'participants']);
+    Route::get('/participants/export', [AdminDashboard::class, 'exportParticipants'])->name('participants.export');
     Route::get('/participants/{participant}', [AdminDashboard::class, 'participantShow']);
     Route::get('/participants/{participant}/resend-invoice', [AdminDashboard::class, 'resendInvoice'])->name('participants.resend-invoice');
     Route::put('/participants/{participant}', [AdminDashboard::class, 'participantUpdate'])->name('participants.update');

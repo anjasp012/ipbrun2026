@@ -75,27 +75,105 @@ class AdminController extends Controller
     {
         $query = Participant::with(['raceEntries.ticket.category', 'raceEntries.ticket.period']);
 
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
                   ->orWhere('email', 'like', "%$search%")
+                  ->orWhere('nik', 'like', "%$search%")
+                  ->orWhere('phone_number', 'like', "%$search%")
                   ->orWhereHas('raceEntries.order', function($rq) use ($search) {
                       $rq->where('order_code', 'like', "%$search%");
                   });
             });
         }
 
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $status = $request->status;
             $query->whereHas('raceEntries.order', function($rq) use ($status) {
                 $rq->where('status', $status);
             });
         }
 
+        if ($request->filled('ticket_type')) {
+            $type = $request->ticket_type;
+            $query->whereHas('raceEntries.ticket', function($rq) use ($type) {
+                $rq->where('type', $type);
+            });
+        }
+
         $participants = $query->latest()->paginate(25);
 
         return view('pages.admin.participants.index', compact('participants'));
+    }
+
+    public function exportParticipants(Request $request)
+    {
+        $query = Participant::with(['raceEntries.ticket.category', 'raceEntries.ticket.period', 'raceEntries.order']);
+
+        if ($request->filled('status')) {
+            $status = $request->status;
+            $query->whereHas('raceEntries.order', function($rq) use ($status) {
+                $rq->where('status', $status);
+            });
+        }
+
+        if ($request->filled('ticket_type')) {
+            $type = $request->ticket_type;
+            $query->whereHas('raceEntries.ticket', function($rq) use ($type) {
+                $rq->where('type', $type);
+            });
+        }
+
+        $participants = $query->latest()->get();
+
+        $filename = "participants_export_" . date('Y-m-d_H-i-s') . ".csv";
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = [
+            'Order Code', 'Name', 'Email', 'Phone', 'NIK', 'Gender', 'Blood Type', 
+            'Jersey Size', 'NIM/NRP', 'Nationality', 'Address', 'Category', 
+            'Ticket Name', 'Type', 'Period', 'Status', 'Registered At'
+        ];
+
+        $callback = function() use($participants, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($participants as $p) {
+                foreach ($p->raceEntries as $entry) {
+                    fputcsv($file, [
+                        $entry->order->order_code ?? '-',
+                        $p->name,
+                        $p->email,
+                        $p->phone_number,
+                        $p->nik,
+                        $p->sex,
+                        $p->blood_type,
+                        $p->jersey_size,
+                        $p->nim_nrp,
+                        $p->nationality,
+                        $p->address,
+                        $entry->ticket->category->name ?? '-',
+                        $entry->ticket->name ?? '-',
+                        strtoupper($entry->ticket->type),
+                        $entry->ticket->period->name ?? '-',
+                        $entry->order->status ?? '-',
+                        $p->created_at->format('Y-m-d H:i')
+                    ]);
+                }
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     public function participantShow(Participant $participant)
