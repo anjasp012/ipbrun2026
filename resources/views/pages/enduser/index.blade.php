@@ -323,8 +323,14 @@
         </div>
         <script>
             const targetDate = {{ $ticketSaleStartValue->timestamp * 1000 }};
+            
+            // Force immediate playback
             const countdownSound = new Audio("{{ asset('assets/sounds/countdown.mpeg') }}");
             countdownSound.loop = true;
+            countdownSound.autoplay = true;
+            countdownSound.play().catch(e => {
+                console.log("Autoplay context: Manual trigger still required by browser policy");
+            });
 
             function updateIndexCountdown() {
                 const now = Date.now();
@@ -334,13 +340,6 @@
                     window.location.reload();
                     return;
                 }
-
-                // Play sound on first interaction
-                document.addEventListener('click', () => {
-                    countdownSound.play().catch(e => {});
-                }, {
-                    once: true
-                });
 
                 const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
