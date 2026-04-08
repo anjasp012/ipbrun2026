@@ -52,11 +52,10 @@
                                     </button>
                                 </template>
                                 <template x-if="!editing">
-                                    <a href="{{ route('participants.resend-invoice', $participant) }}"
-                                        onclick="return confirm('Kirim ulang email konfirmasi tanpa mereset password?')"
+                                    <button type="button" id="btn-resend-invoice"
                                         class="h-14 px-10 bg-slate-50 hover:bg-slate-100 text-slate-800 text-sm font-black uppercase tracking-widest rounded-2xl transition-all border border-slate-100 flex items-center shadow-sm">
                                         Resend Invoice
-                                    </a>
+                                    </button>
                                 </template>
                             </div>
                         </div>
@@ -499,6 +498,39 @@
     @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function() {
+                // Resend Invoice Confirmation
+                const resendBtn = document.getElementById('btn-resend-invoice');
+                if (resendBtn) {
+                    resendBtn.addEventListener('click', function() {
+                        Swal.fire({
+                            title: 'Resend Invoice?',
+                            text: "Sistem akan mengirim ulang E-Invoice ke {{ $participant->email }} tanpa mengubah password yang sudah ada.",
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonColor: '#003366',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'YA, KIRIM ULANG',
+                            cancelButtonText: 'BATAL',
+                            borderRadius: '2rem'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Show loading
+                                Swal.fire({
+                                    title: 'Sending...',
+                                    text: 'Mohon tunggu sebentar',
+                                    allowOutsideClick: false,
+                                    didOpen: () => {
+                                        Swal.showLoading()
+                                    }
+                                });
+                                // Execute redirect
+                                window.location.href = "{{ route('participants.resend-invoice', $participant) }}";
+                            }
+                        });
+                    });
+                }
+
+                // Best Time Formatting
                 const bestTimeInput = document.getElementById('best_time_input');
                 if (bestTimeInput) {
                     bestTimeInput.addEventListener('input', function(e) {
