@@ -437,7 +437,7 @@
                                 <tr class="bg-white"><td class="px-3 py-3 bg-slate-50/50">S</td><td class="px-3 py-3">49</td><td class="px-3 py-3">66</td></tr>
                                 <tr><td class="px-3 py-3 bg-slate-50/50">M</td><td class="px-3 py-3">51</td><td class="px-3 py-3">68</td></tr>
                                 <tr class="bg-white"><td class="px-3 py-3 bg-slate-50/50">L</td><td class="px-3 py-3">53</td><td class="px-3 py-3">70</td></tr>
-                                <tr><td class="px-3 py-3 bg-slate-50/30 font-black text-blue-600 italic">XL</td><td class="px-3 py-3">55</td><td class="px-3 py-3">72</td></tr>
+                                <tr><td class="px-3 py-3 bg-slate-50/50">XL</td><td class="px-3 py-3">55</td><td class="px-3 py-3">72</td></tr>
                                 <tr class="bg-white"><td class="px-3 py-3 bg-slate-50/50">2XL</td><td class="px-3 py-3">57</td><td class="px-3 py-3">74</td></tr>
                                 <tr><td class="px-3 py-3 bg-slate-50/50">3XL</td><td class="px-3 py-3">59</td><td class="px-3 py-3">76</td></tr>
                                 <tr class="bg-white"><td class="px-3 py-3 bg-slate-50/50">4XL</td><td class="px-3 py-3">61</td><td class="px-3 py-3">78</td></tr>
