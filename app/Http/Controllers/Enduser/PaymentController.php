@@ -48,7 +48,7 @@ class PaymentController extends Controller
             $orderCode = $notification->order_id;
             $fraudStatus = $notification->fraud_status;
 
-            return \Illuminate\Support\Facades\DB::transaction(function() use ($orderCode, $transactionStatus, $fraudStatus) {
+            return \Illuminate\Support\Facades\DB::transaction(function () use ($orderCode, $transactionStatus, $fraudStatus) {
                 $order = \App\Models\Order::where('order_code', $orderCode)->with('raceEntries')->first();
 
                 if (!$order) {
@@ -60,7 +60,7 @@ class PaymentController extends Controller
                 if ($transactionStatus == 'capture') {
                     if ($fraudStatus == 'challenge') {
                         $order->update(['status' => 'pending']);
-                        foreach($order->raceEntries as $entry) $entry->update(['status' => 'pending']);
+                        foreach ($order->raceEntries as $entry) $entry->update(['status' => 'pending']);
                     } else if ($fraudStatus == 'accept') {
                         $this->handleSuccessPayment($order, $participant);
                     }
@@ -68,8 +68,8 @@ class PaymentController extends Controller
                     $this->handleSuccessPayment($order, $participant);
                 } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
                     $order->update(['status' => 'failed']);
-                    foreach($order->raceEntries as $entry) $entry->update(['status' => 'failed']);
-                    
+                    foreach ($order->raceEntries as $entry) $entry->update(['status' => 'failed']);
+
                     // Send WhatsApp notification for failure
                     try {
                         $fonnte = new \App\Services\FonnteService();
@@ -99,7 +99,7 @@ class PaymentController extends Controller
 
         // 1. Update Order & Race Entry Status
         $order->update(['status' => 'paid']);
-        foreach($order->raceEntries as $entry) {
+        foreach ($order->raceEntries as $entry) {
             $entry->update(['status' => 'paid']);
         }
 
@@ -115,7 +115,7 @@ class PaymentController extends Controller
                 'name' => $participant->name,
                 'username' => $participant->email,
                 'password' => Hash::make($randomPassword),
-                'role' => 'participant' 
+                'role' => 'participant'
             ]
         );
 
@@ -131,13 +131,31 @@ class PaymentController extends Controller
             ]);
         }
 
-        // 5. Send WhatsApp notification for success/buy-more
         try {
             $fonnte = new \App\Services\FonnteService();
+            $url = "https://dev.ipbrun2026.id/login";
+
             if ($userExists) {
-                $message = "Halo *{$participant->name}*!\n\nPembayaran untuk *tiket tambahan* Anda dengan kode order *{$order->order_code}* BERHASIL dikonfirmasi.\n\nAnda dapat melihat detail tiket baru Anda di dashboard peserta. Terima kasih!";
+                $message = "📢 *Konfirmasi Pembayaran Tambahan – IPB Run 2026*\n\n" .
+                    "Halo *{$participant->name}*,\n\n" .
+                    "Pembayaran untuk kode order *{$order->order_code}* telah berhasil dikonfirmasi ✅\n" .
+                    "*Selamat! Tiket tambahan kamu resmi terdaftar di IPB Run 2026* 🏁\n\n" .
+                    "Silakan cek detail tiket baru kamu di dashboard:\n" .
+                    "URL: {$url}\n\n" .
+                    "Terima kasih atas partisipasinya,\n" .
+                    "Sampai jumpa di garis start! 🏃‍♂️🔥";
             } else {
-                $message = "Halo *{$participant->name}*!\n\nPembayaran untuk kode order *{$order->order_code}* BERHASIL dikonfirmasi. Selamat! Anda telah terdaftar sebagai peserta IPB Run 2026.\n\nDetail akun login Anda:\nEmail: *{$participant->email}*\nPassword: *{$randomPassword}*\n\nSimpan detail ini untuk login ke dashboard peserta. Terima kasih!";
+                $message = "📢 *Konfirmasi Pendaftaran – IPB Run 2026*\n\n" .
+                    "*Halo {$participant->name}*,\n\n" .
+                    "Pembayaran untuk kode order *{$order->order_code}* telah berhasil dikonfirmasi ✅\n" .
+                    "*Selamat! Kamu resmi menjadi peserta IPB Run 2026* 🏁\n\n" .
+                    "Siap-siap untuk pengalaman lari yang seru, penuh tantangan, dan tentunya berkesan! 🔥\n\n" .
+                    "🔐 Berikut akses dashboard kamu:\n" .
+                    "Email: *{$participant->email}*\n" .
+                    "Password: *{$randomPassword}*\n" .
+                    "URL: {$url}\n\n" .
+                    "Terima kasih atas partisipasinya,\n" .
+                    "Sampai jumpa di garis start! 🏃‍♂️🔥";
             }
             $fonnte->sendMessage($participant->phone_number, $message);
         } catch (\Exception $e) {
@@ -149,7 +167,7 @@ class PaymentController extends Controller
     {
         $order_id = $request->query('order_id');
         $status = $request->query('transaction_status');
-        
+
         $order = \App\Models\Order::where('order_code', $order_id)->first();
         $email = $order ? $order->participant->email : null;
 
