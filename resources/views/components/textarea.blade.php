@@ -1,6 +1,2 @@
-@props(['disabled' => false, 'rows' => 3])
-
-<textarea {{ $disabled ? 'disabled' : '' }} rows="{{ $rows }}" {!! $attributes->merge([
-    'class' =>
-        'border-1 border-slate-400/30 bg-white focus:border-[#003366] focus:ring-0 rounded-lg p-4 w-full transition-all duration-200 text-sm placeholder:text-slate-400 placeholder:font-normal disabled:opacity-50 disabled:cursor-not-allowed resize-none font-medium',
+@props(['disabled' => false, 'rows' => 3]) <textarea {{ $disabled ? 'disabled' : '' }} rows="{{ $rows }}" {!! $attributes->merge([ 'class' => 'border-1 border-slate-400/30 bg-white focus:border-[#003366] focus:ring-0 rounded-lg p-4 w-full transition-all duration-200 text-sm placeholder:text-slate-400 placeholder:font-normal disabled:opacity-50 disabled:cursor-not-allowed resize-none font-medium',
 ]) !!}>{{ $slot }}</textarea>
