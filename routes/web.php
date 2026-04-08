@@ -19,6 +19,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/', [EnduserTicket::class, 'home']);
 Route::get('/checkout/{ticket}', [EnduserTicket::class, 'checkout'])->name('checkout');
 Route::post('/register', [EnduserTicket::class, 'register'])->name('register');
+Route::get('/dashboard', [EnduserTicket::class, 'dashboard'])->name('participant.dashboard')->middleware('auth');
 Route::get('/payment/finish', [PaymentController::class, 'finish'])->name('payment.finish');
 Route::get('/payment/{participant}', function (\App\Models\Participant $participant) {
     return view('pages.enduser.payment', compact('participant'));

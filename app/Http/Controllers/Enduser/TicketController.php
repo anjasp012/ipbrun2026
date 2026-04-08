@@ -27,56 +27,16 @@ class TicketController extends Controller
         $ticketSaleStart = Setting::getValue('ticket_sale_start');
         $isMaintenance = Setting::getValue('is_running', '0') !== '1';
 
-        // 1. Maintenance Mode (Shows the designed "Coming Soon" background)
+        // 1. Maintenance Mode
         if ($isMaintenance) {
             return view('pages.enduser.coming-soon');
         }
 
-        // 2. Auth Check: If Participant, show Dashboard
+        // 2. Auth Check: If Participant, redirect to Dashboard
         if (auth()->check() && auth()->user()->role === 'participant') {
-            $user = auth()->user();
-            $participant = $user->participant()->with('raceEntries.ticket.category')->first();
-
-            if (!$participant) {
-                // If somehow they are logged in but have no profile, show regular tickets
-                goto showTickets;
-            }
-
-            $orders = Order::where('participant_id', $participant->id)->with('raceEntries.ticket.category')->latest()->get();
-            
-            // Logic for Pair Recommendation (Strict Mapping)
-            // (5K = 10K; 42K = 10K; 10K = 5K; 21K = 5K)
-            $firstEntry = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->with('ticket.category')->first();
-            $ownedCategoryNames = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->get()->pluck('ticket.category.name')->map(fn($n) => strtoupper($n))->toArray();
-            
-            $pairTarget = '';
-            if ($firstEntry) {
-                $firstCatName = strtoupper($firstEntry->ticket->category->name);
-                if (str_contains($firstCatName, '5K') || str_contains($firstCatName, '42K')) {
-                    $pairTarget = '10K';
-                } elseif (str_contains($firstCatName, '10K') || str_contains($firstCatName, '21K')) {
-                    $pairTarget = '5K';
-                }
-            }
-
-            // Don't recommend if they already own the target category
-            if (in_array($pairTarget, $ownedCategoryNames)) {
-                $pairTarget = '';
-            }
-
-            $pairRecommendation = null;
-            if ($pairTarget && $firstEntry) {
-                $pairRecommendation = Ticket::whereHas('period', fn($q) => $q->where('is_active', true))
-                    ->whereHas('category', fn($q) => $q->where('name', 'LIKE', "%$pairTarget%"))
-                    ->where('type', $firstEntry->ticket->type)
-                    ->with(['category', 'period'])
-                    ->first();
-            }
-
-            return view('pages.enduser.dashboard', compact('participant', 'orders', 'pairRecommendation'));
+            return redirect()->route('participant.dashboard');
         }
 
-        showTickets:
         // 3. Fetch tickets (Standard Landing Page)
         $tickets = Ticket::whereHas('period', function($query) {
             $query->where('is_active', true);
@@ -88,10 +48,53 @@ class TicketController extends Controller
         $tickets_ipb = $tickets->filter(fn($t) => $t->type === 'ipb');
         $tickets_public = $tickets->filter(fn($t) => $t->type === 'umum');
 
-        // Force WIB for parse
         $ticketSaleStartValue = $ticketSaleStart ? \Illuminate\Support\Carbon::parse($ticketSaleStart, 'Asia/Jakarta') : null;
 
         return view('pages.enduser.index', compact('tickets_ipb', 'tickets_public', 'ticketSaleStart', 'ticketSaleStartValue'));
+    }
+
+    public function dashboard()
+    {
+        if (auth()->user()->role !== 'participant') {
+            return redirect('/');
+        }
+
+        $user = auth()->user();
+        $participant = $user->participant()->with('raceEntries.ticket.category')->first();
+
+        if (!$participant) {
+            return redirect('/');
+        }
+
+        $orders = Order::where('participant_id', $participant->id)->with('raceEntries.ticket.category')->latest()->get();
+        
+        $firstEntry = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->with('ticket.category')->first();
+        $ownedCategoryNames = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->get()->pluck('ticket.category.name')->map(fn($n) => strtoupper($n))->toArray();
+        
+        $pairTarget = '';
+        if ($firstEntry) {
+            $firstCatName = strtoupper($firstEntry->ticket->category->name);
+            if (str_contains($firstCatName, '5K') || str_contains($firstCatName, '42K')) {
+                $pairTarget = '10K';
+            } elseif (str_contains($firstCatName, '10K') || str_contains($firstCatName, '21K')) {
+                $pairTarget = '5K';
+            }
+        }
+
+        if (in_array($pairTarget, $ownedCategoryNames)) {
+            $pairTarget = '';
+        }
+
+        $pairRecommendation = null;
+        if ($pairTarget && $firstEntry) {
+            $pairRecommendation = Ticket::whereHas('period', fn($q) => $q->where('is_active', true))
+                ->whereHas('category', fn($q) => $q->where('name', 'LIKE', "%$pairTarget%"))
+                ->where('type', $firstEntry->ticket->type)
+                ->with(['category', 'period'])
+                ->first();
+        }
+
+        return view('pages.enduser.dashboard', compact('participant', 'orders', 'pairRecommendation'));
     }
 
     public function checkout(Ticket $ticket)
