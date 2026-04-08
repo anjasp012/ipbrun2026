@@ -14,8 +14,9 @@ class UserSeeder extends Seeder
     {
         // 1. Super Admin
         \App\Models\User::updateOrCreate(
-            ['email' => 'superadmin@ipbrun2026.com'],
+            ['email' => 'superadmin@ipbrun.com'],
             [
+                'email' => 'superadmin@ipbrun2026.com',
                 'name' => 'Super Admin',
                 'username' => 'superadmin',
                 'password' => \Illuminate\Support\Facades\Hash::make('supersuper'),
@@ -25,8 +26,9 @@ class UserSeeder extends Seeder
 
         // 2. Admin
         \App\Models\User::updateOrCreate(
-            ['email' => 'admin@ipbrun2026.com'],
+            ['email' => 'admin@ipbrun.com'],
             [
+                'email' => 'admin@ipbrun2026.com',
                 'name' => 'Admin Staff',
                 'username' => 'admin',
                 'password' => \Illuminate\Support\Facades\Hash::make('adminadmin'),
@@ -36,8 +38,9 @@ class UserSeeder extends Seeder
 
         // 3. PIC
         \App\Models\User::updateOrCreate(
-            ['email' => 'pic@ipbrun2026.com'],
+            ['email' => 'pic@ipbrun.com'],
             [
+                'email' => 'pic@ipbrun2026.com',
                 'name' => 'PIC Field',
                 'username' => 'pic',
                 'password' => \Illuminate\Support\Facades\Hash::make('picpicpic'),
