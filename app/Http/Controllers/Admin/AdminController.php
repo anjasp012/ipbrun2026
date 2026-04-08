@@ -28,16 +28,17 @@ class AdminController extends Controller
         ];
 
         // 2. Periods & Tickets Breakdown
-        $periods = \App\Models\Period::with(['tickets.category', 'tickets.raceEntries' => function($q) {
+        $periods = \App\Models\Period::with(['tickets.category', 'tickets.raceEntries' => function ($q) {
             $q->whereIn('status', ['pending', 'paid']);
         }])->get();
-        
-        $periodsData = $periods->map(function($period) {
-            $tickets = $period->tickets->map(function($ticket) {
+
+        $periodsData = $periods->map(function ($period) {
+            $tickets = $period->tickets->map(function ($ticket) {
                 $terjual = $ticket->raceEntries->count();
                 return (object) [
                     'kategori' => $ticket->category->name ?? '-',
                     'name' => $ticket->name,
+                    'type' => $ticket->type,
                     'price' => $ticket->price,
                     'kapasitas' => $ticket->qty,
                     'terjual' => $terjual,
@@ -64,8 +65,8 @@ class AdminController extends Controller
         $setting->value = $isActive ? '0' : '1';
         $setting->save();
 
-        $statusMessage = $setting->value === '1' 
-            ? 'Registration is now OPEN and Live!' 
+        $statusMessage = $setting->value === '1'
+            ? 'Registration is now OPEN and Live!'
             : 'Website has been set to MAINTENANCE mode.';
 
         return back()->with('success', $statusMessage);
@@ -77,27 +78,27 @@ class AdminController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
-                  ->orWhere('email', 'like', "%$search%")
-                  ->orWhere('nik', 'like', "%$search%")
-                  ->orWhere('phone_number', 'like', "%$search%")
-                  ->orWhereHas('raceEntries.order', function($rq) use ($search) {
-                      $rq->where('order_code', 'like', "%$search%");
-                  });
+                    ->orWhere('email', 'like', "%$search%")
+                    ->orWhere('nik', 'like', "%$search%")
+                    ->orWhere('phone_number', 'like', "%$search%")
+                    ->orWhereHas('raceEntries.order', function ($rq) use ($search) {
+                        $rq->where('order_code', 'like', "%$search%");
+                    });
             });
         }
 
         if ($request->filled('status')) {
             $status = $request->status;
-            $query->whereHas('raceEntries.order', function($rq) use ($status) {
+            $query->whereHas('raceEntries.order', function ($rq) use ($status) {
                 $rq->where('status', $status);
             });
         }
 
         if ($request->filled('ticket_type')) {
             $type = $request->ticket_type;
-            $query->whereHas('raceEntries.ticket', function($rq) use ($type) {
+            $query->whereHas('raceEntries.ticket', function ($rq) use ($type) {
                 $rq->where('type', $type);
             });
         }
@@ -114,7 +115,7 @@ class AdminController extends Controller
         // Filter Status
         if ($request->filled('status')) {
             $status = $request->status;
-            $query->whereHas('raceEntries.order', function($rq) use ($status) {
+            $query->whereHas('raceEntries.order', function ($rq) use ($status) {
                 $rq->where('status', $status);
             });
         }
@@ -122,7 +123,7 @@ class AdminController extends Controller
         // Filter Ticket Type
         if ($request->filled('ticket_type')) {
             $type = $request->ticket_type;
-            $query->whereHas('raceEntries.ticket', function($rq) use ($type) {
+            $query->whereHas('raceEntries.ticket', function ($rq) use ($type) {
                 $rq->where('type', $type);
             });
         }
@@ -148,17 +149,37 @@ class AdminController extends Controller
 
         $columns = [
             // Participant Data
-            'Name', 'Email', 'Phone', 'NIK', 'Birth Date', 'Gender', 'Blood Type', 
-            'Jersey Size', 'NIM/NRP', 'Nationality', 'Address', 
-            'Emergency Contact Name', 'Emergency Contact Phone', 'Emergency Relationship',
-            'Community', 'Best Time', 'Previous Events', 'Shuttle Bus',
+            'Name',
+            'Email',
+            'Phone',
+            'NIK',
+            'Birth Date',
+            'Gender',
+            'Blood Type',
+            'Jersey Size',
+            'NIM/NRP',
+            'Nationality',
+            'Address',
+            'Emergency Contact Name',
+            'Emergency Contact Phone',
+            'Emergency Relationship',
+            'Community',
+            'Best Time',
+            'Previous Events',
+            'Shuttle Bus',
             // Order Data
-            'Order Code', 'Order Status', 'Total Order Price', 'Registered At',
+            'Order Code',
+            'Order Status',
+            'Total Order Price',
+            'Registered At',
             // Ticket Data
-            'Ticket Name', 'Category', 'Ticket Type', 'Registration Period'
+            'Ticket Name',
+            'Category',
+            'Ticket Type',
+            'Registration Period'
         ];
 
-        $callback = function() use($participants, $columns) {
+        $callback = function () use ($participants, $columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
 
@@ -223,8 +244,8 @@ class AdminController extends Controller
             'nationality'                   => 'required|string',
             'address'                       => 'required|string',
             'emergency_contact_name'        => 'required|string',
-            'emergency_contact_phone_number'=> 'required|string',
-            'emergency_contact_relationship'=> 'required|string',
+            'emergency_contact_phone_number' => 'required|string',
+            'emergency_contact_relationship' => 'required|string',
             'running_community'             => 'nullable|string',
             'best_time'                     => 'nullable|string',
             'previous_events'               => 'nullable|string',
@@ -240,7 +261,7 @@ class AdminController extends Controller
     {
         try {
             $orders = \App\Models\Order::where('participant_id', $participant->id)->where('status', 'paid')->latest()->get();
-            
+
             if ($orders->isEmpty()) {
                 return back()->with('error', 'Tidak ada order yang sudah dibayar. Tidak bisa mengirim ulang invoice.');
             }
