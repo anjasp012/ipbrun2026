@@ -104,6 +104,14 @@
                                         <div
                                             class="p-3 md:p-6 pt-2 md:pt-4 bg-slate-50/40 rounded-b-2xl transition-colors mt-auto">
                                             <div class="mb-3 md:mb-4">
+                                                @if(str_contains(strtoupper($ticket->period->name ?? ''), 'PRESALE') && $ticket->discount > 0)
+                                                    <div class="flex items-center gap-2 mb-0.5">
+                                                        <span class="text-[10px] md:text-[12px] text-red-600 font-[800] uppercase tracking-tight">Normal</span>
+                                                        <span class="text-[10px] md:text-[12px] text-slate-400 font-[800] line-through opacity-70">
+                                                            Rp {{ number_format($ticket->price + $ticket->discount, 0, ',', '.') }}
+                                                        </span>
+                                                    </div>
+                                                @endif
                                                 <span
                                                     class="text-[9px] md:text-[11px] text-slate-400 font-[800] uppercase tracking-wider block mb-0.5">Price
                                                     Entry</span>
