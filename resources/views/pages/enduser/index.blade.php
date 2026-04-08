@@ -323,7 +323,7 @@
         </div>
         <script>
             const targetDate = {{ $ticketSaleStartValue->timestamp * 1000 }};
-            const countdownSound = new Audio("{{ asset('assets/sound/countdown.mpeg') }}");
+            const countdownSound = new Audio("{{ asset('assets/sounds/countdown.mpeg') }}");
             countdownSound.loop = true;
 
             function updateIndexCountdown() {

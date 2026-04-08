@@ -78,8 +78,8 @@
                 error: '',
                 count: 6,
                 sounds: {
-                    standby: new Audio("{{ asset('assets/sound/standby.mpeg') }}"),
-                    start: new Audio("{{ asset('assets/sound/start.mpeg') }}")
+                    standby: new Audio("{{ asset('assets/sounds/standby.mpeg') }}"),
+                    start: new Audio("{{ asset('assets/sounds/start.mpeg') }}")
                 },
 
                 init() {
