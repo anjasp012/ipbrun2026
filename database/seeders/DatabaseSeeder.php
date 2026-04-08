@@ -15,43 +15,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@ipbrun.com',
-            'username' => 'admin',
-            'role' => 'admin',
-        ]);
-
-        User::factory()->create([
-            'name' => 'Participant User',
-            'email' => 'participant@ipbrun.com',
-            'username' => 'participant',
-            'role' => 'participant',
-        ]);
-        
-        User::factory()->create([
-            'name' => 'Tester User',
-            'email' => 'tester@ipbrun.com',
-            'username' => 'tester',
-            'role' => 'tester',
-        ]);
-
-        User::factory()->create([
-            'name' => 'Fotographer User',
-            'email' => 'fotographer@ipbrun.com',
-            'username' => 'fotographer',
-            'role' => 'fotographer',
-        ]);
-
-        User::factory()->create([
-            'name' => 'Scanner User',
-            'email' => 'scanner@ipbrun.com',
-            'username' => 'scanner',
-            'role' => 'scanner',
-        ]);
-        // ... (User creation stays above)
+        $this->call(UserSeeder::class);
+        // ... (User creation removed, moved to UserSeeder)
 
         // Categories
         $categories = ['5K', '10K', '21K', '42K'];

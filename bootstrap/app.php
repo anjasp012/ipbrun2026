@@ -14,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\CheckSiteStatus::class,
         ]);
+        $middleware->alias([
+            'role' => \App\Http\Middleware\CheckAdminRole::class,
+        ]);
         $middleware->validateCsrfTokens(except: [
             'payments/midtrans-callback',
         ]);

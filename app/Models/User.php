@@ -20,6 +20,11 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasUuids;
 
+    const ROLE_SUPERADMIN = 'superadmin';
+    const ROLE_ADMIN = 'admin';
+    const ROLE_PIC = 'pic';
+    const ROLE_PARTICIPANT = 'participant';
+
     /**
      * Get the attributes that should be cast.
      *

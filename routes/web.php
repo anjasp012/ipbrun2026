@@ -40,31 +40,43 @@ Route::get('/test-email', [TestController::class, 'emailForm']);
 Route::post('/test-email', [TestController::class, 'sendEmail']);
 
 // Admin Routes
-Route::prefix('admin')->group(function () {
-    Route::get('/dashboard', [AdminDashboard::class, 'dashboard']);
-    Route::post('/toggle-running', [AdminDashboard::class, 'toggleRunning']);
-    Route::get('/participants', [AdminDashboard::class, 'participants']);
-    Route::get('/participants/export', [AdminDashboard::class, 'exportParticipants'])->name('participants.export');
-    Route::get('/participants/{participant}', [AdminDashboard::class, 'participantShow']);
-    Route::get('/participants/{participant}/resend-invoice', [AdminDashboard::class, 'resendInvoice'])->name('participants.resend-invoice');
-    Route::put('/participants/{participant}', [AdminDashboard::class, 'participantUpdate'])->name('participants.update');
-    Route::get('/tickets', [AdminTicket::class, 'index']);
-    Route::post('/tickets', [AdminTicket::class, 'store'])->name('tickets.store');
-    Route::put('/tickets/{ticket}', [AdminTicket::class, 'update'])->name('tickets.update');
-    Route::delete('/tickets/{ticket}', [AdminTicket::class, 'destroy'])->name('tickets.destroy');
-    Route::post('/periods/{period}/toggle', [AdminTicket::class, 'togglePeriod'])->name('periods.toggle');
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    // Shared Routes (Superadmin, Admin, PIC)
+    Route::middleware(['role:superadmin,admin,pic'])->group(function () {
+        Route::get('/dashboard', [AdminDashboard::class, 'dashboard']);
+        Route::get('/participants', [AdminDashboard::class, 'participants']);
+    });
 
-    Route::get('/categories', [AdminCategory::class, 'index']);
-    Route::post('/categories', [AdminCategory::class, 'store'])->name('categories.store');
-    Route::put('/categories/{category}', [AdminCategory::class, 'update'])->name('categories.update');
-    Route::delete('/categories/{category}', [AdminCategory::class, 'destroy'])->name('categories.destroy');
+    // Superadmin & Admin Only (PIC Restricted)
+    Route::middleware(['role:superadmin,admin'])->group(function () {
+        Route::get('/participants/{participant}', [AdminDashboard::class, 'participantShow']);
+    });
 
-    Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('admin.settings');
-    Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update');
+    // Superadmin Only Routes
+    Route::middleware(['role:superadmin'])->group(function () {
+        Route::post('/toggle-running', [AdminDashboard::class, 'toggleRunning']);
+        Route::get('/participants/export', [AdminDashboard::class, 'exportParticipants'])->name('participants.export');
+        Route::get('/participants/{participant}/resend-invoice', [AdminDashboard::class, 'resendInvoice'])->name('participants.resend-invoice');
+        Route::put('/participants/{participant}', [AdminDashboard::class, 'participantUpdate'])->name('participants.update');
+        
+        Route::get('/tickets', [AdminTicket::class, 'index']);
+        Route::post('/tickets', [AdminTicket::class, 'store'])->name('tickets.store');
+        Route::put('/tickets/{ticket}', [AdminTicket::class, 'update'])->name('tickets.update');
+        Route::delete('/tickets/{ticket}', [AdminTicket::class, 'destroy'])->name('tickets.destroy');
+        Route::post('/periods/{period}/toggle', [AdminTicket::class, 'togglePeriod'])->name('periods.toggle');
 
-    Route::get('/blast', [\App\Http\Controllers\Admin\BlastController::class, 'index'])->name('admin.blast');
-    Route::post('/blast/email', [\App\Http\Controllers\Admin\BlastController::class, 'blastEmail'])->name('admin.blast.email');
-    Route::post('/blast/whatsapp', [\App\Http\Controllers\Admin\BlastController::class, 'blastWhatsapp'])->name('admin.blast.whatsapp');
+        Route::get('/categories', [AdminCategory::class, 'index']);
+        Route::post('/categories', [AdminCategory::class, 'store'])->name('categories.store');
+        Route::put('/categories/{category}', [AdminCategory::class, 'update'])->name('categories.update');
+        Route::delete('/categories/{category}', [AdminCategory::class, 'destroy'])->name('categories.destroy');
+
+        Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('admin.settings');
+        Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update');
+
+        Route::get('/blast', [\App\Http\Controllers\Admin\BlastController::class, 'index'])->name('admin.blast');
+        Route::post('/blast/email', [\App\Http\Controllers\Admin\BlastController::class, 'blastEmail'])->name('admin.blast.email');
+        Route::post('/blast/whatsapp', [\App\Http\Controllers\Admin\BlastController::class, 'blastWhatsapp'])->name('admin.blast.whatsapp');
+    });
 });
 
 Route::get('/test-tailwind', function () {
