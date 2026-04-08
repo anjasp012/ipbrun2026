@@ -411,13 +411,13 @@
                             <div class="absolute top-[45%] left-5 w-[calc(100%-40px)] h-[1px] border-t-2 border-dashed border-white/80">
                                 <div class="absolute -left-1.5 -top-[4px] w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
                                 <div class="absolute -right-1.5 -top-[4px] w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
-                                <span class="absolute -top-3 left-[70%] -translate-x-1/2 bg-[#003366] text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-sm whitespace-nowrap">CHEST</span>
+                                <span class="absolute -top-7 left-[80%] -translate-x-1/2 bg-[#003366] text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-sm whitespace-nowrap">CHEST</span>
                             </div>
                             {{-- Length Indicator (B) --}}
                             <div class="absolute top-4 left-1/2 w-[1px] h-[calc(100%-24px)] border-l-2 border-dashed border-white/80">
                                 <div class="absolute -left-[4px] -top-1.5 w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
                                 <div class="absolute -left-[4px] -bottom-1.5 w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
-                                <span class="absolute bottom-6 right-3 bg-[#003366] text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-sm flex items-center h-6 whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg) translateX(-50%);">BODY LENGTH</span>
+                                <span class="absolute bottom-12 right-5 bg-[#003366] text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-sm flex items-center h-6 whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg) translateX(-50%);">BODY LENGTH</span>
                             </div>
                         </div>
                     </div>
@@ -490,6 +490,7 @@
                 dateFormat: "d-m-Y",
                 maxDate: "today",
                 allowInput: true,
+                clickOpens: false,
                 disableMobile: "true"
             });
 
