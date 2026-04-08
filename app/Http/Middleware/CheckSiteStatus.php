@@ -22,8 +22,8 @@ class CheckSiteStatus
             return $next($request);
         }
 
-        // Allow Home Page (it handles its own view logic for coming soon/countdown)
-        if ($request->is('/')) {
+        // Allow Home Page
+        if ($request->path() === '/' || $request->path() === '') {
             return $next($request);
         }
 
@@ -35,17 +35,21 @@ class CheckSiteStatus
 
         // Check for Registration Schedule
         $startTimeStr = \App\Models\Setting::getValue('ticket_sale_start');
-        if (!$startTimeStr) {
-            return redirect('/');
-        }
-
-        try {
-            $startTime = \Carbon\Carbon::parse($startTimeStr);
-            if ($startTime->isFuture()) {
-                // If we are still in countdown period, block other pages
+        if ($startTimeStr) {
+            try {
+                // Parse correctly and compare with current app time (UTC)
+                $startTime = \Carbon\Carbon::parse($startTimeStr);
+                
+                if ($startTime->isFuture()) {
+                    // It's still in countdown period, block access to internal pages
+                    return redirect('/');
+                }
+            } catch (\Exception $e) {
+                // If invalid date, we assume it's NOT ready
                 return redirect('/');
             }
-        } catch (\Exception $e) {
+        } else {
+            // No schedule set yet, block access
             return redirect('/');
         }
 

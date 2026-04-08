@@ -178,7 +178,7 @@
                                 {{ $message }}</p>
                         @enderror
                     </div>
-                    <div id="nimSection" class="hidden"> <x-label for="nim_nrp">NIM/NRP (Optional)</x-label>
+                    <div id="nimSection" class="hidden"> <x-label for="nim_nrp">NIM/NRP</x-label>
                         <x-input id="nim_nrp" name="nim_nrp" placeholder="Khusus Mahasiswa/Alumni IPB"
                             value="{{ old('nim_nrp') }}"
                             class="{{ $errors->has('nim_nrp') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
