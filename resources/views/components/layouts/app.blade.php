@@ -27,7 +27,7 @@
         [x-cloak] {
             display: none !important;
         }
-    </script>
+    </style>
 </head>
 
 <body class="font-sans antialiased bg-slate-50 text-slate-900 min-h-screen selection:bg-blue-600 selection:text-white">
