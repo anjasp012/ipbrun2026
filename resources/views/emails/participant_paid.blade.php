@@ -173,43 +173,39 @@
                                         {{ $participant->emergency_contact_relationship }}</td>
                                 </tr>
 
-                                @if ($participant->running_community || $participant->best_time || $participant->shuttle_bus)
-                                    <tr>
-                                        <td colspan="2"
-                                            style="padding:30px 0 10px;font-size:11px;color:#00875a;font-weight:bold;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #edf0f5;">
-                                            Running Data</td>
-                                    </tr>
-                                    @if ($participant->running_community)
-                                        <tr>
-                                            <td
-                                                style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
-                                                Komunitas</td>
-                                            <td
-                                                style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
-                                                {{ $participant->running_community }}</td>
-                                        </tr>
-                                    @endif
-                                    @if ($participant->best_time)
-                                        <tr>
-                                            <td
-                                                style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
-                                                Best Time</td>
-                                            <td
-                                                style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
-                                                {{ $participant->best_time }}</td>
-                                        </tr>
-                                    @endif
-                                    @if ($participant->shuttle_bus)
-                                        <tr>
-                                            <td
-                                                style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
-                                                Shuttle Bus</td>
-                                            <td
-                                                style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
-                                                {{ $participant->shuttle_bus }}</td>
-                                        </tr>
-                                    @endif
-                                @endif
+                                <tr>
+                                    <td colspan="2"
+                                        style="padding:30px 0 10px;font-size:11px;color:#00875a;font-weight:bold;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #edf0f5;">
+                                        Running Data</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
+                                        Komunitas Lari</td>
+                                    <td
+                                        style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
+                                        {{ $participant->running_community ?: '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
+                                        Best Time</td>
+                                    <td
+                                        style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
+                                        {{ $participant->best_time ?: '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
+                                        Event Sebelumnya</td>
+                                    <td
+                                        style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
+                                        {{ $participant->previous_events ?: '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
+                                        Shuttle Bus</td>
+                                    <td
+                                        style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
+                                        {{ $participant->shuttle_bus ?: '-' }}</td>
+                                </tr>
                             @endif
                         </table>
                     </div>
