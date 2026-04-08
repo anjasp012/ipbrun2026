@@ -57,7 +57,6 @@
         </div>
     </div>
 
-    @push('scripts')
     <script>
         function startTool() {
             return {
@@ -113,5 +112,4 @@
             }
         }
     </script>
-    @endpush
 </x-layouts.app>
