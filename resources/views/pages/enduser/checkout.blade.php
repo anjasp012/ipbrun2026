@@ -99,12 +99,21 @@
                             </p>
                         @enderror
                     </div>
-                    <div> <x-label for="date_birth">Tanggal Lahir *</x-label> <x-input id="date_birth" name="date_birth"
-                            class="datepicker bg-white {{ $errors->has('date_birth') ? '!border-red-500 ring-4 ring-red-50' : '' }}"
-                            placeholder="DD-MM-YYYY" required value="{{ old('date_birth') }}" />
+                    <div>
+                        <x-label for="date_birth">Tanggal Lahir *</x-label>
+                        <div class="relative group">
+                            <x-input id="date_birth" name="date_birth"
+                                class="datepicker block w-full bg-white pr-12 {{ $errors->has('date_birth') ? '!border-red-500 ring-4 ring-red-50' : '' }}"
+                                placeholder="DD-MM-YYYY" required value="{{ old('date_birth') }}" />
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-4 cursor-pointer text-slate-400 hover:text-[#003366] transition-colors"
+                                onclick="document.getElementById('date_birth')._flatpickr.open()">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                        </div>
                         @error('date_birth')
-                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
-                            </p>
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>
                         @enderror
                     </div>
                     <div> <x-label for="sex">Jenis Kelamin *</x-label> <x-select id="sex" name="sex"
@@ -402,13 +411,13 @@
                             <div class="absolute top-[45%] left-5 w-[calc(100%-40px)] h-[1px] border-t-2 border-dashed border-white/80">
                                 <div class="absolute -left-1.5 -top-[4px] w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
                                 <div class="absolute -right-1.5 -top-[4px] w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
-                                <span class="absolute top-2 left-1/2 -translate-x-1/2 bg-[#003366] text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-sm whitespace-nowrap">CHEST</span>
+                                <span class="absolute -top-3 left-[70%] -translate-x-1/2 bg-[#003366] text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-sm whitespace-nowrap">CHEST</span>
                             </div>
                             {{-- Length Indicator (B) --}}
                             <div class="absolute top-4 left-1/2 w-[1px] h-[calc(100%-24px)] border-l-2 border-dashed border-white/80">
                                 <div class="absolute -left-[4px] -top-1.5 w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
                                 <div class="absolute -left-[4px] -bottom-1.5 w-2.5 h-2.5 bg-white rounded-full border-2 border-[#FF7A21]"></div>
-                                <span class="absolute top-1/2 right-3 -translate-y-1/2 bg-[#003366] text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-sm flex items-center h-6 whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg) translateX(-50%);">BODY LENGTH</span>
+                                <span class="absolute bottom-6 right-3 bg-[#003366] text-white text-[10px] font-black px-2 py-0.5 rounded-sm shadow-sm flex items-center h-6 whitespace-nowrap" style="writing-mode: vertical-rl; transform: rotate(180deg) translateX(-50%);">BODY LENGTH</span>
                             </div>
                         </div>
                     </div>
@@ -476,7 +485,7 @@
                 });
             @endif
 
-            flatpickr(".datepicker", {
+            const birthPicker = flatpickr(".datepicker", {
                 locale: "id",
                 dateFormat: "d-m-Y",
                 maxDate: "today",
