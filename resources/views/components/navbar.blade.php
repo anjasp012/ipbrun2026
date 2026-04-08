@@ -35,6 +35,8 @@
                     </button>
                     
                     <div x-show="desktopDropdownOpen" 
+                         x-cloak
+                         style="display: none"
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0 translate-y-2"
                          x-transition:enter-end="opacity-100 translate-y-0"
@@ -110,7 +112,7 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="!mobileMenuOpen">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16m-7 6h7"></path>
                     </svg>
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="mobileMenuOpen" style="display-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-show="mobileMenuOpen" x-cloak style="display: none">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
@@ -120,6 +122,8 @@
 
     <!-- Mobile Menu Overlay -->
     <div x-show="mobileMenuOpen" 
+         x-cloak
+         style="display: none"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
@@ -132,6 +136,8 @@
 
     <!-- Mobile Menu Side Panel -->
     <div x-show="mobileMenuOpen" 
+         x-cloak
+         style="display: none"
          x-transition:enter="transition ease-out duration-300 transform"
          x-transition:enter-start="translate-x-full"
          x-transition:enter-end="translate-x-0"
@@ -155,7 +161,7 @@
                     Race Info
                     <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
                 </button>
-                <div x-show="open" class="ml-4 mt-2 space-y-1 mb-2 border-l-2 border-slate-100 pl-4">
+                <div x-show="open" x-cloak style="display: none" class="ml-4 mt-2 space-y-1 mb-2 border-l-2 border-slate-100 pl-4">
                     <a href="{{ url('/route') }}" class="block px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-[#003366]">Route</a>
                     <a href="{{ url('/faq') }}" class="block px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-[#003366]">FAQ</a>
                     <a href="{{ url('/rules') }}" class="block px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-widest hover:text-[#003366]">Rules & Regulations</a>
