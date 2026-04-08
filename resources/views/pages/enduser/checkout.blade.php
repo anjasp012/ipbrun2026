@@ -137,13 +137,17 @@
                         @enderror
                     </div>
                     <div>
-                        <div class="flex justify-between items-center mb-1"> <x-label for="jersey_size"
-                                class="!mb-0">Ukuran Jersey *</x-label> <button type="button"
-                                onclick="showSizeChart()"
+                        <div class="flex justify-between items-center mb-1">
+                            <x-label for="jersey_size" class="!mb-0">Ukuran Jersey *</x-label>
+                            <button type="button" onclick="showSizeChart()"
                                 class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-1">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Size Chart
+                            </button>
+                        </div>
                         <x-select id="jersey_size" name="jersey_size" required :options="[
                             'XS' => 'XS',
                             'S' => 'S',
@@ -157,8 +161,7 @@
                         ]" :selected="old('jersey_size')"
                             class="{{ $errors->has('jersey_size') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
                         @error('jersey_size')
-                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
-                                {{ $message }}</p>
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>
                         @enderror
                     </div>
                     <div id="nimSection" class="hidden"> <x-label for="nim_nrp">NIM/NRP (Optional)</x-label>
