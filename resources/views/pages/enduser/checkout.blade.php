@@ -366,20 +366,158 @@
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        function showSizeChart() {
+            if (typeof Swal === 'undefined') {
+                alert('Sedang memuat sistem... Silakan coba lagi dalam sekejap.');
+                return;
+            }
+            Swal.fire({
+                title: '<span class="text-[#003366] font-black uppercase tracking-tight">Jersey Size Chart</span>',
+                html: `
+                <div class="mt-6 flex flex-col md:flex-row items-center gap-8 px-2">
+                    <div class="flex items-center gap-6 bg-slate-50 p-6 rounded-3xl border border-slate-100 flex-1 w-full">
+                        <div class="relative w-20 h-20 shrink-0">
+                            <svg class="w-full h-full text-[#FF7A21]" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 3L4 7V9H6V21H18V9H20V7L17 3H7Z" />
+                            </svg>
+                            <div class="absolute top-[45%] left-1 w-full h-[1px] border-t border-dashed border-white/80"></div>
+                            <div class="absolute top-1 left-1/2 w-[1px] h-[80%] border-l border-dashed border-white/80"></div>
+                        </div>
+                        <div class="text-left space-y-2">
+                            <div class="flex items-start gap-2">
+                                <span class="bg-[#003366] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5">A</span>
+                                <p class="text-[11px] font-bold text-slate-700 leading-tight">
+                                    <span class="text-[#003366]">Lebar Dada:</span><br>Dari ketiak ke ketiak.
+                                </p>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="bg-[#003366] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5">B</span>
+                                <p class="text-[11px] font-bold text-slate-700 leading-tight">
+                                    <span class="text-[#003366]">Panjang:</span><br>Dari kerah ke bawah.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="overflow-hidden rounded-2xl border border-slate-100 flex-1 w-full">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-[#003366] text-white font-black uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-4 py-3">Size</th>
+                                    <th class="px-4 py-3">A (cm)</th>
+                                    <th class="px-4 py-3">B (cm)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50 font-bold text-slate-600">
+                                <tr><td class="px-4 py-3 bg-slate-50/30">S</td><td class="px-4 py-3">47</td><td class="px-4 py-3">67</td></tr>
+                                <tr><td class="px-4 py-3 bg-slate-50/30">M</td><td class="px-4 py-3">50</td><td class="px-4 py-3">70</td></tr>
+                                <tr><td class="px-4 py-3 bg-slate-50/30">L</td><td class="px-4 py-3">53</td><td class="px-4 py-3">73</td></tr>
+                                <tr><td class="px-4 py-3 bg-slate-50/30">XL</td><td class="px-4 py-3">56</td><td class="px-4 py-3">75</td></tr>
+                                <tr><td class="px-4 py-3 bg-slate-50/30">XXL</td><td class="px-4 py-3">59</td><td class="px-4 py-3">77</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <p class="mt-6 text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">
+                    * Toleransi ukuran ±1-2 cm. <br> Pastikan ukuran yang Anda pilih sudah sesuai.
+                </p>
+                `,
+                showConfirmButton: true,
+                confirmButtonText: 'TUTUP',
+                confirmButtonColor: '#003366',
+                width: '600px',
+                customClass: {
+                    popup: 'rounded-[3rem] border border-slate-100 shadow-2xl',
+                    confirmButton: 'rounded-xl px-12 py-4 font-black uppercase tracking-widest text-[11px]'
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-                    @if ($errors->any())
-                        @php
-                            $allErrors = $errors->all();
-                            $errorMsg = 'Silakan periksa kembali isian formulir Anda yang berwarna merah.';
-                            if (count($allErrors) == 1) {
-                                $errorMsg = $allErrors[0];
-                            }
-                        @endphp Swal.fire({
-                                icon: 'error',
-                                title: 'Pendaftaran Gagal',
-                                text: '{!! $errorMsg !!}',
-                                confirmButtonColor: '#003366',
-                                confirmButtonText: 'OKE, SAYA MENGERTI'
-                            }).then(() => { // Scroll to first error const firstError = document.querySelector('.text-red-500, .border-red-500'); if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' }); }); @endif flatpickr(".datepicker", { locale:"id", dateFormat:"d-m-Y", maxDate:"today", disableMobile:"true" }); const ticketPrice = {{ $ticket->price }}; const adminFee = 4500; const isIPB ="{{ $ticket->type }}" ==="ipb"; const pairTicketPrice = {{ $pairTicket->price ?? 0 }}; const nimInput = document.getElementById('nim_nrp'); if (isIPB) { document.getElementById('donateSection').classList.remove('hidden'); document.getElementById('nimSection').classList.remove('hidden'); nimInput.setAttribute('required', 'required'); } else { nimInput.value = ''; // Clear if hidden nimInput.removeAttribute('required'); } function updateTotal() { let donEvent = parseInt(document.getElementById('donation_event')?.value || 0); let donScholar = parseInt(document.getElementById('donation_scholarship')?.value || 0); let isSecondTicketChecked = document.getElementById('cb_second_ticket')?.checked || false; const summaryEvent = document.getElementById('row_donation_event'); const lblEvent = document.getElementById('lbl_donation_event'); if (donEvent > 0) { summaryEvent.classList.remove('hidden'); lblEvent.innerText = 'Rp ' + donEvent.toLocaleString('id-ID'); } else { summaryEvent.classList.add('hidden'); } const summaryScholar = document.getElementById('row_donation_scholarship'); const lblScholar = document.getElementById('lbl_donation_scholarship'); if (donScholar > 0) { summaryScholar.classList.remove('hidden'); lblScholar.innerText = 'Rp ' + donScholar.toLocaleString('id-ID'); } else { summaryScholar.classList.add('hidden'); } const summarySecond = document.getElementById('row_second_ticket'); let secondPrice = 0; if (isSecondTicketChecked && summarySecond) { summarySecond.classList.remove('hidden'); secondPrice = pairTicketPrice; } else if (summarySecond) { summarySecond.classList.add('hidden'); } let total = ticketPrice + adminFee + donEvent + donScholar + secondPrice; const formattedTotal = 'Rp ' + total.toLocaleString('id-ID'); document.getElementById('lbl_total').innerText = formattedTotal; } document.getElementById('donation_event')?.addEventListener('change', updateTotal); document.getElementById('donation_scholarship')?.addEventListener('change', updateTotal); document.getElementById('cb_second_ticket')?.addEventListener('change', updateTotal); updateTotal(); }); function showSizeChart() { Swal.fire({ title: '<span class="text-[#003366] font-black uppercase tracking-tight">Jersey Size Chart</span>', html: ` <div class="mt-6 flex flex-col md:flex-row items-center gap-8 px-2"> {{-- Illustration Part --}} <div class="flex items-center gap-6 bg-slate-50 p-6 rounded-3xl border border-slate-100 flex-1 w-full"> <div class="relative w-20 h-20 shrink-0"> <svg class="w-full h-full text-[#FF7A21]" viewBox="0 0 24 24" fill="currentColor"> <path d="M7 3L4 7V9H6V21H18V9H20V7L17 3H7Z" /> </svg> {{-- Indicators --}} <div class="absolute top-[45%] left-1 w-full h-[1px] border-t border-dashed border-white/80"></div> <div class="absolute top-1 left-1/2 w-[1px] h-[80%] border-l border-dashed border-white/80"></div> </div> <div class="text-left space-y-2"> <div class="flex items-start gap-2"> <span class="bg-[#003366] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5">A</span> <p class="text-[11px] font-bold text-slate-700 leading-tight"> <span class="text-[#003366]">Lebar Dada:</span><br>Dari ketiak ke ketiak. </p> </div> <div class="flex items-start gap-2"> <span class="bg-[#003366] text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shrink-0 mt-0.5">B</span> <p class="text-[11px] font-bold text-slate-700 leading-tight"> <span class="text-[#003366]">Panjang:</span><br>Dari kerah ke bawah. </p> </div> </div> </div> {{-- Table Part --}} <div class="overflow-hidden rounded-2xl border border-slate-100 flex-1 w-full"> <table class="w-full text-left text-xs"> <thead class="bg-[#003366] text-white font-black uppercase tracking-wider"> <tr> <th class="px-4 py-3">Size</th> <th class="px-4 py-3">A (cm)</th> <th class="px-4 py-3">B (cm)</th> </tr> </thead> <tbody class="divide-y divide-slate-50 font-bold text-slate-600"> <tr><td class="px-4 py-3 bg-slate-50/30">S</td><td class="px-4 py-3">47</td><td class="px-4 py-3">67</td></tr> <tr><td class="px-4 py-3 bg-slate-50/30">M</td><td class="px-4 py-3">50</td><td class="px-4 py-3">70</td></tr> <tr><td class="px-4 py-3 bg-slate-50/30">L</td><td class="px-4 py-3">53</td><td class="px-4 py-3">73</td></tr> <tr><td class="px-4 py-3 bg-slate-50/30">XL</td><td class="px-4 py-3">56</td><td class="px-4 py-3">75</td></tr> <tr><td class="px-4 py-3 bg-slate-50/30">XXL</td><td class="px-4 py-3">59</td><td class="px-4 py-3">77</td></tr> </tbody> </table> </div> </div> <p class="mt-6 text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed"> * Toleransi ukuran ±1-2 cm. <br> Pastikan ukuran yang Anda pilih sudah sesuai. </p> `, showConfirmButton: true, confirmButtonText: 'TUTUP', confirmButtonColor: '#003366', width: '600px', customClass: { popup: 'rounded-[3rem] border border-slate-100 shadow-2xl', confirmButton: 'rounded-xl px-12 py-4 font-black uppercase tracking-widest text-[11px]' } }); }
+            @if ($errors->any())
+                @php
+                    $allErrors = $errors->all();
+                    $errorMsg = 'Silakan periksa kembali isian formulir Anda yang berwarna merah.';
+                    if (count($allErrors) == 1) {
+                        $errorMsg = $allErrors[0];
+                    }
+                @endphp
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Pendaftaran Gagal',
+                    text: '{!! $errorMsg !!}',
+                    confirmButtonColor: '#003366',
+                    confirmButtonText: 'OKE, SAYA MENGERTI'
+                }).then(() => {
+                    const firstError = document.querySelector('.text-red-500, .border-red-500');
+                    if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                });
+            @endif
+
+            flatpickr(".datepicker", {
+                locale: "id",
+                dateFormat: "d-m-Y",
+                maxDate: "today",
+                disableMobile: "true"
+            });
+
+            const ticketPrice = {{ $ticket->price }};
+            const adminFee = 4500;
+            const isIPB = "{{ $ticket->type }}" === "ipb";
+            const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
+            const nimInput = document.getElementById('nim_nrp');
+
+            if (isIPB) {
+                document.getElementById('donateSection')?.classList.remove('hidden');
+                document.getElementById('nimSection')?.classList.remove('hidden');
+                nimInput?.setAttribute('required', 'required');
+            } else {
+                if (nimInput) nimInput.value = '';
+                nimInput?.removeAttribute('required');
+            }
+
+            function updateTotal() {
+                let donEvent = parseInt(document.getElementById('donation_event')?.value || 0);
+                let donScholar = parseInt(document.getElementById('donation_scholarship')?.value || 0);
+                let isSecondTicketChecked = document.getElementById('cb_second_ticket')?.checked || false;
+
+                const summaryEvent = document.getElementById('row_donation_event');
+                const lblEvent = document.getElementById('lbl_donation_event');
+                if (donEvent > 0) {
+                    summaryEvent?.classList.remove('hidden');
+                    if (lblEvent) lblEvent.innerText = 'Rp ' + donEvent.toLocaleString('id-ID');
+                } else {
+                    summaryEvent?.classList.add('hidden');
+                }
+
+                const summaryScholar = document.getElementById('row_donation_scholarship');
+                const lblScholar = document.getElementById('lbl_donation_scholarship');
+                if (donScholar > 0) {
+                    summaryScholar?.classList.remove('hidden');
+                    if (lblScholar) lblScholar.innerText = 'Rp ' + donScholar.toLocaleString('id-ID');
+                } else {
+                    summaryScholar?.classList.add('hidden');
+                }
+
+                const summarySecond = document.getElementById('row_second_ticket');
+                let secondPrice = 0;
+                if (isSecondTicketChecked && summarySecond) {
+                    summarySecond.classList.remove('hidden');
+                    secondPrice = pairTicketPrice;
+                } else if (summarySecond) {
+                    summarySecond.classList.add('hidden');
+                }
+
+                let total = ticketPrice + adminFee + donEvent + donScholar + secondPrice;
+                const formattedTotal = 'Rp ' + total.toLocaleString('id-ID');
+                const lblTotal = document.getElementById('lbl_total');
+                if (lblTotal) lblTotal.innerText = formattedTotal;
+            }
+
+            document.getElementById('donation_event')?.addEventListener('change', updateTotal);
+            document.getElementById('donation_scholarship')?.addEventListener('change', updateTotal);
+            document.getElementById('cb_second_ticket')?.addEventListener('change', updateTotal);
+
+            updateTotal();
+        });
     </script>
 </x-layouts.app>
