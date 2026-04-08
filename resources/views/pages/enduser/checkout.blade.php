@@ -264,7 +264,8 @@
                             ]" :selected="old('emergency_contact_relationship')"
                             class="{{ $errors->has('emergency_contact_relationship') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
                         @error('emergency_contact_relationship')
-                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
+                                {{ $message }}</p>
                         @enderror
                     </div>
                 </div> <!-- Other Race Interest Section --> @php
@@ -359,7 +360,7 @@
                             @if ($pairTicket)
                                 <div id="row_second_ticket"
                                     class="hidden flex justify-between items-center text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg">
-                                    <span class="text-[#E8630A] font-bold italic">Paket Ganda:
+                                    <span class="text-[#E8630A] font-bold italic">Paket Tambahan:
                                         {{ $pairTicket->category->name }}
                                         ({{ $pairTicket->name ?: strtoupper($pairTicket->type) }})</span> <span
                                         class="text-[#E8630A] font-black">Rp
@@ -529,7 +530,7 @@
                 bestTimeInput.addEventListener('input', function(e) {
                     let value = e.target.value.replace(/\D/g, '');
                     if (value.length > 6) value = value.slice(0, 6);
-                    
+
                     let formattedValue = '';
                     if (value.length > 0) {
                         formattedValue = value.slice(0, 2);
