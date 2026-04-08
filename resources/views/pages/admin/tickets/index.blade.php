@@ -1,20 +1,20 @@
 <x-layouts.admin title="Periode & Tiket">
     <div class="space-y-6">
         <!-- Header Info -->
-        <div class="flex items-center justify-between bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+        <div class="flex items-center justify-between bg-white p-10 rounded-2xl border border-slate-100 shadow-sm">
             <div>
                 <h3 class="text-3xl font-black text-[#003366] uppercase tracking-tight">Manajemen Periode & Tiket</h3>
                 <p class="text-sm text-slate-400 font-bold uppercase tracking-wider mt-2">Kelola jendela registrasi dan inventaris tiket</p>
             </div>
             <div class="flex items-center gap-4">
-                <span class="text-[12px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-6 py-3 rounded-2xl border border-slate-100">
+                <span class="text-[12px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-6 py-3 rounded-lg border border-slate-100">
                     Total Periods: {{ count($periods) }}
                 </span>
             </div>
         </div>
 
         @if(session('success'))
-            <div class="bg-emerald-50 text-emerald-700 px-8 py-5 rounded-[1.5rem] border border-emerald-100 text-base font-bold flex items-center gap-4 animate-slide-in">
+            <div class="bg-emerald-50 text-emerald-700 px-8 py-5 rounded-xl border border-emerald-100 text-base font-bold flex items-center gap-4 animate-slide-in">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                 {{ session('success') }}
             </div>
@@ -48,7 +48,7 @@
             }
         }">
             @foreach($periods as $period)
-            <div class="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden transition-all duration-300" 
+            <div class="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden transition-all duration-300" 
                  :class="{ 'ring-2 ring-blue-100 border-blue-200': activeAccordion === '{{ $period->id }}' }">
                 
                 {{-- Accordion Header (Period Row) --}}
@@ -58,7 +58,7 @@
                     <div class="flex items-center gap-8">
                         {{-- Icon / Indicator --}}
                         <div @class([
-                            'w-14 h-14 rounded-[1.25rem] flex items-center justify-center transition-all duration-500',
+                            'w-14 h-14 rounded-lg flex items-center justify-center transition-all duration-500',
                             'bg-orange-50 text-[#E8630A] shadow-inner' => $period->is_active,
                             'bg-slate-50 text-slate-400' => !$period->is_active
                         ])>
@@ -85,14 +85,14 @@
                         @if(!$period->is_active)
                         <form action="{{ route('periods.toggle', $period) }}" method="POST" @click.stop="">
                             @csrf
-                            <x-button variant="navy" type="submit" class="rounded-xl px-6 h-12 text-[11px]">
+                            <x-button variant="navy" type="submit" class="rounded-md px-6 h-12 text-[11px]">
                                 Aktifkan Periode
                             </x-button>
                         </form>
                         @endif
 
                         {{-- Chevron --}}
-                        <div class="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-50 text-slate-400 transition-transform duration-300"
+                        <div class="w-12 h-12 flex items-center justify-center rounded-lg bg-slate-50 text-slate-400 transition-transform duration-300"
                              :class="{ 'rotate-180 bg-blue-50 text-blue-600': activeAccordion === '{{ $period->id }}' }">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
@@ -104,7 +104,7 @@
                      x-collapse 
                      style="display: none;">
                     <div class="p-8 bg-slate-50/50 border-t border-slate-50">
-                        <div class="bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-sm">
+                        <div class="bg-white rounded-xl border border-slate-100 overflow-hidden shadow-sm">
                             <table class="w-full text-left">
                                 <thead>
                                     <tr class="bg-slate-50 uppercase tracking-widest text-[11px] font-black text-slate-400 border-b border-slate-100">
@@ -138,7 +138,7 @@
                                             <div class="flex flex-col gap-2 w-full max-w-[250px]">
                                                 <div class="flex items-center gap-3">
                                                     <select x-model="type" @change="isDirty = true"
-                                                        class="bg-blue-50/50 border border-blue-100 rounded-xl px-3 py-1.5 text-[11px] font-black uppercase text-blue-700 focus:ring-0">
+                                                        class="bg-blue-50/50 border border-blue-100 rounded-md px-3 py-1.5 text-[11px] font-black uppercase text-blue-700 focus:ring-0">
                                                         <option value="umum">UMUM</option>
                                                         <option value="ipb">IPB</option>
                                                     </select>
@@ -149,21 +149,21 @@
                                             </div>
                                         </td>
                                         <td class="px-8 py-5 text-center">
-                                            <div class="inline-flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-50 transition-all">
+                                            <div class="inline-flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-lg border border-slate-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-50 transition-all">
                                                 <span class="text-[11px] font-black text-slate-300">Rp</span>
                                                 <input type="number" x-model="price" @input="isDirty = true" @keyup.enter="save()"
                                                     class="w-32 bg-transparent border-none p-0 text-sm font-black text-slate-800 focus:ring-0">
                                             </div>
                                         </td>
                                         <td class="px-8 py-5 text-center">
-                                            <div class="inline-flex items-center gap-3 px-4 py-2 bg-rose-50/50 rounded-2xl border border-rose-100 focus-within:border-rose-300 focus-within:ring-2 focus-within:ring-rose-50 transition-all">
+                                            <div class="inline-flex items-center gap-3 px-4 py-2 bg-rose-50/50 rounded-lg border border-rose-100 focus-within:border-rose-300 focus-within:ring-2 focus-within:ring-rose-50 transition-all">
                                                 <span @class(['text-[11px] font-black text-rose-300'])>Rp</span>
                                                 <input type="number" x-model="discount" @input="isDirty = true" @keyup.enter="save()"
                                                     class="w-28 bg-transparent border-none p-0 text-sm font-black text-rose-600 focus:ring-0">
                                             </div>
                                         </td>
                                         <td class="px-8 py-5 text-center">
-                                            <div class="inline-flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-50 transition-all">
+                                            <div class="inline-flex items-center gap-3 px-4 py-2 bg-slate-50 rounded-lg border border-slate-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-50 transition-all">
                                                 <input type="number" x-model="qty" @input="isDirty = true" @keyup.enter="save()"
                                                     class="w-20 bg-transparent border-none p-0 text-sm font-black text-slate-800 focus:ring-0 text-center">
                                             </div>
@@ -179,7 +179,7 @@
                                         </td>
                                         <td class="px-8 py-5 text-right flex items-center justify-end gap-4">
                                             <button @click="save()" x-show="isDirty" x-cloak
-                                                class="px-6 py-2 bg-blue-600 text-white rounded-xl text-[11px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2 shadow-sm shadow-blue-100">
+                                                class="px-6 py-2 bg-blue-600 text-white rounded-md text-[11px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all flex items-center gap-2 shadow-sm shadow-blue-100">
                                                 <span x-show="!isSaving">Simpan</span>
                                                 <span x-show="isSaving" class="flex"><svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></span>
                                             </button>
@@ -205,7 +205,7 @@
                         </div>
 
                         {{-- Quick Add Ticket --}}
-                        <div class="mt-6 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
+                        <div class="mt-6 p-6 bg-white rounded-xl border border-slate-100 shadow-sm">
                             <form action="{{ route('tickets.store') }}" method="POST" class="flex items-end gap-4 flex-wrap lg:flex-nowrap">
                                 @csrf
                                 <input type="hidden" name="period_id" value="{{ $period->id }}">
@@ -213,7 +213,7 @@
                                 <div class="w-40">
                                     <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-2">Tipe</label>
                                     <select name="type" required
-                                        class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all">
+                                        class="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all">
                                         <option value="umum">UMUM</option>
                                         <option value="ipb">IPB</option>
                                     </select>
@@ -222,13 +222,13 @@
                                 <div class="flex-grow min-w-[200px]">
                                     <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1">Nama Tiket (Opsional)</label>
                                     <input type="text" name="name" placeholder="Reguler / Early Bird..."
-                                        class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all">
+                                        class="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all">
                                 </div>
 
                                 <div class="w-48">
                                     <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1">Kategori</label>
                                     <select name="category_id" required
-                                        class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all">
+                                        class="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all">
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                                         @endforeach
@@ -238,16 +238,16 @@
                                 <div class="w-40">
                                     <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1">Harga (Rp)</label>
                                     <input type="number" name="price" required placeholder="0"
-                                        class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all">
+                                        class="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all">
                                 </div>
 
                                 <div class="w-32">
                                     <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest block mb-1">Stok</label>
                                     <input type="number" name="qty" required placeholder="0"
-                                        class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all text-center">
+                                        class="w-full bg-slate-50 border border-slate-100 rounded-lg px-5 py-3 text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-300 outline-none transition-all text-center">
                                 </div>
 
-                                <button type="submit" class="px-8 h-14 bg-[#003366] text-white rounded-2xl text-[12px] font-black uppercase tracking-widest hover:bg-[#002244] transition-all shadow-sm shadow-blue-100 whitespace-nowrap">
+                                <button type="submit" class="px-8 h-14 bg-[#003366] text-white rounded-lg text-[12px] font-black uppercase tracking-widest hover:bg-[#002244] transition-all shadow-sm shadow-blue-100 whitespace-nowrap">
                                     Simpan Tiket
                                 </button>
                             </form>

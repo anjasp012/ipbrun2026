@@ -1,18 +1,18 @@
 <x-layouts.admin title="Dashboard Summary">
     <div class="space-y-6">
         @if(session('success'))
-            <div class="bg-emerald-50 text-emerald-700 px-8 py-5 rounded-3xl border border-emerald-100 text-base font-bold flex items-center gap-4 animate-slide-in shadow-sm">
+            <div class="bg-emerald-50 text-emerald-700 px-8 py-5 rounded-xl border border-emerald-100 text-base font-bold flex items-center gap-4 animate-slide-in shadow-sm">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                 {{ session('success') }}
             </div>
         @endif
 
         <!-- Website Status Section (Maintained) -->
-        <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-8 overflow-hidden relative">
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-8 overflow-hidden relative">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 relative z-10">
                 <div class="flex items-center gap-6">
                     <div @class([
-                        'w-14 h-14 rounded-[1.25rem] flex items-center justify-center transition-colors',
+                        'w-14 h-14 rounded-lg flex items-center justify-center transition-colors',
                         'bg-emerald-50 text-emerald-600' => \App\Models\Setting::getValue('wa_notification_active', '0') === '1',
                         'bg-rose-50 text-rose-600' => \App\Models\Setting::getValue('wa_notification_active', '0') !== '1'
                     ])>
@@ -39,7 +39,7 @@
 
                 <div class="flex items-center gap-6">
                     <div @class([
-                        'w-14 h-14 rounded-[1.25rem] flex items-center justify-center transition-colors',
+                        'w-14 h-14 rounded-lg flex items-center justify-center transition-colors',
                         'bg-emerald-50 text-emerald-600' => $stats['is_running'],
                         'bg-rose-50 text-rose-600' => !$stats['is_running']
                     ])>
@@ -69,7 +69,7 @@
                     <x-button type="button" 
                               onclick="confirmToggle()"
                               variant="{{ $stats['is_running'] ? 'danger' : 'success' }}" 
-                              class="px-8 py-3 rounded-2xl text-sm">
+                              class="px-8 py-3 rounded-lg text-sm">
                         {{ $stats['is_running'] ? 'Set to Maintenance' : 'Open Registration' }}
                     </x-button>
                 </form>
@@ -100,10 +100,10 @@
                     padding: '2rem',
                     borderRadius: '1.5rem',
                     customClass: {
-                        popup: 'rounded-3xl border border-slate-100 shadow-2xl',
+                        popup: 'rounded-xl border border-slate-100 shadow-2xl',
                         title: 'font-black text-[#003366] uppercase tracking-tight',
-                        confirmButton: 'rounded-xl px-6 py-3 font-bold uppercase tracking-widest text-xs',
-                        cancelButton: 'rounded-xl px-6 py-3 font-bold uppercase tracking-widest text-xs'
+                        confirmButton: 'rounded-md px-6 py-3 font-bold uppercase tracking-widest text-xs',
+                        cancelButton: 'rounded-md px-6 py-3 font-bold uppercase tracking-widest text-xs'
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -120,25 +120,25 @@
             <!-- Summary Grid -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 {{-- Total Pendapatan --}}
-                <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm border-l-[6px] border-l-blue-100">
+                <div class="bg-white p-8 rounded-xl border border-slate-100 shadow-sm border-l-[6px] border-l-blue-100">
                     <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL PENDAPATAN TERBAYAR</p>
                     <h4 class="text-2xl font-black text-slate-800">Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}</h4>
                 </div>
 
                 {{-- Total Order --}}
-                <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                <div class="bg-white p-8 rounded-xl border border-slate-100 shadow-sm">
                     <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL ORDER</p>
                     <h4 class="text-3xl font-black text-slate-800">{{ number_format($stats['total_order'], 0, ',', '.') }}</h4>
                 </div>
 
                 {{-- Total Peserta --}}
-                <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+                <div class="bg-white p-8 rounded-xl border border-slate-100 shadow-sm">
                     <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL PESERTA</p>
                     <h4 class="text-3xl font-black text-slate-800">{{ number_format($stats['total_participants'], 0, ',', '.') }}</h4>
                 </div>
 
                 {{-- Total Sisa Tiket --}}
-                <div @class(['bg-white p-8 rounded-3xl border border-slate-100 shadow-sm border-l-[6px] border-l-emerald-500'])>
+                <div @class(['bg-white p-8 rounded-xl border border-slate-100 shadow-sm border-l-[6px] border-l-emerald-500'])>
                     <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL SISA TIKET</p>
                     <h4 class="text-3xl font-black text-emerald-600">{{ number_format($stats['total_remaining_tickets'], 0, ',', '.') }}</h4>
                 </div>
@@ -152,22 +152,22 @@
             
             <!-- Period Summary -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-slate-50 p-6 rounded-[2rem] border border-slate-100">
+                <div class="bg-slate-50 p-6 rounded-xl border border-slate-100">
                     <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">TOTAL KAPASITAS</p>
                     <h4 class="text-2xl font-black text-slate-800">{{ number_format($period->total_kapasitas, 0, ',', '.') }}</h4>
                 </div>
-                <div class="bg-yellow-50/50 p-6 rounded-[2rem] border border-yellow-100/50">
+                <div class="bg-yellow-50/50 p-6 rounded-xl border border-yellow-100/50">
                     <p class="text-[11px] font-black text-yellow-600 uppercase tracking-widest mb-2">TOTAL TERJUAL</p>
                     <h4 class="text-2xl font-black text-yellow-700 truncate">{{ number_format($period->total_terjual, 0, ',', '.') }}</h4>
                 </div>
-                <div class="bg-emerald-50 p-6 rounded-[2rem] border border-emerald-100">
+                <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
                     <p class="text-[11px] font-black text-emerald-600 uppercase tracking-widest mb-2">TOTAL SISA STOK</p>
                     <h4 class="text-2xl font-black text-emerald-700 truncate">{{ number_format($period->total_sisa_stok, 0, ',', '.') }}</h4>
                 </div>
             </div>
 
             <!-- Ticket Table -->
-            <div class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead>

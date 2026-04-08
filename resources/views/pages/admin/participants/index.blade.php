@@ -1,28 +1,28 @@
 <x-layouts.admin title="Participant Master List">
     <div class="space-y-6">
         <!-- Filter & Search Bar -->
-        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col md:flex-row gap-6 items-center justify-between">
+        <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row gap-6 items-center justify-between">
             <form action="{{ url('/admin/participants') }}" method="GET" class="flex flex-1 gap-6 w-full">
                 <div class="relative flex-1">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search Name, Email, or Order Code..." class="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-100 rounded-2xl text-base font-medium focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search Name, Email, or Order Code..." class="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-100 rounded-lg text-base font-medium focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all">
                     <svg class="absolute left-5 top-4 w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
-                <select name="status" class="h-14 px-8 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-100 transition-all">
+                <select name="status" class="h-14 px-8 bg-slate-50 border border-slate-100 rounded-lg text-sm font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-100 transition-all">
                     <option value="">All Status</option>
                     <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Settle / Paid</option>
                     <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                 </select>
-                <button type="submit" class="h-14 px-10 bg-[#003366] text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-[#002244] transition-all">Filter</button>
+                <button type="submit" class="h-14 px-10 bg-[#003366] text-white rounded-lg text-sm font-black uppercase tracking-widest hover:bg-[#002244] transition-all">Filter</button>
             </form>
             
-            <a href="#" class="h-14 px-10 bg-emerald-50 text-emerald-600 rounded-2xl text-sm font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-3 hover:bg-emerald-100 transition-all">
+            <a href="#" class="h-14 px-10 bg-emerald-50 text-emerald-600 rounded-lg text-sm font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-3 hover:bg-emerald-100 transition-all">
                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                  Export CSV
             </a>
         </div>
 
         <!-- Participants Table -->
-        <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
@@ -50,7 +50,7 @@
                             </td>
                             <td class="px-8 py-8">
                                 @foreach($p->raceEntries as $entry)
-                                    <div class="mb-4 last:mb-0 p-3 bg-slate-50/50 rounded-2xl border border-slate-100/50 w-full">
+                                    <div class="mb-4 last:mb-0 p-3 bg-slate-50/50 rounded-lg border border-slate-100/50 w-full">
                                         <div class="flex items-center justify-between gap-6">
                                             <div>
                                                 <div class="text-[13px] font-black text-slate-800 uppercase tracking-tighter">{{ $entry->ticket->category->name }} ({{ $entry->ticket->name ?: strtoupper($entry->ticket->type) }})</div>
@@ -83,7 +83,7 @@
                                 </div>
                             </td>
                             <td class="px-10 py-8 text-right">
-                                <a href="{{ url('/admin/participants/'.$p->id) }}" class="p-3 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all inline-block">
+                                <a href="{{ url('/admin/participants/'.$p->id) }}" class="p-3 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all inline-block">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                 </a>
                             </td>
