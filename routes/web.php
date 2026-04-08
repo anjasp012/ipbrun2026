@@ -40,6 +40,7 @@ Route::get('/test-email', [TestController::class, 'emailForm']);
 Route::post('/test-email', [TestController::class, 'sendEmail']);
 
 // Admin Routes
+Route::redirect('admin', 'admin/dashboard');
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     // Shared Routes (Superadmin, Admin, PIC)
     Route::middleware(['role:superadmin,admin,pic'])->group(function () {
@@ -58,7 +59,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::get('/participants/export', [AdminDashboard::class, 'exportParticipants'])->name('participants.export');
         Route::get('/participants/{participant}/resend-invoice', [AdminDashboard::class, 'resendInvoice'])->name('participants.resend-invoice');
         Route::put('/participants/{participant}', [AdminDashboard::class, 'participantUpdate'])->name('participants.update');
-        
+
         Route::get('/tickets', [AdminTicket::class, 'index']);
         Route::post('/tickets', [AdminTicket::class, 'store'])->name('tickets.store');
         Route::put('/tickets/{ticket}', [AdminTicket::class, 'update'])->name('tickets.update');
