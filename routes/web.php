@@ -10,6 +10,8 @@ use App\Http\Controllers\Enduser\PaymentController;
 use App\Http\Controllers\Enduser\TestController;
 use App\Http\Controllers\Auth\AuthController;
 
+use App\Http\Controllers\Enduser\ToolController;
+
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -17,6 +19,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Enduser Routes
 Route::get('/', [EnduserTicket::class, 'home']);
+Route::get('/start', [ToolController::class, 'startPage'])->name('start.tool');
+Route::post('/trigger-start', [ToolController::class, 'triggerStart'])->name('trigger.start');
 Route::get('/checkout/{ticket}', [EnduserTicket::class, 'checkout'])->name('checkout');
 Route::post('/register', [EnduserTicket::class, 'register'])->name('register');
 Route::get('/dashboard', [EnduserTicket::class, 'dashboard'])->name('participant.dashboard')->middleware('auth');
