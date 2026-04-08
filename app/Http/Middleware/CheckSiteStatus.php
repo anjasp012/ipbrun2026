@@ -15,17 +15,37 @@ class CheckSiteStatus
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Don't check for admin routes, start tool, or midtrans callback
+        // Don't check for admin routes, trigger tool, or midtrans callback
         if ($request->is('admin*') || 
-            $request->is('start*') || 
             $request->is('trigger-start*') || 
             $request->is('payments/midtrans-callback*')) {
             return $next($request);
         }
 
-        $isRunning = \App\Models\Setting::getValue('is_running', '0') === '1';
+        // Allow Home Page (it handles its own view logic for coming soon/countdown)
+        if ($request->is('/')) {
+            return $next($request);
+        }
 
-        if (!$isRunning && !$request->is('/')) {
+        // Check if registration is running (Master Switch)
+        $isRunning = \App\Models\Setting::getValue('is_running', '0') === '1';
+        if (!$isRunning) {
+            return redirect('/');
+        }
+
+        // Check for Registration Schedule
+        $startTimeStr = \App\Models\Setting::getValue('ticket_sale_start');
+        if (!$startTimeStr) {
+            return redirect('/');
+        }
+
+        try {
+            $startTime = \Carbon\Carbon::parse($startTimeStr);
+            if ($startTime->isFuture()) {
+                // If we are still in countdown period, block other pages
+                return redirect('/');
+            }
+        } catch (\Exception $e) {
             return redirect('/');
         }
 
