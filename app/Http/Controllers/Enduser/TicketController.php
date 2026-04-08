@@ -160,7 +160,7 @@ class TicketController extends Controller
             'nik' => 'required|numeric|digits:16',
             'date_birth' => 'required',
             'sex' => 'required|in:male,female',
-            'blood_type' => 'required|in:A,B,AB,O,-',
+            'blood_type' => 'required|in:A,A+,A-,B,B+,B-,AB,AB+,AB-,O,O+,O-,-',
             'jersey_size' => 'required|in:S,M,L,XL,XXL',
             'nim_nrp' => $nimRule,
             'nationality' => 'required',
