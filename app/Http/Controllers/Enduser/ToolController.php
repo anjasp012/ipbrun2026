@@ -12,7 +12,6 @@ class ToolController extends Controller
     public function startPage()
     {
         $isRunning = Setting::getValue('is_running', '0') === '1';
-        dd($isRunning, Setting::all()->toArray());
         if ($isRunning) {
             return redirect('/');
         }
@@ -32,7 +31,7 @@ class ToolController extends Controller
 
         // Setting: 24h from now (+3 seconds for the countdown room)
         $startTime = Carbon::now('Asia/Jakarta')->addHours(24)->addSeconds(3);
-        
+
         Setting::updateOrCreate(
             ['key' => 'ticket_sale_start'],
             ['value' => $startTime->toDateTimeString()]
