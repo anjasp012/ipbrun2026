@@ -192,6 +192,40 @@ class TicketController extends Controller
             'nim_nrp' => 'NIM / NRP',
         ]);
 
+        // --- CUSTOM EMAIL VALIDATION LOGIC ---
+        $email = $request->email;
+
+        // 1. Check in users table
+        if (\App\Models\User::where('email', $email)->exists()) {
+            return back()->withInput()->withErrors([
+                'email' => 'Email ini sudah terdaftar sebagai akun pengguna. Silakan gunakan email lain atau login.'
+            ]);
+        }
+
+        // 2. Check in participants table for active orders
+        $existingParticipants = Participant::where('email', $email)->get();
+        foreach ($existingParticipants as $p) {
+            $hasActiveOrder = Order::where('participant_id', $p->id)
+                ->whereIn('status', ['pending', 'paid'])
+                ->exists();
+
+            if ($hasActiveOrder) {
+                return back()->withInput()->withErrors([
+                    'email' => 'Email ini sudah digunakan untuk pendaftaran yang sedang aktif (Pending/Paid).'
+                ]);
+            }
+        }
+
+        // 3. If only failed orders exist, cleanup the old participant data (as requested)
+        foreach ($existingParticipants as $p) {
+            // Check again to be super safe
+            $hasActive = Order::where('participant_id', $p->id)->whereIn('status', ['pending', 'paid'])->exists();
+            if (!$hasActive) {
+                $p->delete(); // Assuming cascading deletes orders & race_entries
+            }
+        }
+        // --- END CUSTOM VALIDATION ---
+
         return \Illuminate\Support\Facades\DB::transaction(function () use ($request, $validated, $ticket) {
             // 1. Lock the ticket record to prevent race conditions
             $ticket->lockForUpdate()->first();
