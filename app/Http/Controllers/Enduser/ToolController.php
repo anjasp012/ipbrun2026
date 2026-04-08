@@ -24,8 +24,8 @@ class ToolController extends Controller
             return response()->json(['success' => false, 'message' => 'Password salah!'], 403);
         }
 
-        // Set start time to NOW
-        $startTime = Carbon::now('Asia/Jakarta');
+        // Set start time to 24 HOURS from now
+        $startTime = Carbon::now('Asia/Jakarta')->addHours(24);
 
         Setting::updateOrCreate(
             ['key' => 'ticket_sale_start'],
