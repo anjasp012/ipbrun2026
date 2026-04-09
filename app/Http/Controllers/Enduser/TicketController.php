@@ -51,9 +51,9 @@ class TicketController extends Controller
         $ticketSaleStartValue = $ticketSaleStart ? \Illuminate\Support\Carbon::parse($ticketSaleStart, 'Asia/Jakarta') : null;
 
         return view('pages.enduser.index', compact(
-            'tickets_ipb', 
-            'tickets_public', 
-            'ticketSaleStart', 
+            'tickets_ipb',
+            'tickets_public',
+            'ticketSaleStart',
             'ticketSaleStartValue',
             'isMaintenance'
         ));
