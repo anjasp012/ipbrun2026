@@ -26,9 +26,9 @@ class UserSeeder extends Seeder
 
         // 2. Admin
         \App\Models\User::updateOrCreate(
-            ['email' => 'admin@ipbrun2026.id'],
+            ['email' => 'admin@ipbrun2026.com'],
             [
-                'email' => 'admin@ipbrun2026.com',
+                'email' => 'admin@ipbrun2026.id',
                 'name' => 'Admin Staff',
                 'username' => 'admin',
                 'password' => \Illuminate\Support\Facades\Hash::make('adminadmin'),
