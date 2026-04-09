@@ -79,7 +79,10 @@ class PaymentController extends Controller
                         \Illuminate\Support\Facades\Log::error('Fonnte failure notification failed: ' . $e->getMessage());
                     }
                 } else if ($transactionStatus == 'pending') {
-                    $participant->update(['status' => 'pending']);
+                    $order->update(['status' => 'pending']);
+                    foreach ($order->raceEntries as $entry) {
+                        $entry->update(['status' => 'pending']);
+                    }
                 }
 
                 return response()->json(['status' => 'success']);
