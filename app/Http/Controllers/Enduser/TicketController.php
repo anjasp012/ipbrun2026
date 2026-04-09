@@ -238,17 +238,14 @@ class TicketController extends Controller
         // --- END CUSTOM VALIDATION ---
 
         return \Illuminate\Support\Facades\DB::transaction(function () use ($request, $validated, $ticket) {
-            // 1. Lock the ticket record to prevent race conditions
-            $ticket->lockForUpdate()->first();
+            // 1. Lock the ticket record to prevent race conditions (Ambil data paling fresh & kunci row di DB)
+            $lockedTicket = Ticket::where('id', $ticket->id)->lockForUpdate()->first();
 
             // 2. Check current stock accurately
-            // 2. Check current stock accurately
-            $usedQty = RaceEntry::where('ticket_id', $ticket->id)
-                ->whereHas('participant', function ($q) {
-                    $q->whereIn('status', ['pending', 'paid']);
-                })->count();
+            $usedQty = RaceEntry::where('ticket_id', $lockedTicket->id)
+                ->whereIn('status', ['pending', 'paid'])->count();
 
-            if ($usedQty >= $ticket->qty) {
+            if ($usedQty >= $lockedTicket->qty) {
                 return redirect('/')->with('error', 'Maaf, tiket untuk kategori ini baru saja habis terjual.');
             }
 
