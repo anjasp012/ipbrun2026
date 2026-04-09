@@ -32,8 +32,8 @@ class TicketController extends Controller
             return view('pages.enduser.coming-soon');
         }
 
-        // 2. Auth Check: If Participant, redirect to Dashboard
-        if (auth()->check() && auth()->user()->role === 'participant') {
+        // 2. Auth Check: If Participant AND has profile, redirect to Dashboard
+        if (auth()->check() && auth()->user()->role === 'participant' && auth()->user()->participant()->exists()) {
             return redirect()->route('participant.dashboard');
         }
 
@@ -69,7 +69,8 @@ class TicketController extends Controller
         $participant = $user->participant()->with('raceEntries.ticket.category')->first();
 
         if (!$participant) {
-            return redirect('/');
+            auth()->logout();
+            return redirect('/login')->with('error', 'Silakan login kembali. Akun Anda tidak tertaut dengan data peserta.');
         }
 
         $orders = Order::where('participant_id', $participant->id)->with('raceEntries.ticket.category')->latest()->get();
@@ -105,6 +106,9 @@ class TicketController extends Controller
 
     public function checkout(Ticket $ticket)
     {
+        if (auth()->check() && auth()->user()->role === 'participant' && auth()->user()->participant()->exists()) {
+            return redirect()->route('participant.dashboard');
+        }
         // 1. Check if the ticket's period is active
         if (!$ticket->period || !$ticket->period->is_active) {
             return redirect('/')->with('error', 'Maaf, periode pendaftaran untuk tiket ini tidak aktif.');
@@ -143,6 +147,9 @@ class TicketController extends Controller
 
     public function register(Request $request)
     {
+        if (auth()->check() && auth()->user()->role === 'participant' && auth()->user()->participant()->exists()) {
+            return redirect()->route('participant.dashboard');
+        }
         $ticket = Ticket::findOrFail($request->ticket_id);
         $nimRule = ($ticket->type === 'ipb') ? 'required|string' : 'nullable|string';
 
