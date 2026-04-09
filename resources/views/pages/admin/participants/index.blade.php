@@ -95,7 +95,7 @@
                                                 @if ($entry->status == 'paid')
                                                     <span
                                                         class="text-[11px] font-black text-emerald-500 uppercase">Paid</span>
-                                                    @ifelse($entry->status == 'pending')
+                                                @elseif($entry->status == 'pending')
                                                     <span
                                                         class="text-[11px] font-black text-orange-500 uppercase">Pending</span>
                                                 @else
