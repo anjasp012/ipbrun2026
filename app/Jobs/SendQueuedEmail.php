@@ -7,22 +7,22 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Services\FonnteService;
+use Illuminate\Support\Facades\Mail;
 
-class SendWhatsAppBlast implements ShouldQueue
+class SendQueuedEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $recipient;
-    public $messageStr;
+    protected $recipient;
+    protected $mailable;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($recipient, $messageStr)
+    public function __construct($recipient, $mailable)
     {
         $this->recipient = $recipient;
-        $this->messageStr = $messageStr;
+        $this->mailable = $mailable;
     }
 
     /**
@@ -30,10 +30,9 @@ class SendWhatsAppBlast implements ShouldQueue
      */
     public function handle(): void
     {
-        $fonnte = new FonnteService();
-        $fonnte->sendMessage($this->recipient, $this->messageStr);
+        Mail::to($this->recipient)->send($this->mailable);
         
-        // Add 5 seconds delay to prevent being banned
+        // Add 5 seconds delay to prevent being banned/rate-limited
         sleep(5);
     }
 }

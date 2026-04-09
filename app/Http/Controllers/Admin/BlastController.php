@@ -34,10 +34,10 @@ class BlastController extends Controller
         $recipients = array_filter(preg_split("/[\s,]+/", $request->targets));
         $count = 0;
 
-        foreach ($recipients as $recipient) {
+        foreach ($recipients as $index => $recipient) {
             $recipient = trim($recipient);
             if (filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
-                Mail::to($recipient)->queue(new PromotionBlast($request->subject, $request->message, $attachmentPath));
+                \App\Jobs\SendQueuedEmail::dispatch($recipient, new PromotionBlast($request->subject, $request->message, $attachmentPath));
                 $count++;
             }
         }
@@ -55,10 +55,10 @@ class BlastController extends Controller
         $recipients = array_filter(preg_split("/[\s,]+/", $request->targets));
         $count = 0;
 
-        foreach ($recipients as $recipient) {
+        foreach ($recipients as $index => $recipient) {
             $recipient = trim($recipient);
             if (!empty($recipient)) {
-                \App\Jobs\SendWhatsAppBlast::dispatch($recipient, $request->message);
+                \App\Jobs\SendWhatsAppBlast::dispatch($recipient, $request->message)->delay(now()->addSeconds($index * 5));
                 $count++;
             }
         }

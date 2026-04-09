@@ -24,6 +24,11 @@
                     Home
                 </a>
 
+                <a href="{{ route('check.order') }}"
+                    class="px-5 py-2 rounded-xl text-[13px] font-black uppercase tracking-widest text-[#E8630A] hover:bg-orange-50 transition-all {{ request()->routeIs('check.order') ? 'bg-orange-50 text-[#E8630A]' : '' }}">
+                    Cek Status
+                </a>
+
                 <!-- Dropdown Race Info -->
                 <div class="relative" @mouseenter="desktopDropdownOpen = true"
                     @mouseleave="desktopDropdownOpen = false">
@@ -199,6 +204,17 @@
                                 </path>
                             </svg>
                             Home
+                        </a>
+
+                        <a href="{{ route('check.order') }}"
+                            class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-[13px] font-black uppercase tracking-widest {{ request()->routeIs('check.order') ? 'bg-orange-50 text-[#E8630A]' : 'text-slate-600 hover:bg-slate-50/80' }} transition-all">
+                            <svg class="w-5 h-5 opacity-40 {{ request()->routeIs('check.order') ? 'text-[#E8630A]' : 'text-slate-500' }}" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                                </path>
+                            </svg>
+                            Cek Status
                         </a>
 
                         <div x-data="{ open: false }">

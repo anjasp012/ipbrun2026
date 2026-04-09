@@ -416,9 +416,8 @@ class TicketController extends Controller
 
             // Send WhatsApp notification
             try {
-                $fonnte = new \App\Services\FonnteService();
                 $message = "Halo *{$participant->name}*!\n\nPesanan tiket IPB Run 2026 Anda berhasil dengan kode order *{$order->order_code}*.\n\nSilakan lakukan pembayaran melalui link berikut:\n{$snapResponse->redirect_url}\n\nTerima kasih!";
-                $fonnte->sendMessage($participant->phone_number, $message);
+                \App\Jobs\SendWhatsAppBlast::dispatch($participant->phone_number, $message);
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error('Fonnte notification failed: ' . $e->getMessage());
             }
@@ -427,5 +426,24 @@ class TicketController extends Controller
         } catch (\Exception $e) {
             throw new \Exception('Midtrans integration failed: ' . $e->getMessage());
         }
+    }
+
+    public function checkOrder(Request $request)
+    {
+        $orderCode = $request->query('order_code');
+        $order = null;
+        $error = null;
+
+        if ($orderCode) {
+            $order = Order::where('order_code', 'LIKE', "%$orderCode%")
+                ->with(['participant', 'raceEntries.ticket.category'])
+                ->first();
+
+            if (!$order) {
+                $error = "Pesanan dengan kode \"$orderCode\" tidak ditemukan.";
+            }
+        }
+
+        return view('pages.enduser.check_order', compact('order', 'orderCode', 'error'));
     }
 }
