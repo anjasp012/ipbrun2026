@@ -410,7 +410,9 @@ class TicketController extends Controller
                 'duration' => 10
             ],
             'callbacks' => [
-                'finish' => route('payment.finish')
+                'finish' => route('payment.finish'),
+                'unfinish' => route('payment.finish'),
+                'error' => route('payment.finish')
             ]
         ];
 
