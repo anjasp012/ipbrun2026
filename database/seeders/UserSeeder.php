@@ -13,16 +13,16 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // 1. Super Admin
-        \App\Models\User::updateOrCreate(
-            ['email' => 'superadmin@ipbrun2026.com'],
-            [
-                'email' => 'superadmin@ipbrun2026.id',
-                'name' => 'Super Admin',
-                'username' => 'superadmin',
-                'password' => \Illuminate\Support\Facades\Hash::make('supersuper'),
-                'role' => 'superadmin',
-            ]
-        );
+        // \App\Models\User::updateOrCreate(
+        //     ['email' => 'superadmin@ipbrun2026.com'],
+        //     [
+        //         'email' => 'superadmin@ipbrun2026.id',
+        //         'name' => 'Super Admin',
+        //         'username' => 'superadmin',
+        //         'password' => \Illuminate\Support\Facades\Hash::make('supersuper'),
+        //         'role' => 'superadmin',
+        //     ]
+        // );
 
         // 2. Admin
         \App\Models\User::updateOrCreate(
