@@ -32,8 +32,8 @@ class TicketController extends Controller
             return view('pages.enduser.coming-soon');
         }
 
-        // 2. Auth Check: If Participant AND has profile, redirect to Dashboard
-        if (auth()->check() && auth()->user()->role === 'participant' && auth()->user()->participant()->exists()) {
+        // 2. Auth Check: If Participant, redirect to Dashboard
+        if (auth()->check() && auth()->user()->role === 'participant') {
             return redirect()->route('participant.dashboard');
         }
 

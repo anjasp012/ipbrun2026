@@ -50,7 +50,7 @@
                                         $qty = $ticket->qty - $ticket->participants_count;
                                     @endphp
                                     <div
-                                        class="relative bg-white border border-slate-100 rounded-2xl flex flex-col transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md group/card hover:-translate-y-1">
+                                        class="relative bg-white border border-slate-100 rounded-2xl flex flex-col transition-all duration-300 shadow-sm hover:shadow-md group/card hover:-translate-y-1">
 
                                         <!-- Card Content -->
                                         <div class="p-3 md:p-6 pb-2">
@@ -88,13 +88,10 @@
                                         </div>
 
                                         <!-- Perforation -->
-                                        <div
-                                            class="relative flex items-center py-1 md:py-2 overflow-hidden pointer-events-none">
-                                            <div
-                                                class="absolute -left-3 w-6 h-6 bg-[#f1f5f9] rounded-full shadow-inner ring-1 ring-inset ring-slate-200/20">
+                                        <div class="relative flex items-center py-1 md:py-2 pointer-events-none">
+                                            <div class="absolute -left-3 w-6 h-6 bg-[#f1f5f9] rounded-full">
                                             </div>
-                                            <div
-                                                class="absolute -right-3 w-6 h-6 bg-[#f1f5f9] rounded-full shadow-inner ring-1 ring-inset ring-slate-200/20">
+                                            <div class="absolute -right-3 w-6 h-6 bg-[#f1f5f9] rounded-full">
                                             </div>
                                             <div class="w-full border-t-2 border-dashed border-slate-200 mx-3 md:mx-5">
                                             </div>
@@ -104,11 +101,14 @@
                                         <div
                                             class="p-3 md:p-6 pt-2 md:pt-4 bg-slate-50/40 rounded-b-2xl transition-colors mt-auto">
                                             <div class="mb-3 md:mb-4">
-                                                @if(str_contains(strtoupper($ticket->period->name ?? ''), 'PRESALE') && $ticket->discount > 0)
+                                                @if (str_contains(strtoupper($ticket->period->name ?? ''), 'PRESALE') && $ticket->discount > 0)
                                                     <div class="flex items-center gap-2 mb-0.5">
-                                                        <span class="text-[10px] md:text-[12px] text-red-600 font-[800] uppercase tracking-tight">Normal</span>
-                                                        <span class="text-[10px] md:text-[12px] text-slate-400 font-[800] line-through opacity-70">
-                                                            Rp {{ number_format($ticket->price + $ticket->discount, 0, ',', '.') }}
+                                                        <span
+                                                            class="text-[10px] md:text-[12px] text-red-600 font-[800] uppercase tracking-tight">Normal</span>
+                                                        <span
+                                                            class="text-[10px] md:text-[12px] text-slate-400 font-[800] line-through opacity-70">
+                                                            Rp
+                                                            {{ number_format($ticket->price + $ticket->discount, 0, ',', '.') }}
                                                         </span>
                                                     </div>
                                                 @endif
@@ -260,44 +260,68 @@
 
     @if (!$isMaintenance)
         <div class="fixed inset-0 z-[100] flex items-center justify-center p-6 overflow-hidden select-none"
-             x-data="launchControl()"
-             x-show="!isLive"
-             x-transition:leave="transition ease-in duration-1000"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0">
-            
+            x-data="launchControl()" x-show="!isLive" x-transition:leave="transition ease-in duration-1000"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+
             <div class="fixed inset-0 bg-[#001A33] backdrop-blur-3xl"></div>
-            
+
             <!-- Background Elements -->
-            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-            <div class="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-y-1/2"></div>
-            <div class="absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-[#FF7A21]/30 to-transparent -translate-x-1/2"></div>
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10">
+            </div>
+            <div
+                class="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-y-1/2">
+            </div>
+            <div
+                class="absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-[#FF7A21]/30 to-transparent -translate-x-1/2">
+            </div>
 
             <div class="relative w-full max-w-4xl text-center">
-                
+
                 <!-- Registration Schedule Countdown -->
                 <template x-if="hasSchedule && state === 'schedule'">
                     <div class="space-y-12">
                         <div class="space-y-6">
-                            <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" alt="IPB Run 2026" class="h-24 md:h-32 mx-auto drop-shadow-2xl">
+                            <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" alt="IPB Run 2026"
+                                class="h-24 md:h-32 mx-auto drop-shadow-2xl">
                             <div>
-                                <h2 class="text-[13px] font-[900] text-[#FF7A21] uppercase tracking-[0.6em] mb-4">OFFICIAL REGISTRATION OPENS IN</h2>
+                                <h2 class="text-[13px] font-[900] text-[#FF7A21] uppercase tracking-[0.6em] mb-4">
+                                    OFFICIAL REGISTRATION OPENS IN</h2>
                                 <div class="w-16 h-1 bg-[#FF7A21] mx-auto rounded-full"></div>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 max-w-3xl mx-auto items-center">
-                            <div class="flex flex-col"><span class="text-6xl md:text-8xl font-black text-white tracking-tighter" x-text="time.d">00</span><span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Days</span></div>
-                            <div class="flex flex-col"><span class="text-6xl md:text-8xl font-black text-white tracking-tighter" x-text="time.h">00</span><span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Hours</span></div>
-                            <div class="flex flex-col"><span class="text-6xl md:text-8xl font-black text-white tracking-tighter" x-text="time.m">00</span><span class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Minutes</span></div>
-                            <div class="flex flex-col"><span class="text-6xl md:text-8xl font-black text-[#FF7A21] tracking-tighter drop-shadow-[0_0_25px_rgba(255,122,33,0.3)]" x-text="time.s">00</span><span class="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF7A21]/60 mt-3">Seconds</span></div>
+                            <div class="flex flex-col"><span
+                                    class="text-6xl md:text-8xl font-black text-white tracking-tighter"
+                                    x-text="time.d">00</span><span
+                                    class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Days</span>
+                            </div>
+                            <div class="flex flex-col"><span
+                                    class="text-6xl md:text-8xl font-black text-white tracking-tighter"
+                                    x-text="time.h">00</span><span
+                                    class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Hours</span>
+                            </div>
+                            <div class="flex flex-col"><span
+                                    class="text-6xl md:text-8xl font-black text-white tracking-tighter"
+                                    x-text="time.m">00</span><span
+                                    class="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mt-3">Minutes</span>
+                            </div>
+                            <div class="flex flex-col"><span
+                                    class="text-6xl md:text-8xl font-black text-[#FF7A21] tracking-tighter drop-shadow-[0_0_25px_rgba(255,122,33,0.3)]"
+                                    x-text="time.s">00</span><span
+                                    class="text-[10px] font-black uppercase tracking-[0.4em] text-[#FF7A21]/60 mt-3">Seconds</span>
+                            </div>
                         </div>
 
                         <div class="pt-8 flex flex-col items-center gap-6">
-                            <p class="text-white/60 text-sm font-medium tracking-[0.1em] max-w-sm mx-auto leading-relaxed">Persiapkan diri Anda untuk pendaftaran tercepat.</p>
-                            <div class="flex items-center gap-4 py-3 px-6 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
+                            <p
+                                class="text-white/60 text-sm font-medium tracking-[0.1em] max-w-sm mx-auto leading-relaxed">
+                                Persiapkan diri Anda untuk pendaftaran tercepat.</p>
+                            <div
+                                class="flex items-center gap-4 py-3 px-6 bg-white/5 rounded-full border border-white/10 backdrop-blur-sm">
                                 <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                                <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">LIVE MONITORING ACTIVE</span>
+                                <span class="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">LIVE
+                                    MONITORING ACTIVE</span>
                             </div>
                         </div>
                     </div>
@@ -306,41 +330,55 @@
                 <!-- Manual Start Tool (If No Schedule) -->
                 <template x-if="!hasSchedule && state !== 'count'">
                     <div class="space-y-12">
-                         <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}" class="h-32 mx-auto drop-shadow-2xl">
-                         
-                         <template x-if="state === 'manual'">
+                        <img src="{{ asset('assets/images/logo_ipbrun2026.png') }}"
+                            class="h-32 mx-auto drop-shadow-2xl">
+
+                        <template x-if="state === 'manual'">
                             <div class="space-y-6">
-                                <h2 class="text-white/50 font-bold uppercase tracking-widest text-sm">System Standby</h2>
-                                <button @click="state = 'password'" class="bg-[#FF7A21] text-white px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-[4px] shadow-xl shadow-orange-900/40 hover:scale-105 active:scale-95 transition-all">
+                                <h2 class="text-white/50 font-bold uppercase tracking-widest text-sm">System Standby
+                                </h2>
+                                <button @click="state = 'password'"
+                                    class="bg-[#FF7A21] text-white px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-[4px] shadow-xl shadow-orange-900/40 hover:scale-105 active:scale-95 transition-all">
                                     INITIATE START TOOL
                                 </button>
                             </div>
-                         </template>
+                        </template>
 
-                         <template x-if="state === 'password'">
+                        <template x-if="state === 'password'">
                             <div class="max-w-md mx-auto space-y-6">
-                                <input type="password" x-model="password" @keyup.enter="checkPass()" placeholder="••••••••" class="w-full bg-white/5 border border-white/10 rounded-2xl h-16 text-center text-white text-xl font-bold tracking-[4px] focus:outline-none focus:border-[#FF7A21]">
-                                <button @click="checkPass()" class="w-full h-16 bg-[#FF7A21] text-white rounded-2xl font-black uppercase tracking-widest">Verify Control</button>
+                                <input type="password" x-model="password" @keyup.enter="checkPass()"
+                                    placeholder="••••••••"
+                                    class="w-full bg-white/5 border border-white/10 rounded-2xl h-16 text-center text-white text-xl font-bold tracking-[4px] focus:outline-none focus:border-[#FF7A21]">
+                                <button @click="checkPass()"
+                                    class="w-full h-16 bg-[#FF7A21] text-white rounded-2xl font-black uppercase tracking-widest">Verify
+                                    Control</button>
                             </div>
-                         </template>
+                        </template>
 
-                         <template x-if="state === 'ready'">
+                        <template x-if="state === 'ready'">
                             <div class="text-center space-y-12" x-transition:enter="transition ease-out duration-500"
-                                x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100">
+                                x-transition:enter-start="opacity-0 scale-90"
+                                x-transition:enter-end="opacity-100 scale-100">
                                 <div class="space-y-4">
-                                    <h2 class="text-white text-3xl font-[900] uppercase tracking-tighter italic text-center">SYSTEM READY</h2>
-                                    <p class="text-[11px] font-bold text-white/40 uppercase tracking-[4px] text-center">PRESS START TO TRIGGER COUNTDOWN</p>
+                                    <h2
+                                        class="text-white text-3xl font-[900] uppercase tracking-tighter italic text-center">
+                                        SYSTEM READY</h2>
+                                    <p
+                                        class="text-[11px] font-bold text-white/40 uppercase tracking-[4px] text-center">
+                                        PRESS START TO TRIGGER COUNTDOWN</p>
                                 </div>
 
                                 <div class="relative group inline-block mx-auto">
-                                    <div class="absolute inset-0 bg-red-600 blur-3xl opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity"></div>
+                                    <div
+                                        class="absolute inset-0 bg-red-600 blur-3xl opacity-20 pointer-events-none group-hover:opacity-40 transition-opacity">
+                                    </div>
                                     <button @click="startCountdown()"
                                         class="relative w-48 h-48 bg-red-600 text-white rounded-full font-black text-2xl uppercase tracking-[2px] shadow-2xl shadow-red-950/50 border-8 border-red-500/50 hover:bg-red-500 hover:scale-105 active:scale-90 transition-all animate-pulse mx-auto">
                                         START
                                     </button>
                                 </div>
                             </div>
-                         </template>
+                        </template>
                     </div>
                 </template>
 
@@ -348,7 +386,8 @@
                     <div class="text-center" x-transition:enter="transition ease-out duration-300">
                         <div class="text-[200px] leading-none font-black text-[#FF7A21] drop-shadow-[0_0_50px_rgba(255,122,33,0.4)] animate-bounce"
                             x-text="count"></div>
-                        <p class="text-white font-[900] text-3xl uppercase tracking-[15px] opacity-40 mt-8">INITIATING</p>
+                        <p class="text-white font-[900] text-3xl uppercase tracking-[15px] opacity-40 mt-8">INITIATING
+                        </p>
                     </div>
                 </template>
 
@@ -364,7 +403,12 @@
                     state: @json(!empty($ticketSaleStart) ? 'schedule' : 'manual'),
                     password: '',
                     count: 7,
-                    time: { d: '00', h: '00', m: '00', s: '00' },
+                    time: {
+                        d: '00',
+                        h: '00',
+                        m: '00',
+                        s: '00'
+                    },
                     sounds: {
                         standby: new Audio("{{ asset('assets/sounds/standby.mpeg') }}"),
                         start: new Audio("{{ asset('assets/sounds/start.mpeg') }}"),
@@ -377,9 +421,11 @@
 
                         // Try to start music on first interaction
                         document.addEventListener('click', () => {
-                            if(this.state === 'schedule') this.sounds.countdown.play().catch(e=>{});
-                            else if(this.state === 'manual') this.sounds.standby.play().catch(e=>{});
-                        }, { once: true });
+                            if (this.state === 'schedule') this.sounds.countdown.play().catch(e => {});
+                            else if (this.state === 'manual') this.sounds.standby.play().catch(e => {});
+                        }, {
+                            once: true
+                        });
 
                         if (this.hasSchedule) {
                             this.startScheduleTimer();
@@ -397,7 +443,8 @@
                             }
 
                             this.time.d = Math.floor(diff / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-                            this.time.h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
+                            this.time.h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(
+                                2, '0');
                             this.time.m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
                             this.time.s = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
 
@@ -409,7 +456,7 @@
                     checkPass() {
                         if (this.password === 'IpbRun2026#') {
                             this.state = 'ready';
-                            this.sounds.standby.play().catch(e=>{});
+                            this.sounds.standby.play().catch(e => {});
                         } else {
                             alert('Invalid Access');
                         }
@@ -431,8 +478,13 @@
                     async triggerSystem() {
                         const response = await fetch("{{ route('trigger.start') }}", {
                             method: "POST",
-                            headers: { "Content-Type": "application/json", "X-CSRF-TOKEN": "{{ csrf_token() }}" },
-                            body: JSON.stringify({ password: this.password })
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify({
+                                password: this.password
+                            })
                         });
                         const result = await response.json();
                         if (result.success) {
@@ -442,7 +494,7 @@
                             this.state = 'schedule';
                             this.isLive = false;
                             this.startScheduleTimer();
-                            this.sounds.countdown.play().catch(e=>{});
+                            this.sounds.countdown.play().catch(e => {});
                         } else {
                             alert(result.message);
                             window.location.reload();
