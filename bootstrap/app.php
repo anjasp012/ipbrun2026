@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -20,6 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'payments/midtrans-callback',
         ]);
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        $schedule->command('app:cancel-expired-orders')->everyMinute();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
