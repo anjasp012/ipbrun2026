@@ -56,8 +56,8 @@
                             class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest">Route</a>
                         <a href="{{ route('faq') }}"
                             class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest {{ request()->routeIs('faq') ? 'text-[#003366] bg-slate-50' : '' }}">FAQ</a>
-                        <a href="#"
-                            class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest">Rules
+                        <a href="{{ route('rules') }}"
+                            class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest {{ request()->routeIs('rules') ? 'text-[#003366] bg-slate-50' : '' }}">Rules
                             & Regulations</a>
                     </div>
                 </div>
@@ -241,8 +241,8 @@
                                     Maps</a>
                                 <a href="{{ route('faq') }}"
                                     class="block py-2 text-[11px] font-bold uppercase tracking-widest hover:text-[#003366] {{ request()->routeIs('faq') ? 'text-[#003366]' : 'text-slate-500' }}">F.A.Q</a>
-                                <a href="{{ url('/rules') }}"
-                                    class="block py-2 text-[11px] font-bold text-slate-500 uppercase tracking-widest hover:text-[#003366]">Regulations</a>
+                                <a href="{{ route('rules') }}"
+                                    class="block py-2 text-[11px] font-bold uppercase tracking-widest hover:text-[#003366] {{ request()->routeIs('rules') ? 'text-[#003366]' : 'text-slate-500' }}">Regulations</a>
                             </div>
                         </div>
 

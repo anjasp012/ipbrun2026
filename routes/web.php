@@ -30,6 +30,9 @@ Route::get('/faq', function () {
 Route::get('/surat-kuasa', function () {
     return view('pages.enduser.surat_kuasa');
 })->name('surat.kuasa');
+Route::get('/rules', function () {
+    return view('pages.enduser.rules');
+})->name('rules');
 Route::get('/dashboard', [EnduserTicket::class, 'dashboard'])->name('participant.dashboard')->middleware('auth');
 Route::get('/payment/finish', [PaymentController::class, 'finish'])->name('payment.finish');
 Route::get('/payment/{participant}', function (\App\Models\Participant $participant) {
