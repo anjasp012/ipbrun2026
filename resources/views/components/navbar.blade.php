@@ -62,8 +62,8 @@
                     </div>
                 </div>
 
-                <a href="#"
-                    class="px-5 py-2 rounded-xl text-[13px] font-black uppercase tracking-widest text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-all">
+                <a href="{{ route('surat.kuasa') }}"
+                    class="px-5 py-2 rounded-xl text-[13px] font-black uppercase tracking-widest hover:text-[#003366] hover:bg-slate-50 transition-all {{ request()->routeIs('surat.kuasa') ? 'text-[#003366] bg-slate-50' : 'text-slate-500' }}">
                     Surat Kuasa
                 </a>
             </div>
@@ -246,8 +246,8 @@
                             </div>
                         </div>
 
-                        <a href="{{ url('/surat-kuasa') }}"
-                            class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-[13px] font-black uppercase tracking-widest {{ request()->is('surat-kuasa*') ? 'bg-blue-50 text-[#003366]' : 'text-slate-600 hover:bg-slate-50/80' }} transition-all">
+                        <a href="{{ route('surat.kuasa') }}"
+                            class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-[13px] font-black uppercase tracking-widest {{ request()->routeIs('surat.kuasa') ? 'bg-blue-50 text-[#003366]' : 'text-slate-600 hover:bg-slate-50/80' }} transition-all">
                             <svg class="w-5 h-5 opacity-40" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
