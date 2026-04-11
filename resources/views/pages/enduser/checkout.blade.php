@@ -257,7 +257,7 @@
                         @enderror
                     </div>
                     <div class="md:col-span-2">
-                        <x-label for="emergency_contact_relationship">Hubungan Kontak Darurat *</x-label>
+                        <x-label for="emergency_contact_relationship">Hubungan *</x-label>
                         <x-select id="emergency_contact_relationship" name="emergency_contact_relationship" required
                             :options="[
                                 'Orang Tua' => 'Orang Tua',
@@ -343,7 +343,7 @@
                     <div class="space-y-0">
                         <label class="flex items-start gap-4 cursor-pointer group py-4 bg-slate-50/50 transition-all">
                             <div class="flex-shrink-0 mt-0.5">
-                                <input type="checkbox" name="disclaimer_1" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer">
+                                <input type="checkbox" name="disclaimer_1" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer disclaimer-cb">
                             </div>
                             <span class="text-xs text-slate-600 leading-relaxed font-medium">
                                 Saya sebagai peserta IPB RUN 2026 akan mematuhi ketentuan lomba & memahami kegiatan outdoor ini memliliki risiko kematian, cidera dll. Dan risiko yang timbul selama mengikuti kegiatan ini akibat tindakan yang tidak sesuai dengan aturan, ketentuan, dan arahan panitia menjadi tanggung jawab saya pribadi. Panitia penyelenggara dibebaskan dari segala tuntutan atas kejadian tersebut. <span class="text-red-500 font-black">*</span>
@@ -351,7 +351,7 @@
                         </label>
                         <label class="flex items-start gap-4 cursor-pointer group py-4 bg-slate-50/50 transition-all">
                             <div class="flex-shrink-0 mt-0.5">
-                                <input type="checkbox" name="disclaimer_2" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer">
+                                <input type="checkbox" name="disclaimer_2" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer disclaimer-cb">
                             </div>
                             <span class="text-xs text-slate-600 leading-relaxed font-medium">
                                 Saya memberikan hak penuh kepada panitia untuk menggunakan foto atau video peserta selama acara untuk keperluan resmi tanpa tuntutan kompensasi. <span class="text-red-500 font-black">*</span>
@@ -359,7 +359,7 @@
                         </label>
                         <label class="flex items-start gap-4 cursor-pointer group py-4 bg-slate-50/50 transition-all">
                             <div class="flex-shrink-0 mt-0.5">
-                                <input type="checkbox" name="disclaimer_3" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer">
+                                <input type="checkbox" name="disclaimer_3" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer disclaimer-cb">
                             </div>
                             <span class="text-xs text-slate-600 leading-relaxed font-medium">
                                 Saya menjamin bahwa seluruh data yang telah saya isikan pada formulir di atas adalah benar dan akurat. <span class="text-red-500 font-black">*</span>
@@ -643,6 +643,35 @@
             document.getElementById('cb_second_ticket')?.addEventListener('change', updateTotal);
 
             updateTotal();
+
+            const disclaimers = document.querySelectorAll('.disclaimer-cb');
+            const submitBtn = document.getElementById('btn_submit');
+
+            function checkDisclaimers() {
+                let allChecked = true;
+                disclaimers.forEach(function(cb) {
+                    if (!cb.checked) allChecked = false;
+                });
+
+                if (submitBtn) {
+                    if (allChecked) {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        submitBtn.classList.add('hover:bg-[#002244]', 'active:scale-95');
+                    } else {
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                        submitBtn.classList.remove('hover:bg-[#002244]', 'active:scale-95');
+                    }
+                }
+            }
+
+            if (disclaimers.length > 0) {
+                disclaimers.forEach(function(cb) {
+                    cb.addEventListener('change', checkDisclaimers);
+                });
+                checkDisclaimers();
+            }
         });
     </script>
 </x-layouts.app>
