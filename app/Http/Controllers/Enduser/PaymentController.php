@@ -73,7 +73,11 @@ class PaymentController extends Controller
                     // Send WhatsApp notification for failure
                     try {
                         $statusText = ($transactionStatus == 'expire') ? 'Telah Kadaluarsa' : 'Gagal';
-                        $message = "Halo *{$participant->name}*!\n\nPembayaran untuk kode order *{$orderCode}* dinyatakan *{$statusText}*.\n\nJika ini adalah kesalahan, Anda dapat mencoba mendaftar kembali. Terima kasih!";
+                        $message = "📢 *Tiket Expired – IPB Run 2026*\n\n" .
+                            "Halo *{$participant->name}*!\n\n" .
+                            "Pembayaran untuk kode order *{$orderCode}* dinyatakan *{$statusText}*.\n" .
+                            "Jika ini adalah kesalahan, Anda dapat mencoba mendaftar kembali.\n\n" .
+                            "Terima kasih.";
                         \App\Jobs\SendWhatsAppBlast::dispatch($participant->phone_number, $message);
                     } catch (\Exception $e) {
                         \Illuminate\Support\Facades\Log::error('Fonnte failure notification failed: ' . $e->getMessage());
