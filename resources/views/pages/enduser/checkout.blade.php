@@ -246,7 +246,7 @@
                                 {{ $message }}</p>
                         @enderror
                     </div>
-                    <div> <x-label for="emergency_contact_phone_number">HP Darurat *</x-label> <x-input
+                    <div> <x-label for="emergency_contact_phone_number">Nomor Darurat *</x-label> <x-input
                             id="emergency_contact_phone_number" name="emergency_contact_phone_number"
                             placeholder="08xxxxxxxxx" required :numeric="true"
                             value="{{ old('emergency_contact_phone_number') }}"
