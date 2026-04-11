@@ -100,7 +100,7 @@
                                         <!-- Price / Action -->
                                         <div
                                             class="p-3 md:p-6 pt-2 md:pt-4 bg-slate-50/40 rounded-b-2xl transition-colors mt-auto">
-                                            <div class="mb-3 md:mb-4">
+                                            <!-- <div class="mb-3 md:mb-4">
                                                 @if (str_contains(strtoupper($ticket->period->name ?? ''), 'PRESALE') && $ticket->discount > 0)
                                                     <div class="flex items-center gap-2 mb-0.5">
                                                         <span
@@ -118,19 +118,10 @@
                                                 <span
                                                     class="text-[15px] md:text-[21px] font-[900] text-[#003366] leading-none font-['Plus_Jakarta_Sans']">Rp
                                                     {{ number_format($ticket->price, 0, ',', '.') }}</span>
-                                            </div>
+                                            </div> -->
 
                                             @if ($qty > 0)
                                                 @auth
-                                                    <a href="{{ route('participant.buy-more', $ticket->id) }}"
-                                                        class="w-full bg-orange-600 text-white py-2 md:py-2.5 rounded-lg md:rounded-xl font-[800] text-[12px] md:text-[15px] transition-all active:scale-95 hover:bg-orange-700 flex items-center justify-center gap-1 md:gap-2">
-                                                        <svg class="w-3 h-3 md:w-4 md:h-4" fill="none"
-                                                            stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                                stroke-width="2.5" d="M12 4v16m8-8H4"></path>
-                                                        </svg>
-                                                        Beli Lagi
-                                                    </a>
                                                 @else
                                                     <a href="{{ route('checkout', $ticket->id) }}"
                                                         class="w-full bg-[#003366] text-white py-2 md:py-2.5 rounded-lg md:rounded-xl font-[800] text-[12px] md:text-[15px] transition-all active:scale-95 hover:bg-[#002244] flex items-center justify-center">

@@ -335,7 +335,7 @@
                     <h3 class="text-sm font-black text-[#003366] uppercase tracking-[2px] mb-4 pb-2 border-b border-slate-100">
                         Persetujuan & Disclaimer
                     </h3>
-                    <div class="space-y-4">
+                    <div class="space-y-2">
                         <label class="flex items-start gap-4 cursor-pointer group p-4 bg-slate-50/50 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
                             <div class="flex-shrink-0 mt-0.5">
                                 <input type="checkbox" name="disclaimer_1" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer">

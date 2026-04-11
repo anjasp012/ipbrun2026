@@ -36,9 +36,10 @@ class TicketController extends Controller
         if (auth()->check()) {
             if (auth()->user()->role === 'participant') {
                 return redirect()->route('participant.dashboard');
-            } else {
-                return redirect('/admin/dashboard');
-            }
+            } 
+            // else {
+            //     return redirect('/admin/dashboard');
+            // }
         }
 
         // 3. Fetch tickets
