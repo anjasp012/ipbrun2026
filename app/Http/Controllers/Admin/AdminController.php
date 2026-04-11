@@ -166,6 +166,7 @@ class AdminController extends Controller
             'Community',
             'Best Time',
             'Previous Events',
+            'Medical Condition',
             'Shuttle Bus',
             // Order Data
             'Order Code',
@@ -204,6 +205,7 @@ class AdminController extends Controller
                         $p->running_community ?: '-',
                         $p->best_time ?: '-',
                         $p->previous_events ?: '-',
+                        $p->medical_condition ?: '-',
                         $p->shuttle_bus ?: 'No',
                         // Order
                         $entry->order->order_code ?? '-',
@@ -249,6 +251,7 @@ class AdminController extends Controller
             'running_community'             => 'nullable|string',
             'best_time'                     => 'nullable|string',
             'previous_events'               => 'nullable|string',
+            'medical_condition'             => 'nullable|string',
             'shuttle_bus'                   => 'nullable|string',
         ]);
 

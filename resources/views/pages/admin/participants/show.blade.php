@@ -360,6 +360,18 @@
                                                 class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 font-bold text-[#003366] h-20">{{ $participant->previous_events }}</textarea>
                                         </template>
                                     </div>
+                                    <div class="md:col-span-2">
+                                        <label
+                                            class="block text-sm font-bold text-slate-400 mb-2 uppercase tracking-widest">Medical Condition</label>
+                                        <template x-if="!editing">
+                                            <p class="text-lg font-black text-[#003366]">
+                                                {{ $participant->medical_condition ?: '-' }}</p>
+                                        </template>
+                                        <template x-if="editing">
+                                            <textarea name="medical_condition"
+                                                class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 font-bold text-[#003366] h-20">{{ $participant->medical_condition }}</textarea>
+                                        </template>
+                                    </div>
                                     <div>
                                         <label
                                             class="block text-sm font-bold text-slate-400 mb-2 uppercase tracking-widest">Shuttle
