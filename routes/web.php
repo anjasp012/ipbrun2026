@@ -24,6 +24,9 @@ Route::get('/check-order', [EnduserTicket::class, 'checkOrder'])->name('check.or
 Route::post('/trigger-start', [ToolController::class, 'triggerStart'])->name('trigger.start');
 Route::get('/checkout/{ticket}', [EnduserTicket::class, 'checkout'])->name('checkout');
 Route::post('/register', [EnduserTicket::class, 'register'])->name('register');
+Route::get('/faq', function () {
+    return view('pages.enduser.faq');
+})->name('faq');
 Route::get('/dashboard', [EnduserTicket::class, 'dashboard'])->name('participant.dashboard')->middleware('auth');
 Route::get('/payment/finish', [PaymentController::class, 'finish'])->name('payment.finish');
 Route::get('/payment/{participant}', function (\App\Models\Participant $participant) {
