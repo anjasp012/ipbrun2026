@@ -242,7 +242,7 @@ class AdminController extends Controller
             'sex'                           => 'required|in:male,female',
             'blood_type'                    => 'required|string',
             'jersey_size'                   => 'required|string',
-            'nim_nrp'                       => 'nullable|string|max:20',
+            'nim_nrp'                       => 'nullable|string|min:6',
             'nationality'                   => 'required|string',
             'address'                       => 'required|string',
             'emergency_contact_name'        => 'required|string',

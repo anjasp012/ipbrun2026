@@ -156,7 +156,7 @@ class TicketController extends Controller
             return redirect()->route('participant.dashboard');
         }
         $ticket = Ticket::findOrFail($request->ticket_id);
-        $nimRule = ($ticket->type === 'ipb') ? 'required|string' : 'nullable|string';
+        $nimRule = ($ticket->type === 'ipb') ? 'required|string|min:6' : 'nullable|string|min:6';
 
         $validated = $request->validate([
             'ticket_id' => 'required',
@@ -188,6 +188,7 @@ class TicketController extends Controller
             'numeric' => ':attribute harus berupa angka.',
             'digits' => ':attribute harus berjumlah :digits digit.',
             'in' => 'Pilihan :attribute tidak valid.',
+            'min' => ':attribute minimal :min karakter.',
         ], [
             'name' => 'Nama Lengkap',
             'email' => 'Alamat Email',
@@ -428,7 +429,15 @@ class TicketController extends Controller
 
             // Send WhatsApp notification
             try {
-                $message = "Halo *{$participant->name}*!\n\nPesanan tiket IPB Run 2026 Anda berhasil dengan kode order *{$order->order_code}*.\n\nSilakan lakukan pembayaran melalui link berikut:\n{$snapResponse->redirect_url}\n\nTerima kasih!";
+                $message = "📢 *Pembayaran Tiket – IPB Run 2026*\n\n" .
+                    "Halo *{$participant->name}*,\n\n" .
+                    "Pesanan tiket IPB Run 2026 kamu telah berhasil dibuat dengan kode order:\n" .
+                    "*{$order->order_code}*\n\n" .
+                    "Untuk mengamankan slot kamu, segera lakukan pembayaran melalui link berikut:\n" .
+                    "🔗 {$snapResponse->redirect_url}\n\n" .
+                    "⏳ *Perhatian:*\n" .
+                    "Pembayaran hanya diberikan waktu 10 menit. Jika terlewat, pesanan akan otomatis dibatalkan dan slot dialihkan ke peserta lain.\n\n" .
+                    "Terima kasih atas partisipasimu.";
                 \App\Jobs\SendWhatsAppBlast::dispatch($participant->phone_number, $message);
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error('Fonnte notification failed: ' . $e->getMessage());

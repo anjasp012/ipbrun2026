@@ -180,11 +180,14 @@
                     </div>
                     <div id="nimSection" class="hidden"> <x-label for="nim_nrp">NIM/NRP</x-label>
                         <x-input id="nim_nrp" name="nim_nrp" placeholder="Khusus Mahasiswa/Alumni IPB"
-                            value="{{ old('nim_nrp') }}"
+                            value="{{ old('nim_nrp') }}" minlength="6"
                             class="{{ $errors->has('nim_nrp') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
                         @error('nim_nrp')
                             <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">
                                 {{ $message }}</p>
+                        @else
+                            <p class="mt-2 text-[10px] text-[#E8630A] font-bold uppercase tracking-wider leading-tight">
+                                Minimal 6 karakter. Contoh: G64150001 atau A123456</p>
                         @enderror
                     </div>
                     <div> <x-label for="nationality">Kewarganegaraan</x-label> <x-input id="nationality"
