@@ -220,6 +220,11 @@
                             name="previous_events" rows="2"
                             placeholder="Sebutkan event yang pernah diikuti sebelumnya">{{ old('previous_events') }}</x-textarea>
                     </div>
+                    <div class="md:col-span-2">
+                        <x-label for="medical_condition">Kondisi Medis (Optional)</x-label>
+                        <x-textarea id="medical_condition" name="medical_condition" rows="2"
+                            placeholder="Sebutkan kondisi medis yang perlu diketahui oleh panitia (jika ada)">{{ old('medical_condition') }}</x-textarea>
+                    </div>
                     <div> <x-label for="shuttle_bus">Pilih terminal untuk naik shuttle bus? (Optional)</x-label>
                         <x-select id="shuttle_bus" name="shuttle_bus" :options="[
                             '' => 'Tidak Menggunakan',

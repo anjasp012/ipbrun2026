@@ -179,6 +179,7 @@ class TicketController extends Controller
             'previous_events' => 'nullable|string',
             'best_time' => 'nullable|string',
             'shuttle_bus' => 'nullable|string',
+            'medical_condition' => 'nullable|string',
             'other_race_interest' => 'nullable|string',
         ], [
             'required' => ':attribute wajib diisi.',

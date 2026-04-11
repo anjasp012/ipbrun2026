@@ -206,6 +206,13 @@
                                         style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
                                         {{ $participant->shuttle_bus ?: '-' }}</td>
                                 </tr>
+                                <tr>
+                                    <td style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
+                                        Kondisi Medis</td>
+                                    <td
+                                        style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
+                                        {{ $participant->medical_condition ?: '-' }}</td>
+                                </tr>
                             @endif
                         </table>
                     </div>
