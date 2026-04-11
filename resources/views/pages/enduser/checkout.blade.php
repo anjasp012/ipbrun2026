@@ -335,8 +335,8 @@
                     <h3 class="text-sm font-black text-[#003366] uppercase tracking-[2px] mb-4 pb-2 border-b border-slate-100">
                         Persetujuan & Disclaimer
                     </h3>
-                    <div class="space-y-2">
-                        <label class="flex items-start gap-4 cursor-pointer group p-4 bg-slate-50/50 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
+                    <div class="space-y-0">
+                        <label class="flex items-start gap-4 cursor-pointer group p-4 bg-slate-50/50 transition-all">
                             <div class="flex-shrink-0 mt-0.5">
                                 <input type="checkbox" name="disclaimer_1" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer">
                             </div>
@@ -344,7 +344,7 @@
                                 Saya sebagai peserta IPB RUN 2026 akan mematuhi ketentuan lomba & memahami kegiatan outdoor ini memliliki risiko kematian, cidera dll. Dan risiko yang timbul selama mengikuti kegiatan ini akibat tindakan yang tidak sesuai dengan aturan, ketentuan, dan arahan panitia menjadi tanggung jawab saya pribadi. Panitia penyelenggara dibebaskan dari segala tuntutan atas kejadian tersebut. <span class="text-red-500 font-black">*</span>
                             </span>
                         </label>
-                        <label class="flex items-start gap-4 cursor-pointer group p-4 bg-slate-50/50 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
+                        <label class="flex items-start gap-4 cursor-pointer group p-4 bg-slate-50/50 transition-all">
                             <div class="flex-shrink-0 mt-0.5">
                                 <input type="checkbox" name="disclaimer_2" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer">
                             </div>
@@ -352,7 +352,7 @@
                                 Saya memberikan hak penuh kepada panitia untuk menggunakan foto atau video peserta selama acara untuk keperluan resmi tanpa tuntutan kompensasi. <span class="text-red-500 font-black">*</span>
                             </span>
                         </label>
-                        <label class="flex items-start gap-4 cursor-pointer group p-4 bg-slate-50/50 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
+                        <label class="flex items-start gap-4 cursor-pointer group p-4 bg-slate-50/50 transition-all">
                             <div class="flex-shrink-0 mt-0.5">
                                 <input type="checkbox" name="disclaimer_3" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer">
                             </div>
