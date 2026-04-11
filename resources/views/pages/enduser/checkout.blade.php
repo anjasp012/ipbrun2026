@@ -228,7 +228,7 @@
                     <div> <x-label for="shuttle_bus">Pilih terminal untuk naik shuttle bus? (Optional)</x-label>
                         <x-select id="shuttle_bus" name="shuttle_bus" :options="[
                             '' => 'Tidak Menggunakan',
-                            'Moll Botani Square' => 'Moll Botani Square',
+                            'Mall Botani Square' => 'Mall Botani Square',
                             'Terminal Bubulak' => 'Terminal Bubulak',
                         ]" :selected="old('shuttle_bus')" />
                     </div>
