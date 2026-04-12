@@ -69,6 +69,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::get('/participants/export', [AdminDashboard::class, 'exportParticipants'])->name('participants.export');
         Route::get('/participants/{participant}/resend-invoice', [AdminDashboard::class, 'resendInvoice'])->name('participants.resend-invoice');
         Route::put('/participants/{participant}', [AdminDashboard::class, 'participantUpdate'])->name('participants.update');
+        Route::put('/participants/{participant}/change-password', [AdminDashboard::class, 'changePassword'])->name('participants.change-password');
 
         Route::get('/tickets', [AdminTicket::class, 'index']);
         Route::post('/tickets', [AdminTicket::class, 'store'])->name('tickets.store');

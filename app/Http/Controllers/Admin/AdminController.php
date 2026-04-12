@@ -275,4 +275,26 @@ class AdminController extends Controller
             return back()->with('error', 'Gagal mengirim email: ' . $e->getMessage());
         }
     }
+
+    public function changePassword(Request $request, Participant $participant)
+    {
+        $request->validate([
+            'password' => 'required|min:6'
+        ]);
+
+        $user = \App\Models\User::where('email', $participant->email)->first();
+        
+        if (!$user) {
+            return back()->with('error', 'Gagal: Akun user belum dibuat karena pembayaran tiket belum diverifikasi.');
+        }
+
+        $user->password = \Illuminate\Support\Facades\Hash::make($request->password);
+        $user->save();
+
+        if (!$participant->user_id) {
+            $participant->update(['user_id' => $user->id]);
+        }
+
+        return back()->with('success', "Password untuk profil ({$participant->name}) telah berhasil diubah secara permanen.");
+    }
 }
