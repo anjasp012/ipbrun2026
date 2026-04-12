@@ -163,13 +163,13 @@
             0%, 100% {
                 box-shadow: 0 0 10px 2px rgba(255, 247, 0, 0.6);
                 border-color: #ffea00ff;
-                color: #ffd900ff;
+                color: #000000ff;
                 background-color: rgba(255, 251, 0, 0.05);
             }
             50% {
                 box-shadow: 0 0 25px 6px rgba(255, 247, 0, 0.6);
                 border-color: #ffea00ff;
-                color: #ffd900ff;
+                color: #000000ff;
                 background-color: rgba(255, 204, 0, 0.15);
             }
         }
