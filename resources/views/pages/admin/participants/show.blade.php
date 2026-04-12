@@ -254,7 +254,7 @@
                                         <template x-if="editing">
                                             <select name="blood_type"
                                                 class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 font-bold text-[#003366]">
-                                                @foreach (['A', 'B', 'AB', 'O', '-'] as $bt)
+                                                @foreach (['A', 'A+', 'A-', 'B', 'B+', 'B-', 'AB', 'AB+', 'AB-', 'O', 'O+', 'O-'] as $bt)
                                                     <option value="{{ $bt }}"
                                                         {{ $participant->blood_type == $bt ? 'selected' : '' }}>
                                                         {{ $bt }}</option>
