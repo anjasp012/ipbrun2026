@@ -21,11 +21,11 @@
                 <div class="flex justify-center mb-8 md:hidden">
                     <div class="inline-flex p-1 bg-slate-50 rounded-xl border border-slate-200 shadow-sm w-full">
                         <button onclick="switchCategory('ipb')" id="tab-ipb"
-                            class="flex-1 category-tab active-tab bg-[#00ACB1] text-white shadow-md px-4 py-3 rounded-lg text-xs font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap border border-transparent">
+                            class="flex-1 category-tab tab-pulse bg-[#00ACB1] text-white shadow-md px-4 py-3 rounded-lg text-xs font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap border border-transparent">
                             Tiket Kategori <br> Keluarga IPB
                         </button>
                         <button onclick="switchCategory('umum')" id="tab-umum"
-                            class="flex-1 category-tab px-4 py-3 rounded-lg text-xs font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap text-slate-500 hover:text-[#00ACB1] border border-transparent">
+                            class="flex-1 category-tab tab-pulse px-4 py-3 rounded-lg text-xs font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap text-slate-500 hover:text-[#00ACB1] border border-transparent">
                             Tiket Kategori <br> Umum
                         </button>
                     </div>
@@ -159,9 +159,9 @@
     </div>
 
     <style>
-        @keyframes activeTabPulse {
+        @keyframes tabPulseGlow {
             0% {
-                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 0 0 0 rgba(0, 172, 177, 0.6);
+                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 0 0 0 rgba(0, 172, 177, 0.4);
             }
             70% {
                 box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 0 0 8px rgba(0, 172, 177, 0);
@@ -171,8 +171,9 @@
             }
         }
 
-        .active-tab {
-            animation: activeTabPulse 1.5s infinite;
+        .tab-pulse {
+            animation: tabPulseGlow 1.8s infinite;
+            position: relative;
             z-index: 10;
         }
 
@@ -254,13 +255,13 @@
 
             // Update tab styles
             document.querySelectorAll('.category-tab').forEach(tab => {
-                tab.classList.remove('bg-[#00ACB1]', 'text-white', 'shadow-md', 'active-tab');
+                tab.classList.remove('bg-[#00ACB1]', 'text-white', 'shadow-md');
                 tab.classList.add('text-slate-500', 'hover:text-[#00ACB1]');
             });
 
             const activeTab = document.getElementById('tab-' + id);
             if (activeTab) {
-                activeTab.classList.add('bg-[#00ACB1]', 'text-white', 'shadow-md', 'active-tab');
+                activeTab.classList.add('bg-[#00ACB1]', 'text-white', 'shadow-md');
                 activeTab.classList.remove('text-slate-500', 'hover:text-[#00ACB1]');
             }
         }
