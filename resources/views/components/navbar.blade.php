@@ -236,7 +236,7 @@
                             </button>
                             <div x-show="open" x-cloak style="display: none"
                                 class="pl-11 mt-2 space-y-2 mb-4 animate-fade-down duration-300">
-                                <a href="{{ url('/route') }}"
+                                <a href="#"
                                     class="block py-2 text-[11px] font-bold text-slate-500 uppercase tracking-widest hover:text-[#003366]">Route
                                     Maps</a>
                                 <a href="{{ route('faq') }}"
