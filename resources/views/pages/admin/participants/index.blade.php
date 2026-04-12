@@ -254,41 +254,40 @@
             </div>
         </div>
 
-    </div>
+        <!-- Change Password Modal -->
+        <div x-show="showPasswordModal"
+            class="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm"
+            style="display: none;"
+            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
 
-    <!-- Change Password Modal -->
-    <div x-show="showPasswordModal"
-        class="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm"
-        style="display: none;"
-        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
-        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+            <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
+                @click.away="showPasswordModal = false">
+                <div class="p-10 border-b border-slate-50 bg-slate-50/50">
+                    <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Ganti Password Participant</h3>
+                    <p class="text-sm text-slate-400 font-bold uppercase tracking-wider mt-2" x-text="'Peserta: ' + selectedParticipantName"></p>
+                </div>
 
-        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
-            @click.away="showPasswordModal = false">
-            <div class="p-10 border-b border-slate-50 bg-slate-50/50">
-                <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Ganti Password Participant</h3>
-                <p class="text-sm text-slate-400 font-bold uppercase tracking-wider mt-2" x-text="'Peserta: ' + selectedParticipantName"></p>
-            </div>
-
-            <form :action="'{{ url('/admin/participants') }}/' + selectedParticipantId + '/change-password'" method="POST" @submit="showPasswordModal = false">
-                @csrf
-                @method('PUT')
-                <div class="p-10 space-y-8">
-                    <div>
-                        <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Password Baru</label>
-                        <input type="password" name="password" required minlength="6"
-                            class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-red-50 focus:border-red-200 transition-all" placeholder="Masukkan password baru...">
+                <form :action="'{{ url('/admin/participants') }}/' + selectedParticipantId + '/change-password'" method="POST" @submit="showPasswordModal = false">
+                    @csrf
+                    @method('PUT')
+                    <div class="p-10 space-y-8">
+                        <div>
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Password Baru</label>
+                            <input type="password" name="password" required minlength="6"
+                                class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-red-50 focus:border-red-200 transition-all" placeholder="Masukkan password baru...">
+                        </div>
                     </div>
-                </div>
 
-                <div class="p-8 bg-slate-50 flex items-center justify-end gap-4">
-                    <button type="button" @click="showPasswordModal = false"
-                        class="px-8 py-4 text-sm font-black text-slate-400 uppercase tracking-widest hover:text-slate-600">Batal</button>
-                    <button type="submit"
-                        class="px-10 py-4 bg-red-500 text-white rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-red-900/20 hover:bg-red-600 transition-all">Ubah Password</button>
-                </div>
-            </form>
+                    <div class="p-8 bg-slate-50 flex items-center justify-end gap-4">
+                        <button type="button" @click="showPasswordModal = false"
+                            class="px-8 py-4 text-sm font-black text-slate-400 uppercase tracking-widest hover:text-slate-600">Batal</button>
+                        <button type="submit"
+                            class="px-10 py-4 bg-red-500 text-white rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-red-900/20 hover:bg-red-600 transition-all">Ubah Password</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </x-layouts.admin>
