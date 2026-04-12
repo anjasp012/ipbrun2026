@@ -160,19 +160,23 @@
 
     <style>
         @keyframes inactiveTabPulseGlow {
-            0% {
-                box-shadow: 0 0 0 0 rgba(255, 40, 40, 0.8);
+            0%, 100% {
+                box-shadow: 0 0 10px 2px rgba(255, 0, 0, 0.6);
+                border-color: #ff0000;
+                color: #ff0000;
+                background-color: rgba(255, 0, 0, 0.05);
             }
-            70% {
-                box-shadow: 0 0 0 15px rgba(255, 40, 40, 0);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 40, 40, 0);
+            50% {
+                box-shadow: 0 0 25px 6px rgba(255, 0, 0, 0.9);
+                border-color: #ff0000;
+                color: #ff0000;
+                background-color: rgba(255, 0, 0, 0.15);
             }
         }
 
         .inactive-tab-pulse {
-            animation: inactiveTabPulseGlow 1.2s infinite;
+            animation: inactiveTabPulseGlow 1.2s ease-in-out infinite !important;
+            border: 2px solid #ff0000 !important;
             position: relative;
             z-index: 10;
         }
