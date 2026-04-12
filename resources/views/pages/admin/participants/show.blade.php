@@ -479,10 +479,14 @@
                                         <span
                                             class="px-4 py-1.5 bg-emerald-50 text-emerald-600 text-[11px] font-black uppercase rounded-xl border border-emerald-100">Paid
                                             Order</span>
-                                    @else
+                                    @elseif($order->status == 'pending')
                                         <span
                                             class="px-4 py-1.5 bg-orange-50 text-orange-600 text-[11px] font-black uppercase rounded-xl border border-orange-100 animate-pulse">Pending
                                             Order</span>
+                                    @else
+                                        <span
+                                            class="px-4 py-1.5 bg-slate-100 text-slate-500 text-[11px] font-black uppercase rounded-xl border border-slate-200">
+                                            {{ strtoupper($order->status) }}</span>
                                     @endif
                                 </div>
                                 @foreach ($entries as $entry)
