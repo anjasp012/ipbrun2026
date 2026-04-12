@@ -193,7 +193,7 @@
                                         <tr><td class="px-6 py-4 bg-slate-50/50">5K</td><td class="px-6 py-4">1 Jam</td></tr>
                                         <tr><td class="px-6 py-4 bg-slate-50/50">10K</td><td class="px-6 py-4">2 Jam</td></tr>
                                         <tr><td class="px-6 py-4 bg-slate-50/50">21K (Half Marathon)</td><td class="px-6 py-4 text-[#E8630A]">4 Jam</td></tr>
-                                        <tr><td class="px-6 py-4 bg-slate-50/50">42K (Full Marathon)</td><td class="px-6 py-4 text-[#E8630A]">6 Jam</td></tr>
+                                        <tr><td class="px-6 py-4 bg-slate-50/50">42K (Full Marathon)</td><td class="px-6 py-4 text-[#E8630A]">7 Jam</td></tr>
                                     </tbody>
                                 </table>
                             </div>
