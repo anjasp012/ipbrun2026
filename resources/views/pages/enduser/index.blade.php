@@ -19,7 +19,7 @@
 
                 <!-- Tab Switcher (Mobile Only) -->
                 <div class="flex justify-center mb-8 md:hidden">
-                    <div class="inline-flex p-1 bg-slate-50 rounded-xl border border-slate-200 shadow-sm w-full">
+                    <div class="inline-flex gap-2 p-1 bg-slate-50 rounded-xl border border-slate-200 shadow-sm w-full">
                         <button onclick="switchCategory('ipb')" id="tab-ipb"
                             class="flex-1 category-tab bg-[#00ACB1] text-white shadow-md px-4 py-3 rounded-lg text-xs font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap border border-transparent">
                             Tiket Kategori <br> Keluarga IPB
@@ -161,18 +161,18 @@
     <style>
         @keyframes inactiveTabPulseGlow {
             0% {
-                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 0 0 0 rgba(239, 68, 68, 0.4);
+                box-shadow: 0 0 0 0 rgba(255, 40, 40, 0.8);
             }
             70% {
-                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 0 0 8px rgba(239, 68, 68, 0);
+                box-shadow: 0 0 0 15px rgba(255, 40, 40, 0);
             }
             100% {
-                box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 0 0 0 rgba(239, 68, 68, 0);
+                box-shadow: 0 0 0 0 rgba(255, 40, 40, 0);
             }
         }
 
         .inactive-tab-pulse {
-            animation: inactiveTabPulseGlow 1.8s infinite;
+            animation: inactiveTabPulseGlow 1.2s infinite;
             position: relative;
             z-index: 10;
         }
