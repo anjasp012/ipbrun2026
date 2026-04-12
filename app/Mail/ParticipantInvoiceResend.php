@@ -45,7 +45,7 @@ class ParticipantInvoiceResend extends Mailable implements ShouldQueue
             with: [
                 'userExists'      => false,
                 'order'           => $this->orders->first(),
-                'resendNoCredentials' => true, // Flag to hide login credentials section
+                'resendNoCredentials' => is_null($this->password), // Show credentials if password exists
             ]
         );
     }

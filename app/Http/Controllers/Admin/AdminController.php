@@ -236,6 +236,7 @@ class AdminController extends Controller
     {
         $validated = $request->validate([
             'name'                          => 'required|string|max:255',
+            'email'                         => 'required|email|unique:participants,email,' . $participant->id . '|unique:users,email,' . ($participant->user_id ?: 'NULL') . ',id',
             'phone_number'                  => 'required|string|max:20',
             'nik'                           => 'required|string|max:16',
             'date_birth'                    => 'required|string',
@@ -255,7 +256,46 @@ class AdminController extends Controller
             'shuttle_bus'                   => 'nullable|string',
         ]);
 
+        $oldEmail = $participant->email;
+        $newEmail = $request->email;
+        $emailChanged = strtolower($oldEmail) !== strtolower($newEmail);
+
         $participant->update($validated);
+
+        if ($emailChanged) {
+            $user = $participant->user ?: \App\Models\User::where('email', $oldEmail)->first();
+
+            if ($user) {
+                // Reset password if email changed as requested
+                $randomPassword = \Illuminate\Support\Str::random(8);
+                $user->update([
+                    'email' => $newEmail,
+                    'username' => $newEmail,
+                    'password' => \Illuminate\Support\Facades\Hash::make($randomPassword)
+                ]);
+
+                if (!$participant->user_id) {
+                    $participant->update(['user_id' => $user->id]);
+                }
+
+                // Send New Credentials Email
+                $orders = \App\Models\Order::where('participant_id', $participant->id)
+                    ->whereIn('status', ['paid', 'pending'])
+                    ->latest()
+                    ->get();
+
+                if ($orders->isNotEmpty()) {
+                    try {
+                        \Illuminate\Support\Facades\Mail::to($newEmail)->send(
+                            new \App\Mail\ParticipantInvoiceResend($participant, $orders, $randomPassword)
+                        );
+                        return back()->with('success', 'Data peserta & Akun Login berhasil diperbarui. Email kredensial baru telah dikirim ke ' . $newEmail);
+                    } catch (\Exception $e) {
+                        return back()->with('success', 'Data peserta & Akun diperbarui, tapi GAGAL mengirim email: ' . $e->getMessage());
+                    }
+                }
+            }
+        }
 
         return back()->with('success', 'Data peserta berhasil diperbarui.');
     }

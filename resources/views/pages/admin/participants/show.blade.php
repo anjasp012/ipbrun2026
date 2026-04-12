@@ -1,6 +1,7 @@
 <x-layouts.admin title="Participant Profile & Logistics">
     <div x-data="{ 
         editing: false,
+        initialEmail: '{{ $participant->email }}',
         formatBestTime(e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 6) value = value.slice(0, 6);
@@ -44,9 +45,39 @@
                     window.location.href = '{{ route('participants.resend-invoice', $participant) }}';
                 }
             });
+        },
+        confirmSave(e) {
+            const currentEmail = document.getElementsByName('email')[0].value;
+            let message = 'Apakah Anda yakin ingin menyimpan perubahan data peserta ini?';
+            let icon = 'question';
+
+            if (currentEmail.toLowerCase() !== this.initialEmail.toLowerCase()) {
+                message = '<strong>PERHATIAN!</strong> Anda mengubah alamat email. <br><br> Sistem akan secara otomatis <strong>mereset password</strong> dan mengirimkan email kredensial baru ke: <br> <span class=\'text-blue-600 font-bold\'>' + currentEmail + '</span>';
+                icon = 'warning';
+            }
+
+            Swal.fire({
+                title: 'Simpan Perubahan?',
+                html: message,
+                icon: icon,
+                showCancelButton: true,
+                confirmButtonColor: '#00875a',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'YA, SIMPAN',
+                cancelButtonText: 'BATAL',
+                customClass: {
+                    popup: 'rounded-[2.5rem]',
+                    confirmButton: 'rounded-xl font-black px-8 py-4',
+                    cancelButton: 'rounded-xl font-black px-8 py-4'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    e.target.submit();
+                }
+            });
         }
     }">
-        <form action="{{ route('participants.update', $participant) }}" method="POST">
+        <form action="{{ route('participants.update', $participant) }}" method="POST" @submit.prevent="confirmSave($event)">
             @csrf
             @method('PUT')
 
@@ -115,9 +146,15 @@
 
                                 <div>
                                     <label
-                                        class="block text-sm font-bold text-slate-400 mb-2 uppercase tracking-widest opacity-60">Primary
-                                        Email (Locked)</label>
-                                    <p class="text-lg font-black text-slate-400">{{ $participant->email }}</p>
+                                        class="block text-sm font-bold text-slate-400 mb-2 uppercase tracking-widest">Primary
+                                        Email</label>
+                                    <template x-if="!editing">
+                                        <p class="text-lg font-black text-[#003366]">{{ $participant->email }}</p>
+                                    </template>
+                                    <template x-if="editing">
+                                        <input type="email" name="email" value="{{ $participant->email }}"
+                                            class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 font-bold text-[#003366]">
+                                    </template>
                                 </div>
 
                                 <div>
