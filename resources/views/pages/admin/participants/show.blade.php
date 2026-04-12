@@ -116,24 +116,26 @@
                             </div>
 
                             <div class="flex gap-4">
-                                <button type="button" @click="editing = !editing"
-                                    class="h-14 px-10 rounded-2xl font-black text-xs uppercase tracking-widest transition-all border shadow-sm flex items-center gap-2"
-                                    :class="editing ? 'bg-red-50 text-red-600 border-red-100' :
-                                        'bg-blue-50 text-blue-600 border-blue-100'">
-                                    <span x-text="editing ? 'CANCEL' : 'EDIT DATA'"></span>
-                                </button>
-                                <template x-if="editing">
-                                    <button type="submit"
-                                        class="h-14 px-10 bg-[#00875a] text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-emerald-900/10 hover:bg-emerald-700 transition-all">
-                                        SAVE CHANGES
+                                @if (in_array(auth()->user()->role, ['superadmin', 'admin']))
+                                    <template x-if="!editing">
+                                        <button type="button" @click="confirmResend()"
+                                            class="h-14 px-10 bg-slate-50 hover:bg-slate-100 text-slate-800 text-sm font-black uppercase tracking-widest rounded-2xl transition-all border border-slate-100 flex items-center shadow-sm">
+                                            Resend Invoice
+                                        </button>
+                                    </template>
+                                    <button type="button" @click="editing = !editing"
+                                        class="h-14 px-10 rounded-2xl font-black text-xs uppercase tracking-widest transition-all border shadow-sm flex items-center gap-2"
+                                        :class="editing ? 'bg-red-50 text-red-600 border-red-100' :
+                                            'bg-blue-50 text-blue-600 border-blue-100'">
+                                        <span x-text="editing ? 'CANCEL' : 'EDIT DATA'"></span>
                                     </button>
-                                </template>
-                                <template x-if="!editing">
-                                    <button type="button" @click="confirmResend()"
-                                        class="h-14 px-10 bg-slate-50 hover:bg-slate-100 text-slate-800 text-sm font-black uppercase tracking-widest rounded-2xl transition-all border border-slate-100 flex items-center shadow-sm">
-                                        Resend Invoice
-                                    </button>
-                                </template>
+                                    <template x-if="editing">
+                                        <button type="submit"
+                                            class="h-14 px-10 bg-[#00875a] text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-lg shadow-emerald-900/10 hover:bg-emerald-700 transition-all">
+                                            SAVE CHANGES
+                                        </button>
+                                    </template>
+                                @endif
                             </div>
                         </div>
 
