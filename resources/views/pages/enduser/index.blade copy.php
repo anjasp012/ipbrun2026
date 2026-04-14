@@ -66,6 +66,18 @@
                                                         <span
                                                             class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-slate-100 text-slate-500 border border-slate-200">Sold
                                                             Out</span>
+                                                    @elseif($qty < 10)
+                                                        <span
+                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-red-50 text-red-600 border border-red-100/50">Sisa:
+                                                            {{ $qty }}</span>
+                                                    @elseif($qty < 30)
+                                                        <span
+                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-amber-50 text-amber-600 border border-amber-100/50">Sisa:
+                                                            {{ $qty }}</span>
+                                                    @else
+                                                        <span
+                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-emerald-50 text-emerald-600 border border-emerald-100/50">Sisa:
+                                                            {{ $qty }}</span>
                                                     @endif
                                                 </div>
                                             </div>
