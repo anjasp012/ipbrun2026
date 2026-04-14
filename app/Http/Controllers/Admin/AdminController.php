@@ -110,21 +110,36 @@ class AdminController extends Controller
 
     public function exportParticipants(Request $request)
     {
-        $query = Participant::with(['raceEntries.ticket.category', 'raceEntries.ticket.period', 'raceEntries.order']);
+        $status = $request->status;
+        $ticketType = $request->ticket_type;
 
-        // Filter Status
-        if ($request->filled('status')) {
-            $status = $request->status;
+        $query = Participant::query();
+
+        // Constrain Relationship loading based on filters
+        $query->with(['raceEntries' => function ($q) use ($status, $ticketType) {
+            if ($status) {
+                $q->whereHas('order', function ($oq) use ($status) {
+                    $oq->where('status', $status);
+                });
+            }
+            if ($ticketType) {
+                $q->whereHas('ticket', function ($tq) use ($ticketType) {
+                    $tq->where('type', $ticketType);
+                });
+            }
+            $q->with(['ticket.category', 'ticket.period', 'order']);
+        }]);
+
+        // Filter Participants (WhereHas ensures the participant has at least one matching entry)
+        if ($status) {
             $query->whereHas('raceEntries.order', function ($rq) use ($status) {
                 $rq->where('status', $status);
             });
         }
 
-        // Filter Ticket Type
-        if ($request->filled('ticket_type')) {
-            $type = $request->ticket_type;
-            $query->whereHas('raceEntries.ticket', function ($rq) use ($type) {
-                $rq->where('type', $type);
+        if ($ticketType) {
+            $query->whereHas('raceEntries.ticket', function ($rq) use ($ticketType) {
+                $rq->where('type', $ticketType);
             });
         }
 
