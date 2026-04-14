@@ -22,7 +22,8 @@ class AdminController extends Controller
         $stats = [
             'total_revenue' => \App\Models\Order::where('status', 'paid')->sum('total_price'),
             'total_order' => \App\Models\Order::count(),
-            'total_participants' => Participant::count(),
+            'total_registered' => Participant::count(),
+            'total_participant' => User::where('role', 'participant')->count(),
             'total_remaining_tickets' => $totalCapacity - $totalTicketsSold,
             'is_running' => Setting::getValue('is_running', '0') === '1'
         ];
