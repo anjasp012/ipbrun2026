@@ -420,9 +420,12 @@
                                                 {{ $participant->shuttle_bus ?: '-' }}</p>
                                         </template>
                                         <template x-if="editing">
-                                            <input type="text" name="shuttle_bus"
-                                                value="{{ $participant->shuttle_bus }}"
+                                            <select name="shuttle_bus"
                                                 class="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 font-bold text-[#003366]">
+                                                <option value="" {{ $participant->shuttle_bus == '' ? 'selected' : '' }}>TIDAK MENGGUNAKAN</option>
+                                                <option value="Mall Botani Square" {{ $participant->shuttle_bus == 'Mall Botani Square' ? 'selected' : '' }}>MALL BOTANI SQUARE</option>
+                                                <option value="Terminal Bubulak" {{ $participant->shuttle_bus == 'Terminal Bubulak' ? 'selected' : '' }}>TERMINAL BUBULAK</option>
+                                            </select>
                                         </template>
                                     </div>
                                     <div>
