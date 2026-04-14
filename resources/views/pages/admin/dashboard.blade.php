@@ -163,7 +163,7 @@
                 <div class="bg-white p-8 rounded-xl border border-slate-100 shadow-sm">
                     <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL PENDAFTARAN</p>
                     <h4 class="text-3xl font-black text-slate-800">
-                        {{ number_format($stats['total_participantZ'], 0, ',', '.') }}</h4>
+                        {{ number_format($stats['total_participant'], 0, ',', '.') }}</h4>
                 </div>
                 {{-- Total Sisa Tiket --}}
                 <div @class([
