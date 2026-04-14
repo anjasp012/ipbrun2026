@@ -168,16 +168,12 @@ class AdminController extends Controller
             'Previous Events',
             'Medical Condition',
             'Shuttle Bus',
-            // Order Data
-            'Order Code',
-            'Order Status',
-            'Total Order Price',
-            'Registered At',
-            // Ticket Data
-            'Ticket Name',
-            'Category',
-            'Ticket Type',
-            'Registration Period'
+            // Consolidated Data
+            'Order Codes',
+            'Order Statuses',
+            'Ticket Details',
+            'Total Paid Amount',
+            'First Registered At'
         ];
 
         $callback = function () use ($participants, $columns) {
@@ -185,40 +181,46 @@ class AdminController extends Controller
             fputcsv($file, $columns);
 
             foreach ($participants as $p) {
-                foreach ($p->raceEntries as $entry) {
-                    fputcsv($file, [
-                        // Participant
-                        $p->name,
-                        $p->email,
-                        $p->phone_number,
-                        $p->nik,
-                        $p->date_birth,
-                        strtoupper($p->sex),
-                        $p->blood_type,
-                        $p->jersey_size,
-                        $p->nim_nrp ?: '-',
-                        $p->nationality,
-                        $p->address,
-                        $p->emergency_contact_name,
-                        $p->emergency_contact_phone_number,
-                        $p->emergency_contact_relationship,
-                        $p->running_community ?: '-',
-                        $p->best_time ?: '-',
-                        $p->previous_events ?: '-',
-                        $p->medical_condition ?: '-',
-                        $p->shuttle_bus ?: 'No',
-                        // Order
-                        $entry->order->order_code ?? '-',
-                        strtoupper($entry->order->status ?? ($entry->status ?? 'unknown')),
-                        $entry->order->total_price ?? 0,
-                        $p->created_at->format('Y-m-d H:i'),
-                        // Ticket
-                        $entry->ticket->name ?? ($entry->ticket->type ? strtoupper($entry->ticket->type) : '-'),
-                        $entry->ticket->category->name ?? '-',
-                        strtoupper($entry->ticket->type ?? '-'),
-                        $entry->ticket->period->name ?? 'Standard'
-                    ]);
-                }
+                // Aggregate Entry Data
+                $orderCodes = $p->raceEntries->map(fn($e) => $e->order->order_code ?? '-')->unique()->implode(' | ');
+                $statuses = $p->raceEntries->map(fn($e) => strtoupper($e->order->status ?? ($e->status ?? 'unknown')))->implode(' | ');
+                
+                $ticketDetails = $p->raceEntries->map(function($e) {
+                    $cat = $e->ticket->category->name ?? '-';
+                    $type = strtoupper($e->ticket->type ?? '-');
+                    return "($type - $cat)";
+                })->implode(' | ');
+
+                $totalPaid = $p->raceEntries->where('status', 'paid')->unique('order_id')->sum(fn($e) => $e->order->total_price ?? 0);
+
+                fputcsv($file, [
+                    // Participant
+                    $p->name,
+                    $p->email,
+                    $p->phone_number,
+                    $p->nik,
+                    $p->date_birth,
+                    strtoupper($p->sex),
+                    $p->blood_type,
+                    $p->jersey_size,
+                    $p->nim_nrp ?: '-',
+                    $p->nationality,
+                    $p->address,
+                    $p->emergency_contact_name,
+                    $p->emergency_contact_phone_number,
+                    $p->emergency_contact_relationship,
+                    $p->running_community ?: '-',
+                    $p->best_time ?: '-',
+                    $p->previous_events ?: '-',
+                    $p->medical_condition ?: '-',
+                    $p->shuttle_bus ?: 'No',
+                    // Consolidated Data
+                    $orderCodes,
+                    $statuses,
+                    $ticketDetails,
+                    $totalPaid,
+                    $p->created_at->format('Y-m-d H:i')
+                ]);
             }
 
             fclose($file);
