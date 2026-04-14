@@ -206,36 +206,57 @@ class TicketController extends Controller
             'nim_nrp' => 'NIM / NRP',
         ]);
 
-        // --- CUSTOM EMAIL VALIDATION LOGIC ---
+        // --- CUSTOM IDENTITY VALIDATION LOGIC (1 NIK, 1 NRP, 1 EMAIL) ---
         $email = $request->email;
+        $nik = $request->nik;
+        $nim = $request->nim_nrp;
 
-        // 1. Check in users table
+        // 1. Check if Email is already a registered User
         if (\App\Models\User::where('email', $email)->exists()) {
             return back()->withInput()->withErrors([
-                'email' => 'Email ini sudah terdaftar sebagai akun pengguna. Silakan gunakan email lain atau login.'
+                'email' => 'Email ini sudah terdaftar. Silakan LOGIN ke akun Anda untuk membeli tiket tambahan.'
             ]);
         }
 
-        // 2. Check in participants table for active orders
-        $existingParticipants = Participant::where('email', $email)->get();
-        foreach ($existingParticipants as $p) {
-            $hasActiveOrder = Order::where('participant_id', $p->id)
-                ->whereIn('status', ['pending', 'paid'])
-                ->exists();
+        // 2. Check for Active Registrations by Email
+        $participantByEmail = Participant::where('email', $email)->first();
+        if ($participantByEmail && Order::where('participant_id', $participantByEmail->id)->whereIn('status', ['pending', 'paid'])->exists()) {
+            return back()->withInput()->withErrors([
+                'email' => 'Email ini sudah memiliki pendaftaran yang aktif. Silakan LOGIN untuk mengecek dashboard Anda.'
+            ]);
+        }
 
-            if ($hasActiveOrder) {
+        // 3. Check for Active Registrations by NIK
+        $participantByNik = Participant::where('nik', $nik)->first();
+        if ($participantByNik && Order::where('participant_id', $participantByNik->id)->whereIn('status', ['pending', 'paid'])->exists()) {
+            return back()->withInput()->withErrors([
+                'nik' => 'NIK ini sudah terdaftar dengan pendaftaran yang aktif. Silakan LOGIN menggunakan email pendaftaran sebelumnya.'
+            ]);
+        }
+
+        // 4. Check for Active Registrations by NIM/NRP (if IPB Category)
+        if ($nim) {
+            $participantByNim = Participant::where('nim_nrp', $nim)->first();
+            if ($participantByNim && Order::where('participant_id', $participantByNim->id)->whereIn('status', ['pending', 'paid'])->exists()) {
                 return back()->withInput()->withErrors([
-                    'email' => 'Email ini sudah digunakan untuk pendaftaran yang sedang aktif (Pending/Paid).'
+                    'nim_nrp' => 'NIM/NRP ini sudah terdaftar dengan pendaftaran yang aktif. Silakan LOGIN menggunakan email pendaftaran sebelumnya.'
                 ]);
             }
         }
 
-        // 3. If only failed orders exist, cleanup the old participant data (as requested)
-        foreach ($existingParticipants as $p) {
-            // Check again to be super safe
+        // 5. Cleanup logic: If NIK/Email exists but only has FAILED/EXPIRED orders, 
+        // we allow them to re-register by cleaning up the old (unused) participant records.
+        $allIdentities = Participant::where('email', $email)
+            ->orWhere('nik', $nik)
+            ->when($nim, fn($q) => $q->orWhere('nim_nrp', $nim))
+            ->get();
+
+        foreach ($allIdentities as $p) {
             $hasActive = Order::where('participant_id', $p->id)->whereIn('status', ['pending', 'paid'])->exists();
             if (!$hasActive) {
-                $p->delete(); // Assuming cascading deletes orders & race_entries
+                // If the participant has NO active/pending orders, we delete the record so they can start fresh
+                // This handles cases where they registered but let the 10-minute window expire.
+                $p->delete(); 
             }
         }
         // --- END CUSTOM VALIDATION ---
