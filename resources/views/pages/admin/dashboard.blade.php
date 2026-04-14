@@ -147,18 +147,6 @@
                         {{ number_format($stats['total_revenue'], 0, ',', '.') }}
                     </h4>
                 </div>
-                {{-- Total Pendaftar --}}
-                <div class="bg-white p-8 rounded-xl border border-slate-100 shadow-sm">
-                    <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL PENDAFTAR</p>
-                    <h4 class="text-3xl font-black text-slate-800">
-                        {{ number_format($stats['total_registered'], 0, ',', '.') }}</h4>
-                </div>
-                {{-- Total Order --}}
-                <div class="bg-white p-8 rounded-xl border border-slate-100 shadow-sm">
-                    <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL ORDER</p>
-                    <h4 class="text-3xl font-black text-slate-800">
-                        {{ number_format($stats['total_order'], 0, ',', '.') }}</h4>
-                </div>
                 {{-- Total Peserta --}}
                 <div class="bg-white p-8 rounded-xl border border-slate-100 shadow-sm">
                     <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL PESERTA AKTIF</p>
