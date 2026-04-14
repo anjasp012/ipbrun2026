@@ -16,7 +16,10 @@ class AdminController extends Controller
     public function dashboard()
     {
         // 1. Ringkasan Data
-        $totalTicketsSold = RaceEntry::where('status', 'paid')->count();
+        $totalTicketsSold = RaceEntry::where('status', 'paid')
+            ->whereHas('ticket.period', function($q) {
+                $q->where('name', '!=', 'Invitation & Sponsorship');
+            })->count();
         $totalOrders = \App\Models\Order::where('status', 'paid')->count();
         $totalCapacity = \App\Models\Ticket::sum('qty');
 
@@ -25,6 +28,7 @@ class AdminController extends Controller
             'total_order' => \App\Models\Order::count(),
             'total_registered' => Participant::count(),
             'total_participant' => User::where('role', 'participant')->count(),
+            'total_tickets_sold' => $totalTicketsSold,
             'total_remaining_tickets' => $totalCapacity - $totalTicketsSold,
             'is_running' => Setting::getValue('is_running', '0') === '1'
         ];

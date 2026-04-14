@@ -159,12 +159,18 @@
                     <h4 class="text-3xl font-black text-slate-800">
                         {{ number_format($stats['total_order'], 0, ',', '.') }}</h4>
                 </div>
-                <!-- {{-- Total Peserta --}}
+                {{-- Total Peserta --}}
                 <div class="bg-white p-8 rounded-xl border border-slate-100 shadow-sm">
                     <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL PESERTA AKTIF</p>
                     <h4 class="text-3xl font-black text-slate-800">
                         {{ number_format($stats['total_participant'], 0, ',', '.') }}</h4>
-                </div> -->
+                </div>
+                {{-- Total Tiket Terjual --}}
+                <div class="bg-white p-8 rounded-xl border border-slate-100 shadow-sm bg-blue-50/10">
+                    <p class="text-[11px] font-black text-blue-600 uppercase tracking-widest mb-3">TOTAL TIKET TERJUAL</p>
+                    <h4 class="text-3xl font-black text-blue-700">
+                        {{ number_format($stats['total_tickets_sold'], 0, ',', '.') }}</h4>
+                </div>
                 {{-- Total Sisa Tiket --}}
                 <div @class([
                     'bg-white p-8 rounded-xl border border-slate-100 shadow-sm border-l-[6px] border-l-emerald-500',
