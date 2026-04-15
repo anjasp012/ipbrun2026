@@ -570,27 +570,72 @@
                     </div>
                     <div
                         class="bg-gradient-to-br from-[#003366] to-[#001c38] p-10 rounded-[2.5rem] shadow-[0_30px_60px_-15px_rgba(0,51,102,0.3)] relative overflow-hidden group">
-                        <div class="relative z-10">
-                            <h4 class="text-sm font-black text-white/40 uppercase tracking-[5px] mb-10">Financial
-                                Overview
-                            </h4>
-                            <div class="space-y-8"> @php
-                                $paidOrders = \App\Models\Order::where('participant_id', $participant->id)
-                                    ->where('status', 'paid')
-                                    ->get();
-                            @endphp @foreach ($paidOrders as $o)
-                                    <div
-                                        class="flex justify-between items-center text-base text-white/70 font-black uppercase tracking-widest">
-                                        <span class="opacity-60">Order #{{ $o->order_code }}</span> <span
-                                            class="text-white">IDR
-                                            {{ number_format($o->total_price, 0, ',', '.') }}</span>
+                        <div class="relative z-10 w-full">
+                            <h4 class="text-sm font-black text-white/40 uppercase tracking-[5px] mb-10">Financial Overview</h4>
+                            <div class="space-y-10">
+                                @forelse($participant->orders->sortBy('created_at') as $o)
+                                    <div class="space-y-4 pb-10 border-b border-white/5 last:border-0 last:pb-0">
+                                        <div class="flex justify-between items-center">
+                                            <div class="flex flex-col">
+                                                <span class="text-[10px] font-black {{ $o->status == 'paid' ? 'text-emerald-400' : 'text-orange-400' }} uppercase tracking-widest mb-1">
+                                                    Order {{ strtoupper($o->status) }}
+                                                </span>
+                                                <span class="text-sm font-black text-white uppercase tracking-widest">#{{ $o->order_code }}</span>
+                                            </div>
+                                            <span class="text-xl font-black text-white tracking-tighter">
+                                                IDR {{ number_format($o->total_price, 0, ',', '.') }}
+                                            </span>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 gap-2 pl-4 border-l-2 border-white/10 mt-4">
+                                            {{-- Voucher Info --}}
+                                            @if($o->voucher_code)
+                                                <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest">
+                                                    <span class="text-white/40 italic">Voucher: {{ $o->voucher_code }}</span>
+                                                    <span class="text-emerald-400">- IDR {{ number_format($o->discount_amount, 0, ',', '.') }}</span>
+                                                </div>
+                                            @endif
+
+                                            {{-- Donations --}}
+                                            @if($o->donation_event > 0)
+                                                <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest">
+                                                    <span class="text-white/40">Donasi Event</span>
+                                                    <span class="text-white/80">IDR {{ number_format($o->donation_event, 0, ',', '.') }}</span>
+                                                </div>
+                                            @endif
+                                            @if($o->donation_scholarship > 0)
+                                                <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest">
+                                                    <span class="text-white/40">Donasi Beasiswa</span>
+                                                    <span class="text-white/80">IDR {{ number_format($o->donation_scholarship, 0, ',', '.') }}</span>
+                                                </div>
+                                            @endif
+
+                                            {{-- Admin Fee --}}
+                                            <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest">
+                                                <span class="text-white/40">Admin Fee</span>
+                                                <span class="text-white/80">IDR {{ number_format($o->admin_fee, 0, ',', '.') }}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                @endforeach
-                                <div class="flex justify-between items-center pt-10 border-t border-white/10"> <span
-                                        class="text-sm font-black text-white/40 uppercase tracking-[5px]">Total
-                                        Paid</span>
-                                    <span class="text-4xl font-black text-[#E8630A] uppercase tracking-tighter">IDR
-                                        {{ number_format($paidOrders->sum('total_price'), 0, ',', '.') }}</span>
+                                @empty
+                                    <div class="text-center py-10 opacity-30 italic uppercase text-xs font-black tracking-widest text-white">
+                                        Belum ada history transaksi
+                                    </div>
+                                @endforelse
+
+                                <div class="pt-10 border-t-2 border-dashed border-white/10">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-[10px] font-black text-white/40 uppercase tracking-[4px]">Total Paid Amount</span>
+                                        <span class="text-3xl font-black text-[#E8630A] uppercase tracking-tighter">
+                                            IDR {{ number_format($participant->orders->where('status', 'paid')->sum('total_price'), 0, ',', '.') }}
+                                        </span>
+                                    </div>
+                                    <div class="flex justify-between items-center opacity-40">
+                                        <span class="text-[9px] font-black text-white uppercase tracking-[4px]">Potential (Pending)</span>
+                                        <span class="text-sm font-black text-white uppercase tracking-tighter">
+                                            IDR {{ number_format($participant->orders->where('status', 'pending')->sum('total_price'), 0, ',', '.') }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -32,6 +32,11 @@ class Participant extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
     public function vouchers(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Voucher::class, 'voucher_usages')
