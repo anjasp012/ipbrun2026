@@ -309,7 +309,6 @@
             const ticketPrice = {{ $ticket->price }};
             const adminFee = 4500;
             const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
-            const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
             let currentDiscount = 0;
             let currentVoucher = { type: null, value: 0 };
 
