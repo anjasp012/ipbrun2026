@@ -29,7 +29,7 @@ class Voucher extends Model
 
     public function getUsedCountAttribute()
     {
-        return $this->usages()->count();
+        return $this->usages()->distinct('participant_id')->count('participant_id');
     }
 
     public function isAvailable()

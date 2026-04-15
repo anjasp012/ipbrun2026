@@ -112,16 +112,17 @@ class TicketController extends Controller
         $potentialDiscount = 0;
         if ($pairRecommendation) {
             $potentialVoucher = Voucher::where('code', $participant->nik)->first();
-            if ($potentialVoucher && $potentialVoucher->isAvailable()) {
-                // Check usage limit for this participant
+            if ($potentialVoucher) {
+                // Determine if this participant already used this specific voucher
                 $alreadyUsed = VoucherUsage::where('voucher_id', $potentialVoucher->id)
                     ->where('participant_id', $participant->id)
                     ->exists();
 
-                if (!$alreadyUsed) {
+                // Allow if either global stock is available OR this participant already used it (no extra quota cost)
+                if ($potentialVoucher->isAvailable() || $alreadyUsed) {
                     $potentialDiscount = $potentialVoucher->calculateDiscount($pairRecommendation->price);
                 } else {
-                    $potentialVoucher = null; // Already used
+                    $potentialVoucher = null; // Quota full and not a previous user
                 }
             }
         }
@@ -418,19 +419,14 @@ class TicketController extends Controller
         $discountAmount = 0;
 
         if ($voucher) {
-            if ($voucher->isAvailable()) {
-                // Check if THIS participant has used it
-                $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
-                    ->where('participant_id', $latestParticipant->id)
-                    ->exists();
+            $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
+                ->where('participant_id', $latestParticipant->id)
+                ->exists();
 
-                if (!$alreadyUsed) {
-                    $discountAmount = $voucher->calculateDiscount($ticket->price);
-                } else {
-                    $voucher = null; // Clear it if already used
-                }
+            if ($voucher->isAvailable() || $alreadyUsed) {
+                $discountAmount = $voucher->calculateDiscount($ticket->price);
             } else {
-                $voucher = null; // Clear if quota reached
+                $voucher = null; // Clear if quota reached and not a previous user
             }
         }
 
