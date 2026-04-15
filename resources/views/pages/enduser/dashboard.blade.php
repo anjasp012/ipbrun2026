@@ -89,7 +89,7 @@
                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                 <div class="absolute -right-20 -top-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
                 
-                <div class="relative z-10 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12">
+                <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
                     <div class="flex-grow text-center lg:text-left">
                         <h4 class="text-2xl md:text-3xl font-black uppercase tracking-tight mb-6 leading-tight">Pendaftaran Tiket Tambahan</h4>
                         <p class="text-[12px] md:text-[13px] text-white/70 font-bold uppercase tracking-widest leading-loose italic opacity-80">
