@@ -9,7 +9,7 @@
             class="max-w-7xl mx-auto w-full bg-white/95 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 relative flex flex-col p-6 md:p-16 overflow-hidden">
 
             <!-- Title Section for Community -->
-            <div class="text-center mb-12 relative z-10">
+            <div class="text-center mb-6 relative z-10">
                 <h1 class="text-3xl md:text-5xl font-black text-[#003366] uppercase tracking-tighter mb-4">Registrasi Komunitas</h1>
                 <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px] md:text-xs">Gunakan kode voucher komunitas Anda di halaman checkout</p>
                 <div class="h-1.5 w-20 bg-orange-500 mx-auto rounded-full mt-6"></div>
@@ -24,16 +24,16 @@
                     ];
                 @endphp
 
-                <!-- Tab Switcher (Mobile Only) -->
-                <div class="flex justify-center mb-8 md:hidden">
-                    <div class="inline-flex gap-2 p-1 bg-slate-50 rounded-xl border border-slate-200 shadow-sm w-full">
+                <!-- Tab Switcher (Mobile & Desktop) -->
+                <div class="flex justify-center mb-12">
+                    <div class="inline-flex gap-2 p-1.5 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm w-full md:w-auto md:min-w-[400px]">
                         <button onclick="switchCategory('ipb')" id="tab-ipb"
-                            class="flex-1 category-tab bg-[#00ACB1] text-white shadow-md px-4 py-3 rounded-lg text-xs font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap border border-transparent">
-                            Tiket Kategori <br> Keluarga IPB
+                            class="flex-1 category-tab bg-[#00ACB1] text-white shadow-md px-6 py-4 rounded-xl text-xs md:text-sm font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap border border-transparent">
+                            Tiket Kategori <br class="md:hidden"> Keluarga IPB
                         </button>
                         <button onclick="switchCategory('umum')" id="tab-umum"
-                            class="flex-1 category-tab inactive-tab-pulse px-4 py-3 rounded-lg text-xs font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap text-slate-500 hover:text-[#00ACB1] border border-transparent">
-                            Tiket Kategori <br> Umum
+                            class="flex-1 category-tab inactive-tab-pulse px-6 py-4 rounded-xl text-xs md:text-sm font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap text-slate-500 hover:text-[#00ACB1] border border-transparent">
+                            Tiket Kategori <br class="md:hidden"> Umum
                         </button>
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                 @foreach ($ticketGroups as $group)
                     @if (count($group['data']) > 0)
                         <div id="section-{{ $group['id'] }}"
-                            class="ticket-section md:!block {{ $group['id'] !== 'ipb' ? 'hidden' : '' }} mb-16 last:mb-0">
+                            class="ticket-section {{ $group['id'] !== 'ipb' ? 'hidden' : '' }} mb-16 last:mb-0">
                             {{-- Section Header --}}
                             <div class="flex items-center gap-4 mb-8">
                                 <div class="w-1.5 h-8 bg-[#003366] rounded-full"></div>
