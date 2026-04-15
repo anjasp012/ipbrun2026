@@ -101,13 +101,13 @@
                                 @if($voucher->used_count > 0)
                                         <button @click="detailVoucher = {{ json_encode([
                                             'code' => $voucher->code,
-                                            'participants' => $voucher->usages->map(fn($u) => [
-                                                'name' => $u->participant->name,
-                                                'nik' => $u->participant->nik,
-                                                'order_code' => $u->order->order_code,
-                                                'date' => $u->created_at->format('d M Y, H:i'),
-                                                'status' => strtoupper($u->order->status)
-                                            ])
+                                            'participants' => $voucher->usages->groupBy('participant_id')->map(fn($group) => [
+                                                'name' => $group->first()->participant->name,
+                                                'nik' => $group->first()->participant->nik,
+                                                'order_codes' => $group->map(fn($u) => $u->order->order_code)->toArray(),
+                                                'dates' => $group->map(fn($u) => $u->created_at->format('d/m/Y'))->toArray(),
+                                                'statuses' => $group->map(fn($u) => strtoupper($u->order->status))->toArray()
+                                            ])->values()
                                         ]) }}; showDetailModal = true"
                                             class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-[#003366] font-black rounded-xl hover:bg-blue-100 transition-all text-[10px] uppercase tracking-widest border border-blue-100">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
