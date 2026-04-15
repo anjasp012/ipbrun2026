@@ -22,11 +22,11 @@
                     <div class="inline-flex gap-2 p-1 bg-slate-50 rounded-xl border border-slate-200 shadow-sm w-full">
                         <button onclick="switchCategory('ipb')" id="tab-ipb"
                             class="flex-1 category-tab bg-[#00ACB1] text-white shadow-md px-4 py-3 rounded-lg text-xs font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap border border-transparent">
-                            Tiket Kategori <br> Keluarga IPB
+                            Kategori <br> Keluarga IPB
                         </button>
                         <button onclick="switchCategory('umum')" id="tab-umum"
                             class="flex-1 category-tab inactive-tab-pulse px-4 py-3 rounded-lg text-xs font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap text-slate-500 hover:text-[#00ACB1] border border-transparent">
-                            Tiket Kategori <br> Umum
+                            Kategori <br> Umum
                         </button>
                     </div>
                 </div>
