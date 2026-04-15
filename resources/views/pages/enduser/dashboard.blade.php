@@ -91,12 +91,10 @@
                 
                 <div class="relative z-10 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12">
                     <div class="flex-grow text-center lg:text-left">
-                        <span class="inline-block px-4 py-1.5 bg-white/10 text-white rounded-full text-[9px] font-black uppercase tracking-[3px] mb-6">Penawaran Eksklusif</span>
-                        <h4 class="text-2xl md:text-3xl font-black uppercase tracking-tight mb-6 leading-tight">Ikuti Kategori Tambahan <br class="hidden md:block"> & Maksimalkan Pengalaman Anda</h4>
+                        <h4 class="text-2xl md:text-3xl font-black uppercase tracking-tight mb-6 leading-tight">Pendaftaran Tiket Tambahan</h4>
                         <p class="text-[12px] md:text-[13px] text-white/70 font-bold uppercase tracking-widest leading-loose italic opacity-80">
-                            Berdasarkan pendaftaran Anda, Anda memenuhi kualifikasi untuk mengikuti kategori 
-                            <span class="text-white border-b border-orange-500">{{ $pairRecommendation->category->name }}</span> (HARI {{ (str_contains(strtoupper($pairRecommendation->category->name), '5K') || str_contains(strtoupper($pairRecommendation->category->name), '42K')) ? 'SABTU' : 'MINGGU' }}).
-                        </p>
+                        Anda memenuhi kualifikasi untuk mengikuti kategori 10K (HARI MINGGU). Gunakan tombol di samping untuk mendaftar secara instan        
+                    </p>
                     </div>
 
                     <div class="w-full lg:w-auto text-center border-t lg:border-t-0 lg:border-l border-white/10 pt-10 lg:pt-0 lg:pl-16 flex flex-col items-center lg:items-end">
