@@ -105,10 +105,13 @@
                                             </div>
 
                                             @if ($qty > 0)
-                                                <a href="{{ route('komunitas.checkout', $ticket->id) }}"
-                                                    class="w-full bg-[#003366] text-white py-2 md:py-2.5 rounded-lg md:rounded-xl font-[800] text-[12px] md:text-[15px] transition-all active:scale-95 hover:bg-[#002244] flex items-center justify-center">
-                                                    Daftar
-                                                </a>
+                                                @auth
+                                                    @else
+                                                    <a href="{{ route('komunitas.checkout', $ticket->id) }}"
+                                                        class="w-full bg-[#003366] text-white py-2 md:py-2.5 rounded-lg md:rounded-xl font-[800] text-[12px] md:text-[15px] transition-all active:scale-95 hover:bg-[#002244] flex items-center justify-center">
+                                                        Daftar
+                                                    </a>
+                                                @endauth
                                             @else
                                                 <div
                                                     class="w-full py-2 md:py-2.5 bg-slate-100 text-slate-400 text-center rounded-lg md:rounded-xl font-[900] text-[12px] md:text-[15px] uppercase tracking-wider cursor-not-allowed">
