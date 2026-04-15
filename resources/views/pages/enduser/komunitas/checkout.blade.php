@@ -656,13 +656,19 @@
                 // Recalculate discount if voucher exists
                 let subtotalBeforeDiscount = ticketPrice + adminFee + donEvent + donScholar + secondPrice;
                 const txtDetail = document.getElementById('txt_voucher_detail');
+                const txtCode = document.getElementById('txt_voucher_code');
 
                 if (currentVoucher.type === 'nominal') {
                     currentDiscount = Math.min(currentVoucher.value, subtotalBeforeDiscount);
-                    if (txtDetail) txtDetail.innerText = ' - Rp ' + currentVoucher.value.toLocaleString('id-ID');
+                    if (txtDetail) txtDetail.innerText = ' (Rp ' + currentVoucher.value.toLocaleString('id-ID') + ')';
+                    if (txtCode && txtCode.innerText) txtCode.innerText = txtCode.innerText.split(':')[0] + ': ';
                 } else if (currentVoucher.type === 'percentage') {
                     currentDiscount = Math.floor(subtotalBeforeDiscount * (currentVoucher.value / 100));
-                    if (txtDetail) txtDetail.innerText = ' - ' + currentVoucher.value + '%';
+                    if (txtDetail) txtDetail.innerText = ' (' + currentVoucher.value + '%)';
+                    // Ensure the code label is clean
+                    if (txtCode && txtCode.innerText && !txtCode.innerText.includes(':')) {
+                         // Optional: could add logic here if needed
+                    }
                 }
 
                 if (currentDiscount > 0) {
