@@ -41,7 +41,7 @@
                 @foreach ($ticketGroups as $group)
                     @if (count($group['data']) > 0)
                         <div id="section-{{ $group['id'] }}"
-                            class="ticket-section {{ $group['id'] !== 'ipb' ? 'hidden' : '' }} mb-16 last:mb-0">
+                            class="ticket-section {{ $group['id'] !== 'ipb' ? 'hidden' : '' }} lg:mb-16 last:mb-0">
                             {{-- Section Header --}}
                             <div class="flex items-center gap-4 mb-8">
                                 <div class="w-1.5 h-8 bg-[#003366] rounded-full"></div>
