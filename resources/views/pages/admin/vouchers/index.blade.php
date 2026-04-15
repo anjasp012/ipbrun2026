@@ -290,30 +290,59 @@
                                     <th class="pb-4">Nama Peserta</th>
                                     <th class="pb-4">NIK</th>
                                     <th class="pb-4">Kode Order</th>
-                                    <th class="pb-4">Tanggal Pakai</th>
+                                    <th class="pb-4 text-center">Tanggal Pakai</th>
                                     <th class="pb-4 text-right">Status</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-50">
-                                <template x-for="item in detailVoucher.participants" :key="item.order_code">
+                                <template x-for="person in detailVoucher.participants" :key="person.nik">
                                     <tr class="text-xs group">
                                         <td class="py-4">
-                                            <div class="font-black text-slate-700 uppercase" x-text="item.name"></div>
+                                            <div class="font-black text-slate-700 uppercase" x-text="person.name"></div>
                                         </td>
-                                        <td class="py-4 font-mono font-bold text-slate-400" x-text="item.nik"></td>
+                                        <td class="py-4 font-mono font-bold text-slate-400" x-text="person.nik"></td>
                                         <td class="py-4">
-                                            <span class="px-2 py-1 bg-slate-50 border border-slate-100 rounded text-[10px] font-black text-[#003366]" x-text="item.order_code"></span>
+                                            <div class="flex flex-wrap gap-2">
+                                                <template x-for="(code, idx) in person.order_codes">
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="px-2 py-0.5 bg-slate-50 border border-slate-100 rounded text-[9px] font-black text-[#003366]" x-text="code"></span>
+                                                        <template x-if="idx < person.order_codes.length - 1">
+                                                            <span class="text-slate-300 font-bold">|</span>
+                                                        </template>
+                                                    </div>
+                                                </template>
+                                            </div>
                                         </td>
-                                        <td class="py-4 text-slate-400 font-bold" x-text="item.date"></td>
+                                        <td class="py-4 text-center">
+                                             <div class="flex flex-wrap justify-center gap-2">
+                                                <template x-for="(date, idx) in person.dates">
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="text-slate-400 font-bold" x-text="date"></span>
+                                                        <template x-if="idx < person.dates.length - 1">
+                                                            <span class="text-slate-300 font-bold">|</span>
+                                                        </template>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                        </td>
                                         <td class="py-4 text-right">
-                                            <span class="text-[9px] font-black px-2.5 py-1 rounded uppercase tracking-widest"
-                                                :class="{
-                                                    'bg-emerald-50 text-emerald-600': item.status === 'PAID',
-                                                    'bg-amber-50 text-amber-600': item.status === 'PENDING',
-                                                    'bg-rose-50 text-rose-600': item.status === 'EXPIRED' || item.status === 'FAILED'
-                                                }"
-                                                x-text="item.status">
-                                            </span>
+                                            <div class="flex flex-wrap justify-end gap-2">
+                                                <template x-for="(status, idx) in person.statuses">
+                                                    <div class="flex items-center gap-1">
+                                                        <span class="text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-widest"
+                                                            :class="{
+                                                                'bg-emerald-50 text-emerald-600': status === 'PAID',
+                                                                'bg-amber-50 text-amber-600': status === 'PENDING',
+                                                                'bg-rose-50 text-rose-600': ['EXPIRED', 'FAILED'].includes(status)
+                                                            }"
+                                                            x-text="status">
+                                                        </span>
+                                                        <template x-if="idx < person.statuses.length - 1">
+                                                            <span class="text-slate-300 font-bold">|</span>
+                                                        </template>
+                                                    </div>
+                                                </template>
+                                            </div>
                                         </td>
                                     </tr>
                                 </template>
