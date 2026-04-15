@@ -271,7 +271,10 @@ class CommunityTicketController extends Controller
 
             $participant = Participant::updateOrCreate(
                 ['nik' => $nik],
-                \Illuminate\Support\Arr::except($validated, ['email_confirmation', 'ticket_id', 'other_race_interest', 'voucher_code', 'donation_event', 'donation_scholarship'])
+                array_merge(
+                    \Illuminate\Support\Arr::except($validated, ['email_confirmation', 'ticket_id', 'other_race_interest', 'voucher_code', 'donation_event', 'donation_scholarship']),
+                    ['is_community' => true]
+                )
             );
 
             $orderCode = 'IPBR26-' . strtoupper(Str::random(6));
