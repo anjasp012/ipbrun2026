@@ -29,19 +29,23 @@ class CommunityTicketController extends Controller
 
     public function home()
     {
-        $isMaintenance = Setting::getValue('is_running', '0') !== '1';
-        if ($isMaintenance) {
-            return view('pages.enduser.coming-soon');
-        }
+        $isMaintenance = Setting::where('key', 'is_running')->first()?->value !== '1';
+        $ticketSaleStart = Setting::where('key', 'ticket_sale_start')->first()?->value;
+        $ticketSaleStartValue = $ticketSaleStart ? \Carbon\Carbon::parse($ticketSaleStart, 'Asia/Jakarta') : null;
 
-        $tickets = Ticket::whereHas('period', function ($query) {
+        $tickets_ipb = Ticket::where('type', 'ipb')->whereHas('period', function ($query) {
             $query->where('is_active', true);
-        })->with(['category', 'period'])
-            ->withCount(['raceEntries as participants_count' => function ($query) {
-                $query->whereIn('status', ['pending', 'paid']);
-            }])->get();
+        })->with(['category', 'period'])->withCount(['raceEntries as participants_count' => function ($query) {
+            $query->whereIn('status', ['pending', 'paid']);
+        }])->get();
 
-        return view('pages.enduser.komunitas.index', compact('tickets'));
+        $tickets_public = Ticket::where('type', 'umum')->whereHas('period', function ($query) {
+            $query->where('is_active', true);
+        })->with(['category', 'period'])->withCount(['raceEntries as participants_count' => function ($query) {
+            $query->whereIn('status', ['pending', 'paid']);
+        }])->get();
+
+        return view('pages.enduser.komunitas.index', compact('tickets_ipb', 'tickets_public', 'isMaintenance', 'ticketSaleStart', 'ticketSaleStartValue'));
     }
 
     public function checkout(Ticket $ticket)
