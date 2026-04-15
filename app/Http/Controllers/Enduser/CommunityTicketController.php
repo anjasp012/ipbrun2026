@@ -133,32 +133,76 @@ class CommunityTicketController extends Controller
     public function register(Request $request)
     {
         $ticket = Ticket::findOrFail($request->ticket_id);
+        $nimRule = ($ticket->type === 'ipb') ? 'required|string|min:6' : 'nullable|string|min:6';
         
         $validated = $request->validate([
             'ticket_id' => 'required',
             'name' => 'required|string|max:255',
             'email' => 'required|email',
+            'email_confirmation' => 'required|same:email',
             'phone_number' => 'required|numeric',
             'nik' => 'required|numeric|digits:16',
             'date_birth' => 'required',
             'sex' => 'required|in:male,female',
             'blood_type' => 'required|in:A,A+,A-,B,B+,B-,AB,AB+,AB-,O,O+,O-,-',
             'jersey_size' => 'required|in:XS,S,M,L,XL,2XL,3XL,4XL,5XL',
+            'nim_nrp' => $nimRule,
             'nationality' => 'required',
             'address' => 'required|string',
             'emergency_contact_name' => 'required|string',
             'emergency_contact_phone_number' => 'required|numeric',
             'emergency_contact_relationship' => 'required|string',
             'running_community' => 'nullable|string',
+            'previous_events' => 'nullable|string',
+            'best_time' => 'nullable|string',
             'shuttle_bus' => 'nullable|string',
             'medical_condition' => 'nullable|string',
             'voucher_code' => 'nullable|string',
+            'donation_event' => 'nullable|numeric',
+            'donation_scholarship' => 'nullable|numeric',
+        ], [
+            'required' => ':attribute wajib diisi.',
+            'email' => 'Format email tidak valid.',
+            'same' => 'Konfirmasi email tidak cocok.',
+            'numeric' => ':attribute harus berupa angka.',
+            'digits' => ':attribute harus berjumlah :digits digit.',
+            'in' => 'Pilihan :attribute tidak valid.',
+            'min' => ':attribute minimal :min karakter.',
+        ], [
+            'name' => 'Nama Lengkap',
+            'email' => 'Alamat Email',
+            'email_confirmation' => 'Konfirmasi Email',
+            'phone_number' => 'Nomor WhatsApp',
+            'nik' => 'NIK KTP',
+            'date_birth' => 'Tanggal Lahir',
+            'sex' => 'Jenis Kelamin',
+            'blood_type' => 'Golongan Darah',
+            'jersey_size' => 'Ukuran Jersey',
+            'address' => 'Alamat Lengkap',
+            'emergency_contact_name' => 'Nama Kontak Darurat',
+            'emergency_contact_phone_number' => 'Nomor HP Darurat',
+            'emergency_contact_relationship' => 'Hubungan Kontak',
+            'nim_nrp' => 'NIM / NRP',
         ]);
 
         $nik = $request->nik;
         $email = $request->email;
+        $nim = $request->nim_nrp;
 
-        // Identity check: One NIK cannot buy SAME ticket category twice if active
+        // Cleanup logic (Copy from TicketController)
+        $allIdentities = Participant::where('email', $email)
+            ->orWhere('nik', $nik)
+            ->when($nim, fn($q) => $q->orWhere('nim_nrp', $nim))
+            ->get();
+
+        foreach ($allIdentities as $p) {
+            $hasActive = Order::where('participant_id', $p->id)->whereIn('status', ['pending', 'paid'])->exists();
+            if (!$hasActive) {
+                $p->delete(); 
+            }
+        }
+
+        // Duplicate check (active orders)
         $duplicateCheck = RaceEntry::whereHas('participant', function ($q) use ($nik) {
             $q->where('nik', $nik);
         })
@@ -181,45 +225,13 @@ class CommunityTicketController extends Controller
                 return redirect('/komunitas')->with('error', 'Maaf, tiket untuk kategori ini baru saja habis terjual.');
             }
 
-            // Voucher Validation
-            $voucher = null;
-            $discountAmount = 0;
-            if ($request->voucher_code || $request->nik) {
-                $voucher = Voucher::where('code', $request->voucher_code)
-                    ->when($request->nik, function($q) use ($request) {
-                        return $q->orWhere('code', $request->nik);
-                    })
-                    ->first();
-                
-                if ($voucher) {
-                    // Check global limit
-                    if (!$voucher->isAvailable()) {
-                        throw new \Exception('Maaf, kuota voucher ini sudah habis.');
-                    }
-
-                    // 3. Check per-user limit
-                    $participant = Participant::where('nik', $nik)->first();
-                    if ($participant) {
-                        $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
-                            ->where('participant_id', $participant->id)
-                            ->exists();
-                        
-                        if ($alreadyUsed) {
-                            throw new \Exception('Voucher ini sudah pernah Anda gunakan.');
-                        }
-                    }
-
-                    $discountAmount = $voucher->calculateDiscount($ticket->price + ($request->other_race_interest ? ($pairTicket->price ?? 0) : 0) + $adminFee);
-                }
-            }
-
             $adminFee = 4500;
-            $totalPrice = ($ticket->price - $discountAmount) + $adminFee;
+            $donationEvent = (int) $request->input('donation_event', 0);
+            $donationScholarship = (int) $request->input('donation_scholarship', 0);
+            $totalPrice = $ticket->price + $adminFee + $donationEvent + $donationScholarship;
 
-            // Handle Second Ticket Price
             $second_ticket_id = null;
             if ($request->other_race_interest) {
-                // Find matching pair ticket
                 $categoryName = strtoupper($ticket->category->name ?? '');
                 $pairTarget = (str_contains($categoryName, '5K') || str_contains($categoryName, '42K')) ? '10K' : '5K';
                 
@@ -237,23 +249,42 @@ class CommunityTicketController extends Controller
                 }
             }
 
-            // 3. Find or Create Participant Profile (One NIK = One Participant)
+            // Voucher Validation
+            $voucher = null;
+            $discountAmount = 0;
+            if ($request->voucher_code || $request->nik) {
+                $voucher = Voucher::where('code', $request->voucher_code)
+                    ->when($request->nik, function($q) use ($request) {
+                        return $q->orWhere('code', $request->nik);
+                    })
+                    ->first();
+                
+                if ($voucher) {
+                    if (!$voucher->isAvailable()) {
+                        throw new \Exception('Maaf, kuota voucher ini sudah habis.');
+                    }
+                    $discountAmount = $voucher->calculateDiscount($totalPrice);
+                }
+            }
+
+            $totalPrice -= $discountAmount;
+
             $participant = Participant::updateOrCreate(
                 ['nik' => $nik],
-                \Illuminate\Support\Arr::except($validated, ['ticket_id', 'voucher_code', 'other_race_interest'])
+                \Illuminate\Support\Arr::except($validated, ['email_confirmation', 'ticket_id', 'other_race_interest', 'voucher_code', 'donation_event', 'donation_scholarship'])
             );
 
-            // 5. Create Order
             $orderCode = 'IPBR26-' . strtoupper(Str::random(6));
             $order = Order::create([
                 'participant_id' => $participant->id,
                 'order_code' => $orderCode,
                 'status' => 'pending',
                 'admin_fee' => $adminFee,
+                'donation_event' => $donationEvent,
+                'donation_scholarship' => $donationScholarship,
                 'total_price' => $totalPrice,
             ]);
 
-            // 6. Record Voucher Usage
             if ($voucher) {
                 VoucherUsage::create([
                     'voucher_id' => $voucher->id,
@@ -262,14 +293,12 @@ class CommunityTicketController extends Controller
                 ]);
             }
 
-            // Create Race Entry
             $participant->raceEntries()->create([
                 'ticket_id' => $ticket->id,
                 'order_id' => $order->id,
                 'status' => 'pending',
             ]);
 
-            // Create Second Race Entry if needed
             if ($second_ticket_id) {
                 $participant->raceEntries()->create([
                     'ticket_id' => $second_ticket_id,
@@ -278,12 +307,11 @@ class CommunityTicketController extends Controller
                 ]);
             }
 
-            // Community User logic: Credentials share NIK
             $user = User::updateOrCreate(
                 ['username' => $nik],
                 [
                     'name' => $participant->name,
-                    'email' => $participant->email, // Store real email but uniqueness is no longer enforced in DB
+                    'email' => $participant->email,
                     'password' => Hash::make($nik),
                     'role' => 'participant'
                 ]
@@ -309,6 +337,11 @@ class CommunityTicketController extends Controller
             ];
         }
 
+        $itemDetails[] = ['id' => 'ADMIN_FEE', 'price' => $order->admin_fee, 'quantity' => 1, 'name' => 'Biaya Layanan'];
+
+        if ($order->donation_event > 0) $itemDetails[] = ['id' => 'DONATION_EVENT', 'price' => $order->donation_event, 'quantity' => 1, 'name' => 'Donasi Event'];
+        if ($order->donation_scholarship > 0) $itemDetails[] = ['id' => 'DONATION_SCHOLARSHIP', 'price' => $order->donation_scholarship, 'quantity' => 1, 'name' => 'Donasi Beasiswa'];
+
         if ($order->discount_amount > 0) {
             $itemDetails[] = [
                 'id' => 'VOUCHER_DISCOUNT',
@@ -317,8 +350,6 @@ class CommunityTicketController extends Controller
                 'name' => 'Potongan Voucher (' . $order->voucher_code . ')'
             ];
         }
-
-        $itemDetails[] = ['id' => 'ADMIN_FEE', 'price' => $order->admin_fee, 'quantity' => 1, 'name' => 'Biaya Layanan'];
 
         $params = [
             'transaction_details' => ['order_id' => $order->order_code, 'gross_amount' => $order->total_price],
