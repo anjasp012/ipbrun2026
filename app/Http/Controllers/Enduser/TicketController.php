@@ -108,7 +108,25 @@ class TicketController extends Controller
                 ->first();
         }
 
-        return view('pages.enduser.dashboard', compact('participant', 'orders', 'pairRecommendation'));
+        $potentialVoucher = null;
+        $potentialDiscount = 0;
+        if ($pairRecommendation) {
+            $potentialVoucher = Voucher::where('code', $participant->nik)->first();
+            if ($potentialVoucher && $potentialVoucher->isAvailable()) {
+                // Check usage limit for this participant
+                $alreadyUsed = VoucherUsage::where('voucher_id', $potentialVoucher->id)
+                    ->where('participant_id', $participant->id)
+                    ->exists();
+
+                if (!$alreadyUsed) {
+                    $potentialDiscount = $potentialVoucher->calculateDiscount($pairRecommendation->price);
+                } else {
+                    $potentialVoucher = null; // Already used
+                }
+            }
+        }
+
+        return view('pages.enduser.dashboard', compact('participant', 'orders', 'pairRecommendation', 'potentialVoucher', 'potentialDiscount'));
     }
 
     public function checkout(Ticket $ticket)
@@ -395,7 +413,28 @@ class TicketController extends Controller
         $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
         $adminFee = 4500;
 
-        $finalPrice = $ticket->price + $adminFee;
+        // Check for persistent voucher entitlement (e.g. Community NIK)
+        $voucher = Voucher::where('code', $latestParticipant->nik)->first();
+        $discountAmount = 0;
+
+        if ($voucher) {
+            if ($voucher->isAvailable()) {
+                // Check if THIS participant has used it
+                $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
+                    ->where('participant_id', $latestParticipant->id)
+                    ->exists();
+
+                if (!$alreadyUsed) {
+                    $discountAmount = $voucher->calculateDiscount($ticket->price);
+                } else {
+                    $voucher = null; // Clear it if already used
+                }
+            } else {
+                $voucher = null; // Clear if quota reached
+            }
+        }
+
+        $finalPrice = ($ticket->price + $adminFee) - $discountAmount;
 
         $order = Order::create([
             'participant_id' => $latestParticipant->id,
@@ -403,9 +442,18 @@ class TicketController extends Controller
             'status' => 'pending',
             'admin_fee' => $adminFee,
             'total_price' => $finalPrice,
+            'discount_amount' => $discountAmount,
+            'voucher_code' => $voucher ? $voucher->code : null,
         ]);
 
-
+        // Record usage if a voucher was applied
+        if ($voucher) {
+            VoucherUsage::create([
+                'voucher_id' => $voucher->id,
+                'participant_id' => $latestParticipant->id,
+                'order_id' => $order->id,
+            ]);
+        }
 
         $latestParticipant->raceEntries()->create([
             'ticket_id' => $ticket->id,
