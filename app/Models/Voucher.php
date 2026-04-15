@@ -29,7 +29,12 @@ class Voucher extends Model
 
     public function getUsedCountAttribute()
     {
-        return $this->usages()->distinct('participant_id')->count('participant_id');
+        return $this->usages()
+            ->whereHas('order', function ($q) {
+                $q->whereIn('status', ['pending', 'paid']);
+            })
+            ->distinct('participant_id')
+            ->count('participant_id');
     }
 
     public function isAvailable()
