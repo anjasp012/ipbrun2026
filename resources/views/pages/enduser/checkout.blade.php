@@ -428,6 +428,10 @@
                                     class="text-slate-500 font-medium italic">Biaya Layanan</span> <span
                                     class="text-[#003366] font-bold">Rp 4.500</span> </div>
                             
+                            <div id="row_voucher" class="hidden flex justify-between items-center text-sm ring-2 ring-emerald-100 bg-emerald-50/30 p-2 rounded-lg">
+                                <span class="text-emerald-600 font-bold italic">Potongan Voucher (<span id="txt_voucher_code"></span>)</span>
+                                <span class="text-emerald-700 font-black">- Rp <span id="lbl_discount">0</span></span>
+                            </div>
                             @if ($pairTicket)
                                 <div id="row_second_ticket"
                                     class="hidden flex justify-between items-center text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg">
@@ -438,11 +442,6 @@
                                         {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
                                 </div>
                             @endif
-
-                            <div id="row_voucher" class="hidden flex justify-between items-center text-sm ring-2 ring-emerald-100 bg-emerald-50/30 p-2 rounded-lg">
-                                <span class="text-emerald-600 font-bold italic">Potongan Voucher (<span id="txt_voucher_code"></span>)</span>
-                                <span class="text-emerald-700 font-black">- Rp <span id="lbl_discount">0</span></span>
-                            </div>
                             <div id="row_donation_event" class="hidden flex justify-between items-center text-sm">
                                 <span class="text-slate-500 font-medium italic">Donasi Event</span> <span
                                     id="lbl_donation_event" class="text-[#E8630A] font-bold">Rp 0</span>
@@ -627,7 +626,6 @@
             const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
             const nimInput = document.getElementById('nim_nrp');
             let currentDiscount = 0;
-            let currentVoucher = { type: null, value: 0 };
 
             if (isIPB) {
                 document.getElementById('donateSection')?.classList.remove('hidden');
@@ -670,22 +668,7 @@
                     summarySecond.classList.add('hidden');
                 }
 
-                // Recalculate discount if voucher exists
-                let subtotalBeforeDiscount = ticketPrice + adminFee + donEvent + donScholar + secondPrice;
-                if (currentVoucher.type === 'nominal') {
-                    currentDiscount = Math.min(currentVoucher.value, subtotalBeforeDiscount);
-                } else if (currentVoucher.type === 'percentage') {
-                    currentDiscount = Math.floor(subtotalBeforeDiscount * (currentVoucher.value / 100));
-                }
-
-                if (currentDiscount > 0) {
-                    document.getElementById('row_voucher')?.classList.remove('hidden');
-                    document.getElementById('lbl_discount').innerText = currentDiscount.toLocaleString('id-ID');
-                } else {
-                    document.getElementById('row_voucher')?.classList.add('hidden');
-                }
-
-                let total = subtotalBeforeDiscount - currentDiscount;
+                let total = ticketPrice + adminFee + donEvent + donScholar + secondPrice - currentDiscount;
                 const formattedTotal = 'Rp ' + total.toLocaleString('id-ID');
                 const lblTotal = document.getElementById('lbl_total');
                 if (lblTotal) lblTotal.innerText = formattedTotal;
@@ -717,29 +700,21 @@
                 btn.disabled = true; btn.innerText = '...'; 
                 
                 try {
-                    let donEvent = parseInt(document.getElementById('donation_event')?.value || 0);
-                    let donScholar = parseInt(document.getElementById('donation_scholarship')?.value || 0);
-                    let isSecondTicketChecked = document.getElementById('cb_second_ticket')?.checked || false;
-                    let secondPrice = isSecondTicketChecked ? pairTicketPrice : 0;
-                    let subtotalPrice = ticketPrice + adminFee + donEvent + donScholar + secondPrice;
-
                     const response = await fetch('{{ route("voucher.check") }}', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ code: voucherCode, nik: nikValue, price: subtotalPrice })
+                        body: JSON.stringify({ code: voucherCode, nik: nikValue, price: ticketPrice })
                     });
                     const data = await response.json();
 
                     if (data.valid) {
-                        currentVoucher = { type: data.type, value: data.value };
+                        currentDiscount = data.discount;
+                        document.getElementById('row_voucher').classList.remove('hidden');
                         document.getElementById('txt_voucher_code').innerText = data.code;
+                        document.getElementById('lbl_discount').innerText = currentDiscount.toLocaleString('id-ID');
                         
                         messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">Voucher berhasil dipasang!</span>';
-                        
-                        // Handle auto-detection: if voucher input was empty, fill it with the code found
-                        if (!inputEl.value || inputEl.value === '') {
-                             inputEl.value = data.code;
-                        }
+                        if (code) inputEl.value = data.code; // If auto-detected
                         
                         updateTotal();
                     } else if (voucherCode) {

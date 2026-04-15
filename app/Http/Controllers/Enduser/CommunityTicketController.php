@@ -90,7 +90,11 @@ class CommunityTicketController extends Controller
         $nik = $request->nik;
         $code = $request->code;
         
-        $voucher = Voucher::where('code', $code)->first();
+        $voucher = Voucher::where('code', $code)
+            ->when($nik, function($q) use ($nik) {
+                return $q->orWhere('code', $nik);
+            })
+            ->first();
 
         if (!$voucher) {
             return response()->json(['valid' => false, 'message' => 'Kode voucher tidak valid.']);
@@ -180,8 +184,12 @@ class CommunityTicketController extends Controller
             // Voucher Validation
             $voucher = null;
             $discountAmount = 0;
-            if ($request->voucher_code) {
-                $voucher = Voucher::where('code', $request->voucher_code)->first();
+            if ($request->voucher_code || $request->nik) {
+                $voucher = Voucher::where('code', $request->voucher_code)
+                    ->when($request->nik, function($q) use ($request) {
+                        return $q->orWhere('code', $request->nik);
+                    })
+                    ->first();
                 
                 if ($voucher) {
                     // Check global limit
@@ -201,7 +209,7 @@ class CommunityTicketController extends Controller
                         }
                     }
 
-                    $discountAmount = $voucher->calculateDiscount($ticket->price);
+                    $discountAmount = $voucher->calculateDiscount($ticket->price + ($request->other_race_interest ? ($pairTicket->price ?? 0) : 0) + $adminFee);
                 }
             }
 

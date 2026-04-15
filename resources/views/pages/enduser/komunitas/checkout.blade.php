@@ -243,17 +243,17 @@
                                 <span class="text-slate-500 font-medium italic">Biaya Layanan</span> 
                                 <span class="text-[#003366] font-bold">Rp 4.500</span> 
                             </div>
-                            <!-- Voucher Row -->
-                            <div id="row_voucher" class="hidden flex justify-between items-center text-sm">
-                                <span class="text-emerald-600 font-bold italic">Potongan Voucher (<span id="txt_voucher_code"></span>)</span>
-                                <span class="text-emerald-600 font-black">- Rp <span id="lbl_discount">0</span></span>
-                            </div>
                             @if($pairTicket)
                                 <div id="row_second_ticket" class="hidden flex justify-between items-center text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg">
                                     <span class="text-[#E8630A] font-bold italic">Paket Tambahan: {{ $pairTicket->category->name }}</span>
                                     <span class="text-[#E8630A] font-black">Rp {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
                                 </div>
                             @endif
+                            <!-- Voucher Row -->
+                            <div id="row_voucher" class="hidden flex justify-between items-center text-sm ring-2 ring-emerald-100 bg-emerald-50/30 p-2 rounded-lg">
+                                <span class="text-emerald-600 font-bold italic">Potongan Voucher (<span id="txt_voucher_code"></span>)</span>
+                                <span class="text-emerald-700 font-black">- Rp <span id="lbl_discount">0</span></span>
+                            </div>
                         </div>
 
                         <!-- Voucher Input Area -->
@@ -309,7 +309,9 @@
             const ticketPrice = {{ $ticket->price }};
             const adminFee = 4500;
             const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
+            const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
             let currentDiscount = 0;
+            let currentVoucher = { type: null, value: 0 };
 
             const flatpickrInstance = flatpickr(".datepicker", {
                 locale: "id",
@@ -340,7 +342,22 @@
                     else summarySecond.classList.add('hidden');
                 }
 
-                const total = ticketPrice + adminFee + secondPrice - currentDiscount;
+                // Recalculate discount if voucher exists
+                let subtotalBeforeDiscount = ticketPrice + adminFee + secondPrice;
+                if (currentVoucher.type === 'nominal') {
+                    currentDiscount = Math.min(currentVoucher.value, subtotalBeforeDiscount);
+                } else if (currentVoucher.type === 'percentage') {
+                    currentDiscount = Math.floor(subtotalBeforeDiscount * (currentVoucher.value / 100));
+                }
+
+                if (currentDiscount > 0) {
+                    document.getElementById('row_voucher')?.classList.remove('hidden');
+                    document.getElementById('lbl_discount').innerText = currentDiscount.toLocaleString('id-ID');
+                } else {
+                    document.getElementById('row_voucher')?.classList.add('hidden');
+                }
+
+                const total = subtotalBeforeDiscount - currentDiscount;
                 document.getElementById('lbl_total').innerText = 'Rp ' + total.toLocaleString('id-ID');
             }
 
@@ -367,22 +384,27 @@
                 btn.disabled = true; btn.innerText = '...'; 
                 
                 try {
-                    const response = await fetch('{{ route("voucher.check") }}', {
+                    const isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
+                    const secondPrice = isSecondChecked ? pairTicketPrice : 0;
+                    const subtotalPrice = ticketPrice + adminFee + secondPrice;
+
+                    const response = await fetch('{{ route("komunitas.check-voucher") }}', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ code: voucherCode, nik: nik, price: ticketPrice })
+                        body: JSON.stringify({ code: voucherCode, nik: nik, price: subtotalPrice })
                     });
                     const data = await response.json();
 
                     if (data.valid) {
-                        currentDiscount = data.discount;
-                        document.getElementById('row_voucher').classList.remove('hidden');
+                        currentVoucher = { type: data.type, value: data.value };
                         document.getElementById('txt_voucher_code').innerText = data.code;
-                        document.getElementById('lbl_discount').innerText = currentDiscount.toLocaleString('id-ID');
+                        
+                        if (data.assigned || (!inputEl.value || inputEl.value === '')) {
+                            inputEl.value = data.code;
+                        }
                         
                         if (data.assigned) {
                             messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">Diskon Voucher Otomatis Terpasang!</span>';
-                            inputEl.value = data.code;
                             inputEl.readOnly = true;
                             inputEl.classList.add('bg-slate-50', 'text-slate-400');
                             btn.classList.add('hidden');

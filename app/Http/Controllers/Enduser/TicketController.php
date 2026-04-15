@@ -338,12 +338,8 @@ class TicketController extends Controller
             $discountAmount = 0;
             
             // 1. Check for manual code first
-            if ($request->voucher_code || $request->nik) {
-                $voucher = Voucher::where('code', $request->voucher_code)
-                    ->when($request->nik, function($q) use ($request) {
-                        return $q->orWhere('code', $request->nik);
-                    })
-                    ->first();
+            if ($request->voucher_code) {
+                $voucher = Voucher::where('code', $request->voucher_code)->first();
                 if ($voucher) {
                     // Validate Reusable Logic
                     if (!$voucher->isAvailable()) {
@@ -440,14 +436,11 @@ class TicketController extends Controller
         $discountAmount = 0;
 
         $finalPrice = $ticket->price + $adminFee;
-        if ($voucher || $latestParticipant->nik) {
-            $voucher = $voucher ?: Voucher::where('code', $latestParticipant->nik)->first();
-            
-            if ($voucher) {
-                // Check if THIS participant has used it even for persistent ones
-                $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
-                    ->where('participant_id', $latestParticipant->id)
-                    ->exists();
+        if ($voucher) {
+            // Check if THIS participant has used it even for persistent ones
+            $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
+                ->where('participant_id', $latestParticipant->id)
+                ->exists();
 
             if ($alreadyUsed) {
                 $voucher = null;
