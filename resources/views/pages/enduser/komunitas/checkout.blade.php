@@ -371,32 +371,7 @@
                     </div>
                 </div>
 
-                <!-- Voucher Code Section -->
-                <div class="mt-12 bg-slate-50 border border-slate-100 p-8 rounded-2xl relative overflow-hidden group">
-                    {{-- Decorative Icon --}}
-                    <div class="absolute -right-4 -top-4 opacity-[0.03] scale-150 text-[#003366] group-hover:scale-[1.7] transition-transform duration-700">
-                        <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path></svg>
-                    </div>
 
-                    <div class="relative">
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-1.5 h-6 bg-[#FF7A21] rounded-full"></div>
-                            <h3 class="text-xs font-black text-[#003366] uppercase tracking-[2px]">Gunakan Kode Voucher (Komunitas)</h3>
-                        </div>
-
-                        <div class="flex flex-col md:flex-row gap-4">
-                            <div class="flex-1 relative">
-                                <input type="text" id="voucher_input" name="voucher_code" placeholder="Ketik kode voucher kamu di sini" 
-                                    class="w-full h-14 bg-white border-2 border-slate-100 rounded-xl px-6 font-black text-[#003366] focus:border-[#FF7A21] focus:ring-4 focus:ring-orange-500/10 transition-all outline-none uppercase tracking-widest text-sm placeholder:lowercase placeholder:font-medium placeholder:text-slate-300">
-                            </div>
-                            <button type="button" id="btn_apply_voucher"
-                                class="h-14 px-8 bg-[#003366] text-white rounded-xl font-black text-xs uppercase tracking-[2px] hover:bg-[#FF7A21] transition-all active:scale-95 shadow-lg shadow-blue-900/10">
-                                Pasang
-                            </button>
-                        </div>
-                        <div id="voucher_message" class="mt-3 min-h-[16px]"></div>
-                    </div>
-                </div>
 
                 <!-- Payment Summary (Consistent with Index Card Style) -->
                 <div
@@ -453,6 +428,21 @@
                                 <span class="text-emerald-600 font-bold italic">Potongan Voucher (<span id="txt_voucher_code"></span><span id="txt_voucher_detail"></span>)</span>
                                 <span class="text-emerald-700 font-black">- Rp <span id="lbl_discount">0</span></span>
                             </div>
+                        </div>
+
+                        <!-- Voucher Input Area (Integrated) -->
+                        <div class="mt-6 pt-6 border-t border-dashed border-slate-200">
+                            <div class="flex flex-col md:flex-row gap-3">
+                                <div class="flex-1 relative">
+                                    <input type="text" id="voucher_input" name="voucher_code" placeholder="Punya kode voucher?" 
+                                        class="w-full h-12 bg-white border-2 border-slate-100 rounded-xl px-4 font-black text-[#003366] focus:border-[#FF7A21] focus:ring-4 focus:ring-orange-500/10 transition-all outline-none uppercase tracking-widest text-xs placeholder:lowercase placeholder:font-medium placeholder:text-slate-300">
+                                </div>
+                                <button type="button" id="btn_apply_voucher"
+                                    class="h-12 px-6 bg-[#003366] text-white rounded-xl font-black text-[10px] uppercase tracking-[2px] hover:bg-[#FF7A21] transition-all active:scale-95 shadow-lg shadow-blue-900/10">
+                                    Pasang
+                                </button>
+                            </div>
+                            <div id="voucher_message" class="mt-2 min-h-[14px]"></div>
                         </div>
                         <div
                             class="pt-5 border-t border-dashed border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
