@@ -19,11 +19,16 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => ['required', 'email'],
+            'email' => ['required', 'string'],
             'password' => ['required'],
+        ], [
+            'email.required' => 'Email atau NIK wajib diisi.',
+            'password.required' => 'Password wajib diisi.',
         ]);
 
-        $user = \App\Models\User::where('email', $request->email)->first();
+        $loginField = filter_var($request->email, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        
+        $user = \App\Models\User::where($loginField, $request->email)->first();
 
         // Pre-check for Participant Role
         if ($user && $user->role === 'participant') {
@@ -46,7 +51,7 @@ class AuthController extends Controller
             }
         }
 
-        if (Auth::attempt($request->only('email', 'password'), $request->remember)) {
+        if (Auth::attempt([$loginField => $request->email, 'password' => $request->password], $request->remember)) {
             $request->session()->regenerate();
 
             // Redirect to admin dashboard if staff

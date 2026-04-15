@@ -35,6 +35,15 @@ Route::get('/rules', function () {
 })->name('rules');
 Route::get('/dashboard', [EnduserTicket::class, 'dashboard'])->name('participant.dashboard')->middleware('auth');
 Route::get('/payment/finish', [PaymentController::class, 'finish'])->name('payment.finish');
+
+// Komunitas Flow
+Route::prefix('komunitas')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Enduser\CommunityTicketController::class, 'home'])->name('komunitas.home');
+    Route::get('/checkout/{ticket}', [\App\Http\Controllers\Enduser\CommunityTicketController::class, 'checkout'])->name('komunitas.checkout');
+    Route::post('/check-voucher', [\App\Http\Controllers\Enduser\CommunityTicketController::class, 'checkVoucher'])->name('komunitas.check-voucher');
+    Route::post('/register', [\App\Http\Controllers\Enduser\CommunityTicketController::class, 'register'])->name('komunitas.register');
+});
+
 Route::get('/payment/{participant}', function (\App\Models\Participant $participant) {
     return view('pages.enduser.payment', compact('participant'));
 })->name('payment.show');
@@ -81,6 +90,10 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::get('/blast', [\App\Http\Controllers\Admin\BlastController::class, 'index'])->name('admin.blast');
         Route::post('/blast/email', [\App\Http\Controllers\Admin\BlastController::class, 'blastEmail'])->name('admin.blast.email');
         Route::post('/blast/whatsapp', [\App\Http\Controllers\Admin\BlastController::class, 'blastWhatsapp'])->name('admin.blast.whatsapp');
+
+        Route::get('/vouchers', [\App\Http\Controllers\Admin\VoucherController::class, 'index'])->name('admin.vouchers.index');
+        Route::post('/vouchers', [\App\Http\Controllers\Admin\VoucherController::class, 'store'])->name('admin.vouchers.store');
+        Route::delete('/vouchers/{voucher}', [\App\Http\Controllers\Admin\VoucherController::class, 'destroy'])->name('admin.vouchers.destroy');
     });
 
     // Superadmin & Admin Only (PIC Restricted)

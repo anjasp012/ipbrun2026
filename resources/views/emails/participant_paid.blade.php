@@ -64,6 +64,16 @@
                                     style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
                                     #{{ $order->order_code }}</td>
                             </tr>
+                            @if ($order->discount_amount > 0)
+                                <tr>
+                                    <td
+                                        style="padding:10px 0;font-size:13px;color:#00875a;font-weight:bold;border-bottom:1px solid #edf0f5;">
+                                        Discount ({{ $order->voucher_code }})</td>
+                                    <td
+                                        style="padding:10px 0;font-size:14px;color:#00875a;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
+                                        - Rp {{ number_format($order->discount_amount, 0, ',', '.') }}</td>
+                                </tr>
+                            @endif
                             <tr>
                                 <td style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
                                     Full Name</td>
