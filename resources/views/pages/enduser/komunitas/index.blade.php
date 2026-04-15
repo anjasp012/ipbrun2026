@@ -25,7 +25,7 @@
                 @endphp
 
                 <!-- Tab Switcher (Mobile & Desktop) -->
-                <div class="flex justify-center mb-12">
+                <div class="flex justify-center mb-6">
                     <div class="inline-flex gap-2 p-1.5 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm w-full md:w-auto md:min-w-[400px]">
                         <button onclick="switchCategory('ipb')" id="tab-ipb"
                             class="flex-1 category-tab bg-[#00ACB1] text-white shadow-md px-6 py-4 rounded-xl text-xs md:text-sm font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap border border-transparent">
