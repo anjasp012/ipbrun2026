@@ -310,17 +310,7 @@ class CommunityTicketController extends Controller
                 ]);
             }
 
-            $user = User::updateOrCreate(
-                ['username' => $nik],
-                [
-                    'name' => $participant->name,
-                    'email' => $participant->email,
-                    'password' => Hash::make($nik),
-                    'role' => 'participant'
-                ]
-            );
 
-            $participant->update(['user_id' => $user->id]);
 
             return $this->createMidtransTransaction($order);
         });

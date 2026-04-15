@@ -241,8 +241,8 @@
                                 <tr>
                                     <td align="center" style="padding:15px;border-right:1px solid rgba(255,255,255,0.2);">
                                         <span
-                                            style="font-size:11px;opacity:0.7;text-transform:uppercase;">Username/Email</span><br>
-                                        <strong style="font-size:14px;">{{ $participant->email }}</strong> </td>
+                                            style="font-size:11px;opacity:0.7;text-transform:uppercase;">{{ $participant->is_community ? 'Username (NIK)' : 'Username/Email' }}</span><br>
+                                        <strong style="font-size:14px;">{{ $participant->is_community ? $participant->nik : $participant->email }}</strong> </td>
                                     <td align="center" style="padding:15px;"> <span
                                             style="font-size:11px;opacity:0.7;text-transform:uppercase;">Password</span><br>
                                         <strong style="font-size:14px;">{{ $password }}</strong> </td>
