@@ -19,16 +19,16 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => ['required', 'string'],
+            'username' => ['required', 'string'],
             'password' => ['required'],
         ], [
-            'email.required' => 'Email atau NIK wajib diisi.',
+            'username.required' => 'Username wajib diisi.',
             'password.required' => 'Password wajib diisi.',
         ]);
 
-        $loginField = filter_var($request->email, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
+        $loginField = filter_var($request->username, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
         
-        $user = \App\Models\User::where($loginField, $request->email)->first();
+        $user = \App\Models\User::where($loginField, $request->username)->first();
 
         // Pre-check for Participant Role
         if ($user && $user->role === 'participant') {
@@ -46,12 +46,12 @@ class AuthController extends Controller
 
             if (!$isReady) {
                 return back()->withErrors([
-                    'email' => 'Maaf, pendaftaran/dashboard peserta belum dibuka saat ini.',
-                ])->onlyInput('email');
+                    'username' => 'Maaf, pendaftaran/dashboard peserta belum dibuka saat ini.',
+                ])->onlyInput('username');
             }
         }
 
-        if (Auth::attempt([$loginField => $request->email, 'password' => $request->password], $request->remember)) {
+        if (Auth::attempt([$loginField => $request->username, 'password' => $request->password], $request->remember)) {
             $request->session()->regenerate();
 
             // Redirect to admin dashboard if staff
@@ -63,8 +63,8 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'Informasi akun tidak ditemukan atau password salah.',
-        ])->onlyInput('email');
+            'username' => 'Informasi akun tidak ditemukan atau password salah.',
+        ])->onlyInput('username');
     }
 
     public function logout(Request $request)

@@ -33,17 +33,17 @@
                 <div class="mb-10 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
                     <p
                         class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-center leading-relaxed">
-                        Silakan masukkan email dan password yang Anda terima melalui WhatsApp/Email.
+                        Silakan masukkan username dan password yang Anda terima melalui WhatsApp/Email.
                     </p>
                 </div>
 
                 <form id="loginForm" action="{{ route('login') }}" method="POST" class="space-y-6">
                     @csrf
                     <div class="space-y-2">
-                        <x-label for="email" value="Email Address"
+                        <x-label for="username" value="Username"
                             class="text-[11px] font-black text-slate-400 uppercase tracking-[2px] ml-1 mb-0" />
                         <div class="relative">
-                            <x-input id="email" type="email" name="email" :value="old('email')" required autofocus
+                            <x-input id="username" type="username" name="username" :value="old('username')" required autofocus
                                 class="w-full h-14 bg-slate-50/50 border-slate-100 rounded-2xl px-6 font-bold text-[#003366] focus:bg-white transition-all shadow-none" />
                             <svg class="absolute right-5 top-4.5 w-5 h-5 text-slate-300 pointer-events-none"
                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,7 +52,7 @@
                                 </path>
                             </svg>
                         </div>
-                        @error('email')
+                        @error('username')
                             <p
                                 class="text-red-500 text-[10px] font-black uppercase italic mt-2 ml-1 tracking-wider animate-pulse text-left">
                                 {{ $message }}</p>
