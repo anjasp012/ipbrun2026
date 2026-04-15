@@ -23,6 +23,7 @@ Route::get('/check-order', [EnduserTicket::class, 'checkOrder'])->name('check.or
 // Route::get('/start', [ToolController::class, 'startPage'])->name('start.tool');
 Route::post('/trigger-start', [ToolController::class, 'triggerStart'])->name('trigger.start');
 Route::get('/checkout/{ticket}', [EnduserTicket::class, 'checkout'])->name('checkout');
+Route::post('/check-voucher', [\App\Http\Controllers\Enduser\VoucherController::class, 'check'])->name('voucher.check');
 Route::post('/register', [EnduserTicket::class, 'register'])->name('register');
 Route::get('/faq', function () {
     return view('pages.enduser.faq');

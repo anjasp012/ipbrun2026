@@ -11,11 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // voucher_code and discount_amount removed — derived via voucher_usages relation
+        Schema::table('vouchers', function (Blueprint $table) {
+            $table->integer('usage_limit')->default(1)->after('value');
+        });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        // Nothing to reverse
+        Schema::table('vouchers', function (Blueprint $table) {
+            //
+        });
     }
 };

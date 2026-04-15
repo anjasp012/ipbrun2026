@@ -10,6 +10,7 @@ use App\Models\Setting;
 use App\Models\RaceEntry;
 use App\Models\Order;
 use App\Models\Voucher;
+use App\Models\VoucherUsage;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -61,37 +62,56 @@ class CommunityTicketController extends Controller
             return redirect('/komunitas')->with('error', 'Maaf, tiket untuk kategori ini baru saja habis terjual.');
         }
 
-        return view('pages.enduser.komunitas.checkout', compact('ticket'));
+        // Find the pair ticket
+        $categoryName = strtoupper($ticket->category->name ?? '');
+        $pairTarget = '';
+        if (str_contains($categoryName, '5K') || str_contains($categoryName, '42K')) {
+            $pairTarget = '10K';
+        } elseif (str_contains($categoryName, '10K') || str_contains($categoryName, '21K')) {
+            $pairTarget = '5K';
+        }
+
+        $pairTicket = null;
+        if ($pairTarget) {
+            $pairTicket = Ticket::where('period_id', $ticket->period_id)
+                ->where('type', $ticket->type)
+                ->whereHas('category', function ($q) use ($pairTarget) {
+                    $q->where('name', 'LIKE', "%$pairTarget%");
+                })
+                ->where('id', '!=', $ticket->id)
+                ->first();
+        }
+
+        return view('pages.enduser.komunitas.checkout', compact('ticket', 'pairTicket'));
     }
 
     public function checkVoucher(Request $request)
     {
-        // First check if this participant already has an assigned voucher
-        $participantToken = $request->nik; // NIK context
-        $assignedVoucher = null;
-        if ($participantToken) {
-            $participant = Participant::where('nik', $participantToken)->first();
-            if ($participant) {
-                $assignedVoucher = Voucher::findAssigned($participant->id);
-            }
-        }
-
-        if ($assignedVoucher) {
-            $discount = $assignedVoucher->calculateDiscount($request->price);
-            return response()->json([
-                'valid' => true,
-                'discount' => $discount,
-                'type' => $assignedVoucher->type,
-                'value' => $assignedVoucher->value,
-                'code' => $assignedVoucher->code,
-                'assigned' => true
-            ]);
-        }
-
-        $voucher = Voucher::findValid($request->code);
+        $nik = $request->nik;
+        $code = $request->code;
+        
+        $voucher = Voucher::where('code', $code)->first();
 
         if (!$voucher) {
-            return response()->json(['valid' => false, 'message' => 'Kode voucher tidak valid atau sudah digunakan oleh orang lain.']);
+            return response()->json(['valid' => false, 'message' => 'Kode voucher tidak valid.']);
+        }
+
+        if (!$voucher->isAvailable()) {
+            return response()->json(['valid' => false, 'message' => 'Maaf, kuota pemakaian voucher ini sudah habis.']);
+        }
+
+        // Check if this NIK has already used this voucher
+        if ($nik) {
+            $participant = Participant::where('nik', $nik)->first();
+            if ($participant) {
+                $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
+                    ->where('participant_id', $participant->id)
+                    ->exists();
+
+                if ($alreadyUsed) {
+                    return response()->json(['valid' => false, 'message' => 'Voucher ini sudah pernah Anda gunakan.']);
+                }
+            }
         }
 
         $discount = $voucher->calculateDiscount($request->price);
@@ -157,36 +177,63 @@ class CommunityTicketController extends Controller
                 return redirect('/komunitas')->with('error', 'Maaf, tiket untuk kategori ini baru saja habis terjual.');
             }
 
-            // 1. Check for assigned voucher by NIK
-            $existingParticipant = Participant::where('nik', $nik)->first();
-            $voucher = Voucher::findAssigned($existingParticipant->id ?? null);
-            
-            if (!$voucher && $request->voucher_code) {
-                // 2. Try to claim new one if not assigned yet
-                $voucher = Voucher::findValid($request->voucher_code);
-            }
-
+            // Voucher Validation
+            $voucher = null;
             $discountAmount = 0;
-            if ($voucher) {
-                $discountAmount = $voucher->calculateDiscount($ticket->price);
+            if ($request->voucher_code) {
+                $voucher = Voucher::where('code', $request->voucher_code)->first();
+                
+                if ($voucher) {
+                    // Check global limit
+                    if (!$voucher->isAvailable()) {
+                        throw new \Exception('Maaf, kuota voucher ini sudah habis.');
+                    }
+
+                    // 3. Check per-user limit
+                    $participant = Participant::where('nik', $nik)->first();
+                    if ($participant) {
+                        $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
+                            ->where('participant_id', $participant->id)
+                            ->exists();
+                        
+                        if ($alreadyUsed) {
+                            throw new \Exception('Voucher ini sudah pernah Anda gunakan.');
+                        }
+                    }
+
+                    $discountAmount = $voucher->calculateDiscount($ticket->price);
+                }
             }
 
             $adminFee = 4500;
             $totalPrice = ($ticket->price - $discountAmount) + $adminFee;
 
+            // Handle Second Ticket Price
+            $second_ticket_id = null;
+            if ($request->other_race_interest) {
+                // Find matching pair ticket
+                $categoryName = strtoupper($ticket->category->name ?? '');
+                $pairTarget = (str_contains($categoryName, '5K') || str_contains($categoryName, '42K')) ? '10K' : '5K';
+                
+                $pairTicket = Ticket::where('period_id', $ticket->period_id)
+                    ->where('type', $ticket->type)
+                    ->whereHas('category', function ($q) use ($pairTarget) {
+                        $q->where('name', 'LIKE', "%$pairTarget%");
+                    })
+                    ->where('id', '!=', $ticket->id)
+                    ->first();
+                
+                if ($pairTicket) {
+                    $second_ticket_id = $pairTicket->id;
+                    $totalPrice += $pairTicket->price;
+                }
+            }
+
             // 3. Find or Create Participant Profile (One NIK = One Participant)
             $participant = Participant::updateOrCreate(
                 ['nik' => $nik],
-                \Illuminate\Support\Arr::except($validated, ['ticket_id', 'voucher_code'])
+                \Illuminate\Support\Arr::except($validated, ['ticket_id', 'voucher_code', 'other_race_interest'])
             );
-
-            // 4. Link voucher to participant if newly claimed
-            if ($voucher && !$voucher->participant_id) {
-                $voucher->update([
-                    'participant_id' => $participant->id,
-                    'used_at' => now()
-                ]);
-            }
 
             // 5. Create Order
             $orderCode = 'IPBR26-' . strtoupper(Str::random(6));
@@ -196,9 +243,16 @@ class CommunityTicketController extends Controller
                 'status' => 'pending',
                 'admin_fee' => $adminFee,
                 'total_price' => $totalPrice,
-                'voucher_code' => $voucher ? $voucher->code : null,
-                'discount_amount' => $discountAmount,
             ]);
+
+            // 6. Record Voucher Usage
+            if ($voucher) {
+                VoucherUsage::create([
+                    'voucher_id' => $voucher->id,
+                    'participant_id' => $participant->id,
+                    'order_id' => $order->id,
+                ]);
+            }
 
             // Create Race Entry
             $participant->raceEntries()->create([
@@ -206,6 +260,15 @@ class CommunityTicketController extends Controller
                 'order_id' => $order->id,
                 'status' => 'pending',
             ]);
+
+            // Create Second Race Entry if needed
+            if ($second_ticket_id) {
+                $participant->raceEntries()->create([
+                    'ticket_id' => $second_ticket_id,
+                    'order_id' => $order->id,
+                    'status' => 'pending',
+                ]);
+            }
 
             // Community User logic: Credentials share NIK
             $user = User::updateOrCreate(

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // voucher_code and discount_amount removed — derived via voucher_usages relation
+        // Migration kept for rollback compatibility — columns removed in separate steps
     }
 
     public function down(): void

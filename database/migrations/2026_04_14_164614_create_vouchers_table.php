@@ -18,7 +18,6 @@ return new class extends Migration
             $table->integer('value');
             $table->boolean('is_used')->default(false);
             $table->timestamp('used_at')->nullable();
-            $table->foreignUuid('participant_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();
         });
     }

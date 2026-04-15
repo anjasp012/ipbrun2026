@@ -173,7 +173,37 @@
                     <div class="md:col-span-2"> <x-label for="emergency_contact_relationship">Hubungan *</x-label> <x-input id="emergency_contact_relationship" name="emergency_contact_relationship" required value="{{ old('emergency_contact_relationship') }}" /> </div>
                 </div> 
 
-                <!-- Disclaimer -->
+                <!-- Price / Other Race Interest (Upsell) -->
+                @php
+                    $categoryName = strtoupper($ticket->category->name ?? '');
+                    $pairCategoryName = '';
+                    if (str_contains($categoryName, '5K') || str_contains($categoryName, '42K')) {
+                        $pairCategoryName = '10K (Minggu)';
+                    } elseif (str_contains($categoryName, '10K') || str_contains($categoryName, '21K')) {
+                        $pairCategoryName = '5K (Sabtu)';
+                    }
+                @endphp
+                @if ($pairCategoryName && $pairTicket)
+                    <div class="mt-8 bg-orange-50/50 border border-orange-100 p-8 rounded-2xl">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            <div class="space-y-1">
+                                <p class="text-[11px] font-bold text-[#E8630A]/80 uppercase tracking-widest leading-loose">
+                                    APAKAH ANDA INGIN MENGIKUTI KATEGORI <span class="text-[#E8630A] underline underline-offset-4 decoration-2">{{ $pairCategoryName }}</span> JUGA?
+                                </p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer group">
+                                <input type="checkbox" name="other_race_interest" id="cb_second_ticket" value="1" class="sr-only peer">
+                                <div class="w-16 h-8 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-8 after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-[#FF7A21] shadow-inner ring-4 ring-slate-100"></div>
+                                <span class="ml-4 text-[10px] font-black text-slate-400 peer-checked:text-[#FF7A21] uppercase tracking-widest transition-colors">
+                                    <span class="group-peer-checked:hidden">TIDAK</span>
+                                    <span class="hidden group-peer-checked:inline">YA, IKUT!</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Persetujuan & Disclaimer -->
                 <div class="mt-8 space-y-4">
                     <h3 class="text-sm font-black text-[#003366] uppercase tracking-[2px] mb-4 pb-2 border-b border-slate-100">Persetujuan & Disclaimer</h3>
                     <label class="flex items-start gap-4 cursor-pointer group py-3 px-4 bg-slate-50/50 rounded-xl transition-all">
@@ -218,6 +248,12 @@
                                 <span class="text-emerald-600 font-bold italic">Potongan Voucher (<span id="txt_voucher_code"></span>)</span>
                                 <span class="text-emerald-600 font-black">- Rp <span id="lbl_discount">0</span></span>
                             </div>
+                            @if($pairTicket)
+                                <div id="row_second_ticket" class="hidden flex justify-between items-center text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg">
+                                    <span class="text-[#E8630A] font-bold italic">Paket Tambahan: {{ $pairTicket->category->name }}</span>
+                                    <span class="text-[#E8630A] font-black">Rp {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
+                                </div>
+                            @endif
                         </div>
 
                         <!-- Voucher Input Area -->
@@ -272,6 +308,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const ticketPrice = {{ $ticket->price }};
             const adminFee = 4500;
+            const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
             let currentDiscount = 0;
 
             const flatpickrInstance = flatpickr(".datepicker", {
@@ -294,9 +331,20 @@
             }
 
             function updateTotal() {
-                const total = ticketPrice + adminFee - currentDiscount;
+                const isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
+                const secondPrice = isSecondChecked ? pairTicketPrice : 0;
+                
+                const summarySecond = document.getElementById('row_second_ticket');
+                if (summarySecond) {
+                    if (isSecondChecked) summarySecond.classList.remove('hidden');
+                    else summarySecond.classList.add('hidden');
+                }
+
+                const total = ticketPrice + adminFee + secondPrice - currentDiscount;
                 document.getElementById('lbl_total').innerText = 'Rp ' + total.toLocaleString('id-ID');
             }
+
+            document.getElementById('cb_second_ticket')?.addEventListener('change', updateTotal);
 
             // Auto-check voucher on NIK input
             const nikInput = document.getElementById('nik');
@@ -319,7 +367,7 @@
                 btn.disabled = true; btn.innerText = '...'; 
                 
                 try {
-                    const response = await fetch('{{ route("komunitas.check-voucher") }}', {
+                    const response = await fetch('{{ route("voucher.check") }}', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                         body: JSON.stringify({ code: voucherCode, nik: nik, price: ticketPrice })
@@ -342,7 +390,7 @@
                             messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">Voucher berhasil dipasang!</span>';
                         }
                         updateTotal();
-                    } else if (code) { // Only show error if user manually clicked/entered a code
+                    } else if (voucherCode) { // Show error if a code was manually entered or checked
                         currentDiscount = 0;
                         document.getElementById('row_voucher').classList.add('hidden');
                         messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">${data.message}</span>`;

@@ -9,6 +9,8 @@ use App\Models\Participant;
 use App\Models\Setting;
 use App\Models\RaceEntry;
 use App\Models\Order;
+use App\Models\Voucher;
+use App\Models\VoucherUsage;
 use Midtrans\Config;
 use Midtrans\Snap;
 
@@ -181,6 +183,7 @@ class TicketController extends Controller
             'shuttle_bus' => 'nullable|string',
             'medical_condition' => 'nullable|string',
             'other_race_interest' => 'nullable|string',
+            'voucher_code' => 'nullable|string',
         ], [
             'required' => ':attribute wajib diisi.',
             'email' => 'Format email tidak valid.',
@@ -330,9 +333,30 @@ class TicketController extends Controller
                 \Illuminate\Support\Arr::except($validated, ['email_confirmation', 'ticket_id', 'other_race_interest'])
             );
 
-            // Check for persistent voucher entitlement
-            $voucher = Voucher::where('participant_id', $participant->id)->first();
+            // Voucher Validation
+            $voucher = null;
             $discountAmount = 0;
+            
+            // 1. Check for manual code first
+            if ($request->voucher_code) {
+                $voucher = Voucher::where('code', $request->voucher_code)->first();
+                if ($voucher) {
+                    // Validate Reusable Logic
+                    if (!$voucher->isAvailable()) {
+                        throw new \Exception('Maaf, kuota voucher ini sudah habis.');
+                    }
+
+                    // Check if THIS participant has used it
+                    $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
+                        ->where('participant_id', $participant->id)
+                        ->exists();
+
+                    if ($alreadyUsed) {
+                        throw new \Exception('Voucher ini sudah pernah Anda gunakan.');
+                    }
+                }
+            }
+
             if ($voucher) {
                 $discountAmount = $voucher->calculateDiscount($totalPrice);
                 $totalPrice -= $discountAmount;
@@ -347,10 +371,17 @@ class TicketController extends Controller
                 'admin_fee' => $adminFee,
                 'donation_event' => $donationEvent,
                 'donation_scholarship' => $donationScholarship,
-                'total_price' => $totalPrice, 
-                'voucher_code' => $voucher ? $voucher->code : null,
-                'discount_amount' => $discountAmount,
+                'total_price' => $totalPrice,
             ]);
+
+            // 6. Record Voucher Usage
+            if ($voucher) {
+                VoucherUsage::create([
+                    'voucher_id' => $voucher->id,
+                    'participant_id' => $participant->id,
+                    'order_id' => $order->id,
+                ]);
+            }
 
             // 6. Create Race Entries (HasMany Support)
             // Primary Entry
@@ -401,12 +432,22 @@ class TicketController extends Controller
         $adminFee = 4500;
 
         // Check for persistent voucher entitlement
-        $voucher = Voucher::where('participant_id', $latestParticipant->id)->first();
+        $voucher = null;
         $discountAmount = 0;
+
         $finalPrice = $ticket->price + $adminFee;
         if ($voucher) {
-            $discountAmount = $voucher->calculateDiscount($ticket->price);
-            $finalPrice -= $discountAmount;
+            // Check if THIS participant has used it even for persistent ones
+            $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
+                ->where('participant_id', $latestParticipant->id)
+                ->exists();
+
+            if ($alreadyUsed) {
+                $voucher = null;
+            } else {
+                $discountAmount = $voucher->calculateDiscount($ticket->price);
+                $finalPrice -= $discountAmount;
+            }
         }
 
         $order = Order::create([
@@ -415,9 +456,16 @@ class TicketController extends Controller
             'status' => 'pending',
             'admin_fee' => $adminFee,
             'total_price' => $finalPrice,
-            'voucher_code' => $voucher ? $voucher->code : null,
-            'discount_amount' => $discountAmount,
         ]);
+
+        // Record usage if applicable
+        if ($voucher) {
+            VoucherUsage::create([
+                'voucher_id' => $voucher->id,
+                'participant_id' => $latestParticipant->id,
+                'order_id' => $order->id,
+            ]);
+        }
 
         $latestParticipant->raceEntries()->create([
             'ticket_id' => $ticket->id,

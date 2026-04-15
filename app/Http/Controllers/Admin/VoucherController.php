@@ -11,7 +11,10 @@ class VoucherController extends Controller
 {
     public function index()
     {
-        $vouchers = Voucher::with('participant')->latest()->paginate(20);
+        $vouchers = Voucher::with(['usages.participant', 'usages.order'])
+            ->latest()
+            ->paginate(50);
+            
         return view('pages.admin.vouchers.index', compact('vouchers'));
     }
 
@@ -21,6 +24,7 @@ class VoucherController extends Controller
             'count' => 'required|integer|min:1|max:500',
             'type' => 'required|in:nominal,percentage',
             'value' => 'required|integer|min:1',
+            'usage_limit' => 'required|integer|min:1',
             'prefix' => 'nullable|string|max:10',
         ]);
 
@@ -39,6 +43,7 @@ class VoucherController extends Controller
                 'code' => $code,
                 'type' => $request->type,
                 'value' => $request->value,
+                'usage_limit' => $request->usage_limit,
             ]);
         }
 
@@ -47,7 +52,7 @@ class VoucherController extends Controller
 
     public function destroy(Voucher $voucher)
     {
-        if ($voucher->is_used) {
+        if ($voucher->used_count > 0) {
             return back()->with('error', 'Voucher yang sudah digunakan tidak dapat dihapus.');
         }
 

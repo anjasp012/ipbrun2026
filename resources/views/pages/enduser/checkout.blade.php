@@ -371,6 +371,33 @@
                     </div>
                 </div>
 
+                <!-- Voucher Code Section -->
+                <div class="mt-12 bg-slate-50 border border-slate-100 p-8 rounded-2xl relative overflow-hidden group">
+                    {{-- Decorative Icon --}}
+                    <div class="absolute -right-4 -top-4 opacity-[0.03] scale-150 text-[#003366] group-hover:scale-[1.7] transition-transform duration-700">
+                        <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"></path></svg>
+                    </div>
+
+                    <div class="relative">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-1.5 h-6 bg-[#FF7A21] rounded-full"></div>
+                            <h3 class="text-xs font-black text-[#003366] uppercase tracking-[2px]">Gunakan Kode Voucher</h3>
+                        </div>
+
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <div class="flex-1 relative">
+                                <input type="text" id="voucher_input" name="voucher_code" placeholder="Ketik kode voucher kamu di sini" 
+                                    class="w-full h-14 bg-white border-2 border-slate-100 rounded-xl px-6 font-black text-[#003366] focus:border-[#FF7A21] focus:ring-4 focus:ring-orange-500/10 transition-all outline-none uppercase tracking-widest text-sm placeholder:lowercase placeholder:font-medium placeholder:text-slate-300">
+                            </div>
+                            <button type="button" id="btn_apply_voucher"
+                                class="h-14 px-8 bg-[#003366] text-white rounded-xl font-black text-xs uppercase tracking-[2px] hover:bg-[#FF7A21] transition-all active:scale-95 shadow-lg shadow-blue-900/10">
+                                Pasang
+                            </button>
+                        </div>
+                        <div id="voucher_message" class="mt-3 min-h-[16px]"></div>
+                    </div>
+                </div>
+
                 <!-- Payment Summary (Consistent with Index Card Style) -->
                 <div
                     class="mt-12 bg-white border border-slate-100 rounded-2xl overflow-hidden transition-all duration-300">
@@ -400,6 +427,11 @@
                             <div class="flex justify-between items-center text-sm"> <span
                                     class="text-slate-500 font-medium italic">Biaya Layanan</span> <span
                                     class="text-[#003366] font-bold">Rp 4.500</span> </div>
+                            
+                            <div id="row_voucher" class="hidden flex justify-between items-center text-sm ring-2 ring-emerald-100 bg-emerald-50/30 p-2 rounded-lg">
+                                <span class="text-emerald-600 font-bold italic">Potongan Voucher (<span id="txt_voucher_code"></span>)</span>
+                                <span class="text-emerald-700 font-black">- Rp <span id="lbl_discount">0</span></span>
+                            </div>
                             @if ($pairTicket)
                                 <div id="row_second_ticket"
                                     class="hidden flex justify-between items-center text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg">
@@ -593,6 +625,7 @@
             const isIPB = "{{ $ticket->type }}" === "ipb";
             const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
             const nimInput = document.getElementById('nim_nrp');
+            let currentDiscount = 0;
 
             if (isIPB) {
                 document.getElementById('donateSection')?.classList.remove('hidden');
@@ -635,7 +668,7 @@
                     summarySecond.classList.add('hidden');
                 }
 
-                let total = ticketPrice + adminFee + donEvent + donScholar + secondPrice;
+                let total = ticketPrice + adminFee + donEvent + donScholar + secondPrice - currentDiscount;
                 const formattedTotal = 'Rp ' + total.toLocaleString('id-ID');
                 const lblTotal = document.getElementById('lbl_total');
                 if (lblTotal) lblTotal.innerText = formattedTotal;
@@ -644,6 +677,60 @@
             document.getElementById('donation_event')?.addEventListener('change', updateTotal);
             document.getElementById('donation_scholarship')?.addEventListener('change', updateTotal);
             document.getElementById('cb_second_ticket')?.addEventListener('change', updateTotal);
+
+            // Voucher Logic
+            const nikInputForVoucher = document.getElementById('nik');
+            if (nikInputForVoucher) {
+                nikInputForVoucher.addEventListener('input', function() {
+                    if (this.value.length === 16) {
+                        applyVoucher(null, this.value);
+                    }
+                });
+            }
+
+            async function applyVoucher(code = null, nik = null) {
+                const inputEl = document.getElementById('voucher_input');
+                const voucherCode = code || inputEl.value;
+                const messageEl = document.getElementById('voucher_message');
+                const btn = document.getElementById('btn_apply_voucher');
+                const nikValue = nik || nikInputForVoucher?.value;
+
+                if (!voucherCode && !nikValue) return;
+                
+                btn.disabled = true; btn.innerText = '...'; 
+                
+                try {
+                    const response = await fetch('{{ route("voucher.check") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        body: JSON.stringify({ code: voucherCode, nik: nikValue, price: ticketPrice })
+                    });
+                    const data = await response.json();
+
+                    if (data.valid) {
+                        currentDiscount = data.discount;
+                        document.getElementById('row_voucher').classList.remove('hidden');
+                        document.getElementById('txt_voucher_code').innerText = data.code;
+                        document.getElementById('lbl_discount').innerText = currentDiscount.toLocaleString('id-ID');
+                        
+                        messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">Voucher berhasil dipasang!</span>';
+                        if (code) inputEl.value = data.code; // If auto-detected
+                        
+                        updateTotal();
+                    } else if (voucherCode) {
+                        currentDiscount = 0;
+                        document.getElementById('row_voucher').classList.add('hidden');
+                        messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">${data.message}</span>`;
+                        updateTotal();
+                    }
+                } catch (e) {
+                    if (voucherCode) messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">Error mengecek voucher</span>';
+                } finally {
+                    btn.disabled = false; btn.innerText = 'Pasang';
+                }
+            }
+
+            document.getElementById('btn_apply_voucher')?.addEventListener('click', () => applyVoucher());
 
             updateTotal();
 

@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Voucher extends Model
 {
@@ -14,26 +13,43 @@ class Voucher extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'is_used' => 'boolean',
         'used_at' => 'datetime',
+        'usage_limit' => 'integer',
     ];
 
-    public function participant(): BelongsTo
+    public function usages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->belongsTo(Participant::class);
+        return $this->hasMany(VoucherUsage::class);
+    }
+
+    public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function getUsedCountAttribute()
+    {
+        return $this->usages()->count();
+    }
+
+    public function isAvailable()
+    {
+        return $this->used_count < $this->usage_limit;
+    }
+
+    public function participants(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(Participant::class, 'voucher_usages')
+            ->withPivot('order_id')
+            ->withTimestamps();
     }
 
     public static function findValid($code)
     {
         return self::where('code', $code)
-            ->whereNull('participant_id')
             ->first();
     }
 
-    public static function findAssigned($participantId)
-    {
-        return self::where('participant_id', $participantId)->first();
-    }
 
     public function calculateDiscount($originalPrice)
     {
