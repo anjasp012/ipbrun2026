@@ -1,3 +1,5 @@
+<?php 
+
 namespace App\Http\Controllers\Enduser;
 
 use App\Http\Controllers\Controller;
@@ -14,7 +16,11 @@ class VoucherController extends Controller
         $code = $request->code;
         $price = $request->price;
         
-        $voucher = Voucher::where('code', $code)->first();
+        $voucher = Voucher::where('code', $code)
+            ->when($nik, function($q) use ($nik) {
+                return $q->orWhere('code', $nik);
+            })
+            ->first();
 
         if (!$voucher) {
             return response()->json(['valid' => false, 'message' => 'Kode voucher tidak valid.']);

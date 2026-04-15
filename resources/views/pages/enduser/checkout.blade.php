@@ -714,7 +714,11 @@
                         document.getElementById('lbl_discount').innerText = currentDiscount.toLocaleString('id-ID');
                         
                         messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">Voucher berhasil dipasang!</span>';
-                        if (code) inputEl.value = data.code; // If auto-detected
+                        
+                        // Handle auto-detection: if voucher input was empty, fill it with the code found
+                        if (!inputEl.value || inputEl.value === '') {
+                             inputEl.value = data.code;
+                        }
                         
                         updateTotal();
                     } else if (voucherCode) {
