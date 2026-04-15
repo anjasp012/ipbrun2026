@@ -1,251 +1,352 @@
 <x-layouts.app title="Checkout Komunitas - IPB RUN 2026">
-    <div class="bg-slate-50 min-h-screen py-16 px-6 sm:px-12">
-        <div class="max-w-4xl mx-auto">
-            <div class="mb-12">
-                <a href="{{ url('/komunitas') }}" class="inline-flex items-center gap-2 text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-[#003366] transition-colors mb-6 group">
-                    <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    Kembali Pilih Kategori
-                </a>
-                <h1 class="text-3xl font-black text-[#003366] uppercase tracking-tighter">Formulir Pendaftaran Komunitas</h1>
-                <p class="text-slate-500 font-bold uppercase tracking-widest text-[11px] mt-2">Kategori: {{ $ticket->category->name }} ({{ $ticket->type === 'ipb' ? 'IPB Family' : 'Umum' }})</p>
-            </div>
-
-            <form action="{{ route('komunitas.register') }}" method="POST" class="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                @csrf
-                <input type="hidden" name="ticket_id" value="{{ $ticket->id }}">
-                
-                <div class="lg:col-span-2 space-y-10">
-                    {{-- Section: Personal Data --}}
-                    <div class="bg-white rounded-[2.5rem] p-10 shadow-xl shadow-blue-900/5 border border-slate-100">
-                        <h3 class="text-lg font-black text-[#003366] uppercase tracking-tight mb-8 flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">01</span>
-                            Data Pribadi
-                        </h3>
-                        <div class="space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <x-label for="name" value="Nama Lengkap" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                    <x-input id="name" name="name" :value="old('name')" required class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4" />
-                                    @error('name') <p class="text-red-500 text-[10px] font-bold mt-1 ml-1 uppercase">{{ $message }}</p> @enderror
-                                </div>
-                                <div class="space-y-2">
-                                    <x-label for="email" value="Alamat Email" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                    <x-input id="email" type="email" name="email" :value="old('email')" required class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4" />
-                                    @error('email') <p class="text-red-500 text-[10px] font-bold mt-1 ml-1 uppercase">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <x-label for="phone_number" value="Nomor WhatsApp" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                    <x-input id="phone_number" name="phone_number" :value="old('phone_number')" required class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4" />
-                                    @error('phone_number') <p class="text-red-500 text-[10px] font-bold mt-1 ml-1 uppercase">{{ $message }}</p> @enderror
-                                </div>
-                                <div class="space-y-2">
-                                    <x-label for="nik" value="NIK KTP (16 Digit)" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                    <x-input id="nik" name="nik" :value="old('nik')" required maxlength="16" class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4" />
-                                    @error('nik') <p class="text-red-500 text-[10px] font-bold mt-1 ml-1 uppercase">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <x-label for="date_birth" value="Tanggal Lahir" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                    <x-input id="date_birth" type="date" name="date_birth" :value="old('date_birth')" required class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4" />
-                                    @error('date_birth') <p class="text-red-500 text-[10px] font-bold mt-1 ml-1 uppercase">{{ $message }}</p> @enderror
-                                </div>
-                                <div class="space-y-2">
-                                    <x-label for="sex" value="Jenis Kelamin" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                    <select name="sex" required class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4 font-bold text-slate-700">
-                                        <option value="male" {{ old('sex') == 'male' ? 'selected' : '' }}>Laki-laki</option>
-                                        <option value="female" {{ old('sex') == 'female' ? 'selected' : '' }}>Perempuan</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <x-label for="blood_type" value="Golongan Darah" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                    <select name="blood_type" required class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4 font-bold text-slate-700">
-                                        @foreach(['A','A+','A-','B','B+','B-','AB','AB+','AB-','O','O+','O-','-'] as $bt)
-                                            <option value="{{ $bt }}" {{ old('blood_type') == $bt ? 'selected' : '' }}>{{ $bt }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="space-y-2">
-                                    <x-label for="jersey_size" value="Ukuran Jersey" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                    <select name="jersey_size" required class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4 font-bold text-slate-700">
-                                        @foreach(['XS','S','M','L','XL','2XL','3XL','4XL','5XL'] as $size)
-                                            <option value="{{ $size }}" {{ old('jersey_size') == $size ? 'selected' : '' }}>{{ $size }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <x-label for="nationality" value="Kewarganegaraan" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                <x-input id="nationality" name="nationality" :value="old('nationality', 'Indonesia')" required class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4" />
-                            </div>
-                            <div class="space-y-2">
-                                <x-label for="address" value="Alamat Lengkap" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                <textarea name="address" required class="w-full bg-slate-50 border-slate-100 rounded-xl px-4 py-3 min-h-[100px] font-bold text-slate-700">{{ old('address') }}</textarea>
-                            </div>
+    <div class="fixed inset-0 bg-[#f1f5f9] z-[-2]"></div>
+    <div class="fixed inset-0 z-[-1] bg-cover bg-center bg-fixed opacity-100"
+        style="background-image: url('{{ asset('assets/images/bg.png') }}')"></div>
+    <div class="fixed inset-0 bg-blue-950/25 z-[-1]"></div>
+    <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+        <!-- Main Form Container: Aligned with Index Card Style -->
+        <div
+            class="max-w-[1000px] w-full bg-white border border-slate-100 rounded-2xl shadow-sm md:p-14 p-8 transition-all duration-300">
+            <div class="mb-10 text-center">
+                <h1 class="text-3xl font-[800] text-[#003366] uppercase tracking-tight">Pendaftaran Komunitas</h1>
+                <!-- Ticket Card Head -->
+                <div class="mt-10 relative bg-white border border-slate-100 rounded-t-2xl overflow-hidden">
+                    <div class="p-6 text-center">
+                        <div
+                            class="text-[17px] font-[800] text-[#003366] leading-tight font-['Plus_Jakarta_Sans'] uppercase mb-1">
+                            {{ $ticket->category->name }} {{ $ticket->name ?: strtoupper($ticket->type) }} </div>
+                        <div class="text-[11px] text-[#E8630A] font-[800] uppercase tracking-[0.5px] opacity-80">
+                            {{ $ticket->period->name ?? 'Standard' }} </div>
+                    </div> <!-- Perforation Detail -->
+                    <div class="relative flex items-center py-1 overflow-hidden pointer-events-none">
+                        <div
+                            class="absolute -left-3 w-6 h-6 bg-white rounded-full shadow-inner ring-1 ring-inset ring-slate-100/30">
                         </div>
-                    </div>
-
-                    {{-- Section: Emergency Contact & Others --}}
-                    <div class="bg-white rounded-[2.5rem] p-10 shadow-xl shadow-blue-900/5 border border-slate-100">
-                        <h3 class="text-lg font-black text-[#003366] uppercase tracking-tight mb-8 flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center text-sm">02</span>
-                            Data Kontak Darurat & Lari
-                        </h3>
-                        <div class="space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <x-label for="emergency_contact_name" value="Nama Kontak Darurat" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                    <x-input id="emergency_contact_name" name="emergency_contact_name" :value="old('emergency_contact_name')" required class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4" />
-                                </div>
-                                <div class="space-y-2">
-                                    <x-label for="emergency_contact_phone_number" value="Nomor HP Darurat" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                    <x-input id="emergency_contact_phone_number" name="emergency_contact_phone_number" :value="old('emergency_contact_phone_number')" required class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4" />
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <x-label for="emergency_contact_relationship" value="Hubungan" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                <x-input id="emergency_contact_relationship" name="emergency_contact_relationship" :value="old('emergency_contact_relationship')" required class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4" />
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                                <div class="space-y-2">
-                                    <x-label for="running_community" value="Komunitas Lari" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                    <x-input id="running_community" name="running_community" :value="old('running_community')" placeholder="Opsional" class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4" />
-                                </div>
-                                <div class="space-y-2">
-                                    <x-label for="shuttle_bus" value="Shuttle Bus (Pilih Lokasi)" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                    <select name="shuttle_bus" class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl px-4 font-bold text-slate-700">
-                                        <option value="">Tidak Menggunakan</option>
-                                        <option value="Botani Square (Jalan Pajajaran, Bogor)">Botani Square (Bogor)</option>
-                                        <option value="Gedung Alumni IPB (Baranangsiang, Bogor)">Gedung Alumni IPB (Bogor)</option>
-                                        <option value="FX Sudirman (Jakarta Selatan)">FX Sudirman (Jakarta)</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <x-label for="medical_condition" value="Kondisi Medis" class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1" />
-                                <textarea name="medical_condition" placeholder="Punya riwayat asma, jantung, alergi, atau kondisi medis lainnya? (Isi - jika tidak ada)" class="w-full bg-slate-50 border-slate-100 rounded-xl px-4 py-3 min-h-[100px] font-bold text-slate-700">{{ old('medical_condition') }}</textarea>
-                            </div>
+                        <div
+                            class="absolute -right-3 w-6 h-6 bg-white rounded-full shadow-inner ring-1 ring-inset ring-slate-100/30">
                         </div>
+                        <div class="w-full border-t border-dashed border-slate-200 mx-5"></div>
+                    </div> <!-- Price Part -->
+                    <div class="p-5 bg-slate-50/40 rounded-b-2xl"> <span
+                            class="text-[10px] text-slate-400 font-[800] uppercase tracking-wider block mb-1">Entry
+                            Fee</span>
+                        <div class="text-[22px] font-[900] text-[#003366] leading-none font-['Plus_Jakarta_Sans']">Rp
+                            {{ number_format($ticket->price, 0, ',', '.') }}</div>
                     </div>
                 </div>
+            </div>
+            <form id="registrationForm" action="{{ route('komunitas.register') }}" method="POST"> @csrf 
+                <input type="hidden" name="ticket_id" value="{{ $ticket->id }}"> 
+                
+                <!-- General Error Alert -->
+                @if ($errors->any())
+                    <div class="mb-8 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl">
+                        <div class="flex items-center gap-3"> <svg class="w-5 h-5 text-red-500" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-xs font-bold text-red-700 uppercase tracking-tight">
+                                Silakan periksa kembali isian formulir Anda.
+                            </p>
+                        </div>
+                    </div>
+                @endif 
 
-                <div class="space-y-8">
-                    {{-- Voucher Card --}}
-                    <div class="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-blue-900/5 border border-slate-100">
-                        <h3 class="text-sm font-black text-[#003366] uppercase tracking-widest mb-6">Kode Voucher</h3>
-                        <div class="flex gap-2">
-                            <input type="text" id="voucher_input" name="voucher_code" placeholder="KODE VOUCHER"
-                                class="flex-1 h-12 bg-slate-50 border-slate-100 rounded-xl px-4 font-black text-slate-700 text-sm placeholder:text-slate-300 uppercase">
-                            <button type="button" id="apply_voucher"
-                                class="px-6 h-12 bg-emerald-600 text-white font-black rounded-xl uppercase text-[10px] tracking-widest hover:bg-emerald-700 transition-all active:scale-95">
-                                Cek
+                <!-- Form Fields -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2"> <x-label for="name">Nama Lengkap (Sesuai KTP) *</x-label> <x-input
+                            id="name" name="name" placeholder="Ketik nama lengkap Anda" required
+                            value="{{ old('name') }}"
+                            class="{{ $errors->has('name') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('name')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+                    <div> <x-label for="email">Alamat Email (Untuk Notifikasi) *</x-label> <x-input type="email" id="email"
+                            name="email" placeholder="nama@email.com" required value="{{ old('email') }}"
+                            class="{{ $errors->has('email') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('email')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                        </p>@else<p
+                                class="mt-2 text-[10px] text-[#E8630A] font-bold uppercase tracking-wider leading-tight">
+                                Digunakan untuk pengiriman invoice & info lomba</p>
+                        @enderror
+                    </div>
+                    <div> <x-label for="phone_number">Nomor WhatsApp *</x-label> <x-input id="phone_number"
+                            name="phone_number" placeholder="08xxxxxxxxx" required :numeric="true" maxlength="14"
+                            value="{{ old('phone_number') }}"
+                            class="{{ $errors->has('phone_number') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('phone_number')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+                    <div> <x-label for="nik">NIK KTP *</x-label> <x-input id="nik" name="nik"
+                            placeholder="16 digit NIK" required :numeric="true" maxlength="16"
+                            value="{{ old('nik') }}"
+                            class="{{ $errors->has('nik') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('nik')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                            </p>
+                        @else<p
+                                class="mt-2 text-[10px] text-[#E8630A] font-bold uppercase tracking-wider leading-tight">
+                                NIK akan digunakan sebagai Username & Password login pembatalan/dashboard</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <x-label for="date_birth">Tanggal Lahir *</x-label>
+                        <div class="relative group">
+                            <x-input id="date_birth" name="date_birth"
+                                class="datepicker block w-full bg-white pr-12 {{ $errors->has('date_birth') ? '!border-red-500 ring-4 ring-red-50' : '' }}"
+                                placeholder="DD-MM-YYYY" required value="{{ old('date_birth') }}" />
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-4 cursor-pointer text-slate-400 hover:text-[#003366] transition-colors"
+                                onclick="document.getElementById('date_birth')._flatpickr.open()">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                            </div>
+                        </div>
+                        @error('date_birth')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+                    <div> <x-label for="sex">Jenis Kelamin *</x-label> <x-select id="sex" name="sex"
+                            required :options="['male' => 'Laki-laki', 'female' => 'Perempuan']" :selected="old('sex')"
+                            class="{{ $errors->has('sex') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                    </div>
+                    <div> <x-label for="blood_type">Golongan Darah *</x-label> <x-select id="blood_type"
+                            name="blood_type" required :options="['A'=>'A','A+'=>'A+','A-'=>'A-','B'=>'B','B+'=>'B+','B-'=>'B-','AB'=>'AB','AB+'=>'AB+','AB-'=>'AB-','O'=>'O','O+'=>'O+','O-'=>'O-','-'=>'-']" :selected="old('blood_type')"
+                            class="{{ $errors->has('blood_type') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <x-label for="jersey_size" class="!mb-0">Ukuran Jersey *</x-label>
+                            <button type="button" onclick="showSizeChart()"
+                                class="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Size Chart
                             </button>
                         </div>
-                        <div id="voucher_message" class="mt-3 ml-1"></div>
+                        <x-select id="jersey_size" name="jersey_size" required :options="['XS'=>'XS','S'=>'S','M'=>'M','L'=>'L','XL'=>'XL','2XL'=>'2XL','3XL'=>'3XL','4XL'=>'4XL','5XL'=>'5XL']" :selected="old('jersey_size')"
+                            class="{{ $errors->has('jersey_size') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                    </div>
+                    
+                    @if($ticket->type === 'ipb')
+                    <div> <x-label for="nim_nrp">NIM/NRP *</x-label>
+                        <x-input id="nim_nrp" name="nim_nrp" placeholder="Khusus Mahasiswa/Alumni IPB"
+                            required value="{{ old('nim_nrp') }}" minlength="6"
+                            class="{{ $errors->has('nim_nrp') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                        @error('nim_nrp')
+                            <p class="text-red-500 text-[10px] font-bold mt-1 uppercase tracking-wider">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    @endif
+
+                    <div> <x-label for="nationality">Kewarganegaraan</x-label> <x-input id="nationality"
+                            name="nationality" value="{{ old('nationality', 'Indonesia') }}" required
+                            class="{{ $errors->has('nationality') ? '!border-red-500 ring-4 ring-red-50' : '' }}" />
+                    </div>
+                    <div class="md:col-span-2"> <x-label for="address">Alamat Lengkap *</x-label> <x-textarea
+                            id="address" name="address" rows="2" placeholder="Alamat pengiriman/domisili"
+                            required
+                            class="{{ $errors->has('address') ? '!border-red-500 ring-4 ring-red-50' : '' }}">{{ old('address') }}</x-textarea>
                     </div>
 
-                    {{-- Summary Card --}}
-                    <div class="bg-gradient-to-br from-[#003366] to-blue-900 rounded-[2.5rem] p-10 shadow-2xl shadow-blue-900/20 text-white sticky top-24">
-                        <h3 class="text-sm font-black uppercase tracking-widest mb-8 opacity-60">Ringkasan Pesanan</h3>
-                        <div class="space-y-5 border-b border-white/10 pb-8 mb-8">
-                            <div class="flex justify-between items-center">
-                                <span class="text-[11px] font-bold uppercase tracking-widest opacity-60 text-white/80">Kategori Tiket</span>
-                                <span class="text-xs font-black uppercase tracking-wider">{{ $ticket->category->name }}</span>
+                    <div class="md:col-span-2 mt-4 text-[#003366] font-black text-sm uppercase tracking-widest border-b border-slate-100 pb-2">Optional Running Data</div>
+                    <div> <x-label for="running_community">Komunitas Lari</x-label> <x-input id="running_community" name="running_community" value="{{ old('running_community') }}" /> </div>
+                    <div> <x-label for="shuttle_bus">Shuttle Bus</x-label>
+                        <x-select id="shuttle_bus" name="shuttle_bus" :options="[''=>'Tidak Menggunakan','Botani Square (Bogor)'=>'Botani Square (Bogor)','Gedung Alumni IPB (Bogor)'=>'Gedung Alumni IPB (Bogor)','FX Sudirman (Jakarta)'=>'FX Sudirman (Jakarta)']" :selected="old('shuttle_bus')" />
+                    </div>
+                    <div class="md:col-span-2"> <x-label for="medical_condition">Kondisi Medis</x-label> <x-textarea id="medical_condition" name="medical_condition" rows="2" placeholder="Sebutkan (jika ada)">{{ old('medical_condition') }}</x-textarea> </div>
+
+                    <div class="md:col-span-2 mt-4 text-[#003366] font-black text-sm uppercase tracking-widest border-b border-slate-100 pb-2">Emergency Contact</div>
+                    <div> <x-label for="emergency_contact_name">Nama Kontak *</x-label> <x-input id="emergency_contact_name" name="emergency_contact_name" required value="{{ old('emergency_contact_name') }}" /> </div>
+                    <div> <x-label for="emergency_contact_phone_number">Nomor HP *</x-label> <x-input id="emergency_contact_phone_number" name="emergency_contact_phone_number" required :numeric="true" value="{{ old('emergency_contact_phone_number') }}" /> </div>
+                    <div class="md:col-span-2"> <x-label for="emergency_contact_relationship">Hubungan *</x-label> <x-input id="emergency_contact_relationship" name="emergency_contact_relationship" required value="{{ old('emergency_contact_relationship') }}" /> </div>
+                </div> 
+
+                <!-- Disclaimer -->
+                <div class="mt-8 space-y-4">
+                    <h3 class="text-sm font-black text-[#003366] uppercase tracking-[2px] mb-4 pb-2 border-b border-slate-100">Persetujuan & Disclaimer</h3>
+                    <label class="flex items-start gap-4 cursor-pointer group py-3 px-4 bg-slate-50/50 rounded-xl transition-all">
+                        <input type="checkbox" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer disclaimer-cb">
+                        <span class="text-[11px] text-slate-600 leading-relaxed font-medium">Saya sebagai peserta IPB RUN 2026 akan mematuhi ketentuan lomba & memahami risiko kegiatan ini. Panitia dibebaskan dari segala tuntutan. <span class="text-red-500 font-black">*</span></span>
+                    </label>
+                    <label class="flex items-start gap-4 cursor-pointer group py-3 px-4 bg-slate-50/50 rounded-xl transition-all">
+                        <input type="checkbox" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer disclaimer-cb">
+                        <span class="text-[11px] text-slate-600 leading-relaxed font-medium">Saya memberikan hak kepada panitia menggunakan dokumentasi foto/video untuk keperluan resmi. <span class="text-red-500 font-black">*</span></span>
+                    </label>
+                    <label class="flex items-start gap-4 cursor-pointer group py-3 px-4 bg-slate-50/50 rounded-xl transition-all">
+                        <input type="checkbox" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer disclaimer-cb">
+                        <span class="text-[11px] text-slate-600 leading-relaxed font-medium">Saya menjamin seluruh data yang diisi adalah benar dan akurat. <span class="text-red-500 font-black">*</span></span>
+                    </label>
+                </div>
+
+                <!-- Payment Summary with Voucher Integration -->
+                <div class="mt-12 bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="p-8 pb-1">
+                        <h3 class="text-[15px] font-[800] text-[#003366] leading-tight uppercase tracking-tight mb-2">Rekapitulasi Pembayaran</h3>
+                        <p class="text-[10px] text-[#E8630A] font-[800] uppercase tracking-[0.5px] opacity-80 mb-4">Total tagihan yang harus dibayarkan</p>
+                    </div> 
+                    <!-- Perforation Detail -->
+                    <div class="relative flex items-center py-2 overflow-hidden pointer-events-none">
+                        <div class="absolute -left-3 w-6 h-6 bg-[#f1f5f9] rounded-full ring-1 ring-inset ring-slate-100/30"></div>
+                        <div class="absolute -right-3 w-6 h-6 bg-[#f1f5f9] rounded-full ring-1 ring-inset ring-slate-100/30"></div>
+                        <div class="w-full border-t-2 border-dashed border-slate-200 mx-5"></div>
+                    </div> 
+                    <!-- Summary Content -->
+                    <div class="p-8 pt-4 bg-slate-50/40 space-y-4">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center text-sm"> 
+                                <span class="text-slate-500 font-medium italic">Tiket {{ $ticket->category->name }} ({{ strtoupper($ticket->type) }})</span> 
+                                <span class="text-[#003366] font-bold">Rp {{ number_format($ticket->price, 0, ',', '.') }}</span> 
                             </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[11px] font-bold uppercase tracking-widest opacity-60 text-white/80">Harga Tiket</span>
-                                <span class="text-sm font-black">Rp {{ number_format($ticket->price, 0, ',', '.') }}</span>
+                            <div class="flex justify-between items-center text-sm"> 
+                                <span class="text-slate-500 font-medium italic">Biaya Layanan</span> 
+                                <span class="text-[#003366] font-bold">Rp 4.500</span> 
                             </div>
-                            <div class="flex justify-between items-center text-emerald-400" id="discount_row" style="display: none;">
-                                <span class="text-[11px] font-bold uppercase tracking-widest">Diskon Voucher</span>
-                                <span class="text-sm font-black">- Rp <span id="discount_amount">0</span></span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[11px] font-bold uppercase tracking-widest opacity-60 text-white/80">Biaya Layanan</span>
-                                <span class="text-sm font-black">Rp 4.500</span>
+                            <!-- Voucher Row -->
+                            <div id="row_voucher" class="hidden flex justify-between items-center text-sm">
+                                <span class="text-emerald-600 font-bold italic">Potongan Voucher (<span id="txt_voucher_code"></span>)</span>
+                                <span class="text-emerald-600 font-black">- Rp <span id="lbl_discount">0</span></span>
                             </div>
                         </div>
-                        <div class="flex justify-between items-end mb-10">
-                            <div>
-                                <span class="block text-[10px] font-black uppercase tracking-[3px] opacity-40 mb-1">Total Pembayaran</span>
-                                <span class="text-3xl font-black tracking-tighter">Rp <span id="final_total">{{ number_format($ticket->price + 4500, 0, ',', '.') }}</span></span>
+
+                        <!-- Voucher Input Area -->
+                        <div class="py-4 border-y border-dashed border-slate-200">
+                            <div class="flex flex-col gap-2">
+                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ml-1">Punya Kode Voucher Komunitas?</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="voucher_input" name="voucher_code" placeholder="MASUKKAN KODE" value="{{ old('voucher_code') }}"
+                                        class="flex-1 h-11 bg-white border-slate-200 rounded-xl px-4 font-black text-slate-700 text-xs placeholder:text-slate-300 uppercase focus:ring-2 focus:ring-[#003366]/10 outline-none transition-all">
+                                    <button type="button" id="btn_apply_voucher"
+                                        class="px-6 h-11 bg-emerald-600 text-white font-black rounded-xl uppercase text-[10px] tracking-widest hover:bg-emerald-700 transition-all active:scale-95">
+                                        Cek
+                                    </button>
+                                </div>
+                                <div id="voucher_message" class="mt-1 ml-1"></div>
                             </div>
                         </div>
-                        <button type="submit" class="w-full h-16 bg-orange-500 hover:bg-orange-600 active:scale-[0.98] rounded-2xl font-black uppercase tracking-[3px] text-sm shadow-xl shadow-orange-950/20 transition-all flex items-center justify-center gap-4">
-                            Daftar Sekarang
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-                        </button>
+
+                        <div class="pt-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                            <div class="flex flex-col"> 
+                                <span class="text-[10px] text-slate-400 font-[800] uppercase tracking-wider block mb-1">Total Bayar</span>
+                                <div id="lbl_total" class="text-[32px] font-[900] text-[#003366] leading-none font-['Plus_Jakarta_Sans']">
+                                    Rp {{ number_format($ticket->price + 4500, 0, ',', '.') }}
+                                </div>
+                            </div> 
+                            <x-button type="submit" id="btn_submit" disabled
+                                class="w-full md:w-auto px-10 py-4 bg-[#003366] text-white rounded-xl font-[800] text-[15px] transition-all opacity-50 cursor-not-allowed uppercase tracking-widest">
+                                Daftar Sekarang </x-button>
+                        </div>
                     </div>
                 </div>
+                <div class="mt-8 text-center"> <a href="{{ url('/komunitas') }}"
+                        class="inline-flex items-center gap-2 text-slate-400 font-bold text-[11px] uppercase tracking-widest hover:text-[#003366] transition-all">
+                        ← Batal & Pilih Kategori Lain </a> </div>
             </form>
         </div>
     </div>
 
     @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        const originalPrice = {{ $ticket->price }};
-        const adminFee = 4500;
-        let discount = 0;
+        function showSizeChart() {
+            Swal.fire({
+                title: '<span class="text-[#003366] font-black uppercase text-2xl">Size Chart</span>',
+                html: `<div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 mt-4">Tabel ukuran jersey... (Sesuai Standar)</div>`,
+                confirmButtonText: 'OKE',
+                confirmButtonColor: '#003366',
+                customClass: { popup: 'rounded-3xl', confirmButton: 'rounded-xl px-8 font-black' }
+            });
+        }
 
-        document.getElementById('apply_voucher').addEventListener('click', async function() {
-            const code = document.getElementById('voucher_input').value;
-            const messageEl = document.getElementById('voucher_message');
-            const discountRow = document.getElementById('discount_row');
-            const discountAmountEl = document.getElementById('discount_amount');
-            const finalTotalEl = document.getElementById('final_total');
-            const btn = this;
+        document.addEventListener('DOMContentLoaded', function() {
+            const ticketPrice = {{ $ticket->price }};
+            const adminFee = 4500;
+            let currentDiscount = 0;
 
-            if (!code) return;
+            const flatpickrInstance = flatpickr(".datepicker", {
+                locale: "id",
+                dateFormat: "d-m-Y",
+                maxDate: "today",
+                allowInput: true,
+                disableMobile: "true"
+            });
 
-            btn.disabled = true;
-            btn.innerHTML = '...';
-            messageEl.innerHTML = '';
-
-            try {
-                const response = await fetch('{{ route("komunitas.check-voucher") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ code: code, price: originalPrice })
+            // Input Masking for Date
+            const birthInput = document.getElementById('date_birth');
+            if (birthInput) {
+                birthInput.addEventListener('input', function(e) {
+                    let v = e.target.value.replace(/\D/g, '').slice(0, 8);
+                    if (v.length > 2) v = v.slice(0, 2) + '-' + v.slice(2);
+                    if (v.length > 5) v = v.slice(0, 5) + '-' + v.slice(5);
+                    e.target.value = v;
                 });
-                const data = await response.json();
-
-                if (data.valid) {
-                    discount = data.discount;
-                    discountRow.style.display = 'flex';
-                    discountAmountEl.innerText = discount.toLocaleString('id-ID');
-                    const total = (originalPrice - discount) + adminFee;
-                    finalTotalEl.innerText = total.toLocaleString('id-ID');
-                    messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">Voucher berhasil diterapkan! (-${data.type === 'nominal' ? 'Rp ' + data.value.toLocaleString('id-ID') : data.value + '%'})</span>`;
-                } else {
-                    discount = 0;
-                    discountRow.style.display = 'none';
-                    const total = originalPrice + adminFee;
-                    finalTotalEl.innerText = total.toLocaleString('id-ID');
-                    messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest animate-shake text-left block">${data.message}</span>`;
-                }
-            } catch (error) {
-                console.error(error);
-                messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">Gagal mengecek voucher. Silakan coba lagi.</span>';
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = 'Cek';
             }
+
+            function updateTotal() {
+                const total = ticketPrice + adminFee - currentDiscount;
+                document.getElementById('lbl_total').innerText = 'Rp ' + total.toLocaleString('id-ID');
+            }
+
+            // Voucher AJAX
+            document.getElementById('btn_apply_voucher').addEventListener('click', async function() {
+                const code = document.getElementById('voucher_input').value;
+                const messageEl = document.getElementById('voucher_message');
+                const btn = this;
+
+                if (!code) return;
+                btn.disabled = true; btn.innerText = '...'; messageEl.innerHTML = '';
+
+                try {
+                    const response = await fetch('{{ route("komunitas.check-voucher") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        body: JSON.stringify({ code: code, price: ticketPrice })
+                    });
+                    const data = await response.json();
+
+                    if (data.valid) {
+                        currentDiscount = data.discount;
+                        document.getElementById('row_voucher').classList.remove('hidden');
+                        document.getElementById('txt_voucher_code').innerText = code;
+                        document.getElementById('lbl_discount').innerText = currentDiscount.toLocaleString('id-ID');
+                        messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">Voucher diterapkan!</span>';
+                        updateTotal();
+                    } else {
+                        currentDiscount = 0;
+                        document.getElementById('row_voucher').classList.add('hidden');
+                        messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">${data.message}</span>`;
+                        updateTotal();
+                    }
+                } catch (e) {
+                    messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">Error mengecek voucher</span>';
+                } finally {
+                    btn.disabled = false; btn.innerText = 'Cek';
+                }
+            });
+
+            const disclaimers = document.querySelectorAll('.disclaimer-cb');
+            const submitBtn = document.getElementById('btn_submit');
+            function checkDisclaimers() {
+                let allChecked = Array.from(disclaimers).every(cb => cb.checked);
+                submitBtn.disabled = !allChecked;
+                submitBtn.classList.toggle('opacity-50', !allChecked);
+                submitBtn.classList.toggle('cursor-not-allowed', !allChecked);
+                submitBtn.classList.toggle('hover:bg-[#002244]', allChecked);
+                submitBtn.classList.toggle('active:scale-95', allChecked);
+            }
+            disclaimers.forEach(cb => cb.addEventListener('change', checkDisclaimers));
         });
     </script>
-    <style>
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-            20%, 40%, 60%, 80% { transform: translateX(2px); }
-        }
-        .animate-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-    </style>
     @endpush
 </x-layouts.app>

@@ -37,6 +37,7 @@
     <div class="relative">
         {{ $slot }}
     </div>
+    @stack('scripts')
 </body>
 
 </html>
