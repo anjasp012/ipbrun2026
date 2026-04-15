@@ -95,14 +95,14 @@
                                         <!-- Price / Action -->
                                         <div
                                             class="p-3 md:p-6 pt-2 md:pt-4 bg-slate-50/40 rounded-b-2xl transition-colors mt-auto">
-                                            <div class="mb-3 md:mb-4">
+                                            <!-- <div class="mb-3 md:mb-4">
                                                 <span
                                                     class="text-[9px] md:text-[11px] text-slate-400 font-[800] uppercase tracking-wider block mb-0.5">Price
                                                     Entry</span>
                                                 <span
                                                     class="text-[15px] md:text-[21px] font-[900] text-[#003366] leading-none font-['Plus_Jakarta_Sans']">Rp
                                                     {{ number_format($ticket->price, 0, ',', '.') }}</span>
-                                            </div>
+                                            </div> -->
 
                                             @if ($qty > 0)
                                                 @auth
