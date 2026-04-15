@@ -40,10 +40,20 @@
                         @forelse($vouchers as $voucher)
                             <tr class="hover:bg-slate-50/40 transition-colors group">
                                 <td class="px-8 py-5">
-                                    <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-3" x-data="{ copied: false }">
                                         <span class="font-black text-[#003366] font-mono text-base uppercase bg-blue-50/50 px-4 py-2 rounded-xl border border-blue-100/50 group-hover:border-blue-200 transition-all">
                                             {{ $voucher->code }}
                                         </span>
+                                        <button @click="navigator.clipboard.writeText('{{ $voucher->code }}'); copied = true; setTimeout(() => copied = false, 2000)"
+                                            class="p-2 text-slate-400 hover:text-[#003366] hover:bg-blue-50 rounded-lg transition-all border border-transparent hover:border-blue-100 active:scale-90"
+                                            title="Salin Kode">
+                                            <svg x-show="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                                            </svg>
+                                            <svg x-show="copied" x-cloak class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </td>
                                 <td class="px-8 py-5 text-center">
