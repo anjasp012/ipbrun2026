@@ -111,7 +111,28 @@ class TicketController extends Controller
         $potentialVoucher = null;
         $potentialDiscount = 0;
         if ($pairRecommendation) {
-            $potentialVoucher = Voucher::where('code', $participant->nik)->first();
+            // Find existing voucher usage (Priority: Successful PAID usage history)
+            $lastUsage = VoucherUsage::where('participant_id', $participant->id)
+                ->whereHas('order', function ($q) {
+                    $q->where('status', 'paid');
+                })
+                ->latest()
+                ->first() 
+                ?? 
+                VoucherUsage::where('participant_id', $participant->id)
+                ->whereHas('order', function ($q) {
+                    $q->where('status', 'pending');
+                })
+                ->latest()
+                ->first();
+
+            if ($lastUsage) {
+                $potentialVoucher = $lastUsage->voucher;
+            } else {
+                // Fallback to NIK-based voucher if no history found
+                $potentialVoucher = Voucher::where('code', $participant->nik)->first();
+            }
+
             if ($potentialVoucher) {
                 // Determine if this participant already used this specific voucher
                 $alreadyUsed = VoucherUsage::where('voucher_id', $potentialVoucher->id)
@@ -392,32 +413,102 @@ class TicketController extends Controller
         $user = auth()->user();
         if (!$user) return redirect('/login');
 
-        // 1. Get personal data from single participant profile
-        $latestParticipant = $user->participant;
-
-        if (!$latestParticipant) {
-            return redirect('/')->with('error', 'Data profil Anda belum ditemukan. Silakan daftar manual terlebih dahulu.');
+        $participant = $user->participant;
+        if (!$participant) {
+            return redirect('/')->with('error', 'Data profil Anda belum ditemukan.');
         }
 
-        // 2. Duplicate check (NIK + Ticket)
-        $exists = RaceEntry::whereHas('participant', function ($q) use ($latestParticipant) {
-            $q->where('nik', $latestParticipant->nik);
+        // Duplicate check
+        $exists = RaceEntry::whereHas('participant', function ($q) use ($participant) {
+            $q->where('nik', $participant->nik);
         })->where('ticket_id', $ticket->id)
             ->whereIn('status', ['pending', 'paid'])
-            ->count();
+            ->exists();
 
         if ($exists) {
             return back()->with('error', 'Anda sudah terdaftar atau memiliki pesanan tertunda untuk kategori ini!');
         }
 
-        // 3. Create new Participant row (Cloning Profile)
-        $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
-        $adminFee = 4500;
+        // Find existing voucher usage (Priority: Successful PAID usage history)
+        $lastUsage = VoucherUsage::where('participant_id', $participant->id)
+            ->whereHas('order', function ($q) {
+                $q->where('status', 'paid');
+            })
+            ->latest()
+            ->first() 
+            ?? 
+            VoucherUsage::where('participant_id', $participant->id)
+            ->whereHas('order', function ($q) {
+                $q->where('status', 'pending');
+            })
+            ->latest()
+            ->first();
 
-        // Check for persistent voucher entitlement (e.g. Community NIK)
-        $voucher = Voucher::where('code', $latestParticipant->nik)->first();
+        if ($lastUsage) {
+            $voucher = $lastUsage->voucher;
+        } else {
+            $voucher = Voucher::where('code', $participant->nik)->first();
+        }
+
         $discountAmount = 0;
+        if ($voucher) {
+            $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
+                ->where('participant_id', $participant->id)
+                ->exists();
 
+            if ($voucher->isAvailable() || $alreadyUsed) {
+                $discountAmount = $voucher->calculateDiscount($ticket->price);
+            } else {
+                $voucher = null;
+            }
+        }
+
+        return view('pages.enduser.buy_more', compact('participant', 'ticket', 'voucher', 'discountAmount'));
+    }
+
+    public function buyMoreProcess(Ticket $ticket)
+    {
+        $user = auth()->user();
+        if (!$user) return redirect('/login');
+
+        $latestParticipant = $user->participant;
+        if (!$latestParticipant) {
+            return redirect('/')->with('error', 'Data profil Anda belum ditemukan.');
+        }
+
+        // Duplicate check
+        $exists = RaceEntry::whereHas('participant', function ($q) use ($latestParticipant) {
+            $q->where('nik', $latestParticipant->nik);
+        })->where('ticket_id', $ticket->id)
+            ->whereIn('status', ['pending', 'paid'])
+            ->exists();
+
+        if ($exists) {
+            return back()->with('error', 'Anda sudah terdaftar atau memiliki pesanan tertunda untuk kategori ini!');
+        }
+
+        // Find existing voucher usage (Priority: Successful PAID usage history)
+        $lastUsage = VoucherUsage::where('participant_id', $latestParticipant->id)
+            ->whereHas('order', function ($q) {
+                $q->where('status', 'paid');
+            })
+            ->latest()
+            ->first() 
+            ?? 
+            VoucherUsage::where('participant_id', $latestParticipant->id)
+            ->whereHas('order', function ($q) {
+                $q->where('status', 'pending');
+            })
+            ->latest()
+            ->first();
+
+        if ($lastUsage) {
+            $voucher = $lastUsage->voucher;
+        } else {
+            $voucher = Voucher::where('code', $latestParticipant->nik)->first();
+        }
+
+        $discountAmount = 0;
         if ($voucher) {
             $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
                 ->where('participant_id', $latestParticipant->id)
@@ -426,11 +517,14 @@ class TicketController extends Controller
             if ($voucher->isAvailable() || $alreadyUsed) {
                 $discountAmount = $voucher->calculateDiscount($ticket->price);
             } else {
-                $voucher = null; // Clear if quota reached and not a previous user
+                $voucher = null;
             }
         }
 
-        $finalPrice = ($ticket->price + $adminFee) - $discountAmount;
+        $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
+        $adminFee = 4500;
+        $totalTicketPrice = $ticket->price;
+        $finalPrice = ($totalTicketPrice - $discountAmount) + $adminFee;
 
         $order = Order::create([
             'participant_id' => $latestParticipant->id,
@@ -442,7 +536,6 @@ class TicketController extends Controller
             'voucher_code' => $voucher ? $voucher->code : null,
         ]);
 
-        // Record usage if a voucher was applied
         if ($voucher) {
             VoucherUsage::create([
                 'voucher_id' => $voucher->id,

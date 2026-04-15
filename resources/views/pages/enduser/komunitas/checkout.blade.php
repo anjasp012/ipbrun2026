@@ -399,9 +399,6 @@
                                     ({{ $ticket->name ?: strtoupper($ticket->type) }})</span> <span
                                     class="text-[#003366] font-bold">Rp
                                     {{ number_format($ticket->price, 0, ',', '.') }}</span> </div>
-                            <div class="flex justify-between items-center text-sm"> <span
-                                    class="text-slate-500 font-medium italic">Biaya Layanan</span> <span
-                                    class="text-[#003366] font-bold">Rp 4.500</span> </div>
  
                             @if ($pairTicket)
                                 <div id="row_second_ticket"
@@ -413,6 +410,13 @@
                                         {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
                                 </div>
                             @endif
+
+                            <!-- Voucher Row (Community Style) -->
+                            <div id="row_voucher" class="hidden flex justify-between items-center text-sm ring-2 ring-emerald-100 bg-emerald-50/30 p-2 rounded-lg">
+                                <span class="text-emerald-600 font-bold italic">Potongan Voucher (<span id="txt_voucher_code"></span><span id="txt_voucher_detail"></span>)</span>
+                                <span class="text-emerald-700 font-black">- Rp <span id="lbl_discount">0</span></span>
+                            </div>
+
                             <div id="row_donation_event" class="hidden flex justify-between items-center text-sm">
                                 <span class="text-slate-500 font-medium italic">Donasi Event</span> <span
                                     id="lbl_donation_event" class="text-[#E8630A] font-bold">Rp 0</span>
@@ -423,11 +427,10 @@
                                     id="lbl_donation_scholarship" class="text-[#E8630A] font-bold">Rp 0</span>
                             </div>
 
-                            <!-- Voucher Row (Community Style) -->
-                            <div id="row_voucher" class="hidden flex justify-between items-center text-sm ring-2 ring-emerald-100 bg-emerald-50/30 p-2 rounded-lg">
-                                <span class="text-emerald-600 font-bold italic">Potongan Voucher (<span id="txt_voucher_code"></span><span id="txt_voucher_detail"></span>)</span>
-                                <span class="text-emerald-700 font-black">- Rp <span id="lbl_discount">0</span></span>
-                            </div>
+                            <div class="flex justify-between items-center text-sm"> <span
+                                    class="text-slate-500 font-medium italic">Biaya Layanan</span> <span
+                                    class="text-[#003366] font-bold">Rp 4.500</span> </div>
+
                         </div>
 
                         <!-- Voucher Input Area (Integrated) -->
@@ -624,51 +627,46 @@
             function updateTotal() {
                 let donEvent = parseInt(document.getElementById('donation_event')?.value || 0);
                 let donScholar = parseInt(document.getElementById('donation_scholarship')?.value || 0);
-                let isSecondTicketChecked = document.getElementById('cb_second_ticket')?.checked || false;
+                let isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
 
-                const summaryEvent = document.getElementById('row_donation_event');
-                const lblEvent = document.getElementById('lbl_donation_event');
-                if (donEvent > 0) {
-                    summaryEvent?.classList.remove('hidden');
-                    if (lblEvent) lblEvent.innerText = 'Rp ' + donEvent.toLocaleString('id-ID');
-                } else {
-                    summaryEvent?.classList.add('hidden');
+                if (document.getElementById('row_donation_event')) {
+                    if (donEvent > 0) {
+                        document.getElementById('row_donation_event').classList.remove('hidden');
+                        document.getElementById('lbl_donation_event').innerText = 'Rp ' + donEvent.toLocaleString('id-ID');
+                    } else {
+                        document.getElementById('row_donation_event').classList.add('hidden');
+                    }
                 }
 
-                const summaryScholar = document.getElementById('row_donation_scholarship');
-                const lblScholar = document.getElementById('lbl_donation_scholarship');
-                if (donScholar > 0) {
-                    summaryScholar?.classList.remove('hidden');
-                    if (lblScholar) lblScholar.innerText = 'Rp ' + donScholar.toLocaleString('id-ID');
-                } else {
-                    summaryScholar?.classList.add('hidden');
+                if (document.getElementById('row_donation_scholarship')) {
+                    if (donScholar > 0) {
+                        document.getElementById('row_donation_scholarship').classList.remove('hidden');
+                        document.getElementById('lbl_donation_scholarship').innerText = 'Rp ' + donScholar.toLocaleString('id-ID');
+                    } else {
+                        document.getElementById('row_donation_scholarship').classList.add('hidden');
+                    }
                 }
 
-                const summarySecond = document.getElementById('row_second_ticket');
                 let secondPrice = 0;
-                if (isSecondTicketChecked && summarySecond) {
-                    summarySecond.classList.remove('hidden');
+                const summarySecond = document.getElementById('row_second_ticket');
+                if (isSecondChecked) {
+                    if (summarySecond) summarySecond.classList.remove('hidden');
                     secondPrice = pairTicketPrice;
                 } else if (summarySecond) {
                     summarySecond.classList.add('hidden');
                 }
 
-                // Recalculate discount if voucher exists
-                let subtotalBeforeDiscount = ticketPrice + adminFee + donEvent + donScholar + secondPrice;
+                // Recalculate discount based ONLY on TICKET PRICES
+                let ticketSubtotal = ticketPrice + secondPrice;
                 const txtDetail = document.getElementById('txt_voucher_detail');
                 const txtCode = document.getElementById('txt_voucher_code');
 
                 if (currentVoucher.type === 'nominal') {
-                    currentDiscount = Math.min(currentVoucher.value, subtotalBeforeDiscount);
+                    currentDiscount = Math.min(currentVoucher.value, ticketSubtotal);
                     if (txtDetail) txtDetail.innerText = ' (Rp ' + currentVoucher.value.toLocaleString('id-ID') + ')';
-                    if (txtCode && txtCode.innerText) txtCode.innerText = txtCode.innerText.split(':')[0] + ': ';
                 } else if (currentVoucher.type === 'percentage') {
-                    currentDiscount = Math.floor(subtotalBeforeDiscount * (currentVoucher.value / 100));
+                    currentDiscount = Math.floor(ticketSubtotal * (currentVoucher.value / 100));
                     if (txtDetail) txtDetail.innerText = ' (' + currentVoucher.value + '%)';
-                    // Ensure the code label is clean
-                    if (txtCode && txtCode.innerText && !txtCode.innerText.includes(':')) {
-                         // Optional: could add logic here if needed
-                    }
                 }
 
                 if (currentDiscount > 0) {
@@ -678,7 +676,8 @@
                     document.getElementById('row_voucher')?.classList.add('hidden');
                 }
 
-                const total = subtotalBeforeDiscount - currentDiscount;
+                // Final Total Calculation: (Tickets - Discount) + Fees + Donations
+                const total = (ticketSubtotal - currentDiscount) + adminFee + donEvent + donScholar;
                 document.getElementById('lbl_total').innerText = 'Rp ' + total.toLocaleString('id-ID');
             }
 

@@ -228,7 +228,8 @@ class CommunityTicketController extends Controller
             $adminFee = 4500;
             $donationEvent = (int) $request->input('donation_event', 0);
             $donationScholarship = (int) $request->input('donation_scholarship', 0);
-            $totalPrice = $ticket->price + $adminFee + $donationEvent + $donationScholarship;
+            
+            $ticketSubtotal = $ticket->price;
 
             $second_ticket_id = null;
             if ($request->other_race_interest) {
@@ -245,11 +246,11 @@ class CommunityTicketController extends Controller
                 
                 if ($pairTicket) {
                     $second_ticket_id = $pairTicket->id;
-                    $totalPrice += $pairTicket->price;
+                    $ticketSubtotal += $pairTicket->price;
                 }
             }
 
-            // Voucher Validation
+            // Voucher Validation (Only impacts ticket subtotal)
             $voucher = null;
             $discountAmount = 0;
             if ($request->voucher_code || $request->nik) {
@@ -263,11 +264,11 @@ class CommunityTicketController extends Controller
                     if (!$voucher->isAvailable()) {
                         throw new \Exception('Maaf, kuota voucher ini sudah habis.');
                     }
-                    $discountAmount = $voucher->calculateDiscount($totalPrice);
+                    $discountAmount = $voucher->calculateDiscount($ticketSubtotal);
                 }
             }
 
-            $totalPrice -= $discountAmount;
+            $totalPrice = ($ticketSubtotal - $discountAmount) + $adminFee + $donationEvent + $donationScholarship;
 
             $participant = Participant::updateOrCreate(
                 ['nik' => $nik],
