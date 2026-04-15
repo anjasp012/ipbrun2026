@@ -330,6 +330,14 @@ class TicketController extends Controller
                 \Illuminate\Support\Arr::except($validated, ['email_confirmation', 'ticket_id', 'other_race_interest'])
             );
 
+            // Check for persistent voucher entitlement
+            $voucher = Voucher::where('participant_id', $participant->id)->first();
+            $discountAmount = 0;
+            if ($voucher) {
+                $discountAmount = $voucher->calculateDiscount($totalPrice);
+                $totalPrice -= $discountAmount;
+            }
+
             // 5. Create the TRANSACTION (Order)
             $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
             $order = Order::create([
@@ -339,7 +347,9 @@ class TicketController extends Controller
                 'admin_fee' => $adminFee,
                 'donation_event' => $donationEvent,
                 'donation_scholarship' => $donationScholarship,
-                'total_price' => $totalPrice, // From previous logic
+                'total_price' => $totalPrice, 
+                'voucher_code' => $voucher ? $voucher->code : null,
+                'discount_amount' => $discountAmount,
             ]);
 
             // 6. Create Race Entries (HasMany Support)
@@ -390,12 +400,23 @@ class TicketController extends Controller
         $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
         $adminFee = 4500;
 
+        // Check for persistent voucher entitlement
+        $voucher = Voucher::where('participant_id', $latestParticipant->id)->first();
+        $discountAmount = 0;
+        $finalPrice = $ticket->price + $adminFee;
+        if ($voucher) {
+            $discountAmount = $voucher->calculateDiscount($ticket->price);
+            $finalPrice -= $discountAmount;
+        }
+
         $order = Order::create([
             'participant_id' => $latestParticipant->id,
             'order_code' => $orderCode,
             'status' => 'pending',
             'admin_fee' => $adminFee,
-            'total_price' => $ticket->price + $adminFee,
+            'total_price' => $finalPrice,
+            'voucher_code' => $voucher ? $voucher->code : null,
+            'discount_amount' => $discountAmount,
         ]);
 
         $latestParticipant->raceEntries()->create([
@@ -425,6 +446,15 @@ class TicketController extends Controller
 
         if ($order->donation_event > 0) $itemDetails[] = ['id' => 'DONATION_EVENT', 'price' => $order->donation_event, 'quantity' => 1, 'name' => 'Donasi Event'];
         if ($order->donation_scholarship > 0) $itemDetails[] = ['id' => 'DONATION_SCHOLARSHIP', 'price' => $order->donation_scholarship, 'quantity' => 1, 'name' => 'Donasi Beasiswa'];
+
+        if ($order->discount_amount > 0) {
+            $itemDetails[] = [
+                'id' => 'VOUCHER_DISCOUNT',
+                'price' => -$order->discount_amount,
+                'quantity' => 1,
+                'name' => 'Potongan Voucher (' . $order->voucher_code . ')'
+            ];
+        }
 
         $params = [
             'transaction_details' => ['order_id' => $order->order_code, 'gross_amount' => $order->total_price],

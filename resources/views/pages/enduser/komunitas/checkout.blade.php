@@ -298,42 +298,65 @@
                 document.getElementById('lbl_total').innerText = 'Rp ' + total.toLocaleString('id-ID');
             }
 
-            // Voucher AJAX
-            document.getElementById('btn_apply_voucher').addEventListener('click', async function() {
-                const code = document.getElementById('voucher_input').value;
+            // Auto-check voucher on NIK input
+            const nikInput = document.getElementById('nik');
+            if (nikInput) {
+                nikInput.addEventListener('input', function() {
+                    if (this.value.length === 16) {
+                        applyVoucher(null, this.value);
+                    }
+                });
+            }
+
+            async function applyVoucher(code = null, nik = null) {
+                const inputEl = document.getElementById('voucher_input');
+                const voucherCode = code || inputEl.value;
                 const messageEl = document.getElementById('voucher_message');
-                const btn = this;
+                const btn = document.getElementById('btn_apply_voucher');
 
-                if (!code) return;
-                btn.disabled = true; btn.innerText = '...'; messageEl.innerHTML = '';
-
+                if (!voucherCode && !nik) return;
+                
+                btn.disabled = true; btn.innerText = '...'; 
+                
                 try {
                     const response = await fetch('{{ route("komunitas.check-voucher") }}', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ code: code, price: ticketPrice })
+                        body: JSON.stringify({ code: voucherCode, nik: nik, price: ticketPrice })
                     });
                     const data = await response.json();
 
                     if (data.valid) {
                         currentDiscount = data.discount;
                         document.getElementById('row_voucher').classList.remove('hidden');
-                        document.getElementById('txt_voucher_code').innerText = code;
+                        document.getElementById('txt_voucher_code').innerText = data.code;
                         document.getElementById('lbl_discount').innerText = currentDiscount.toLocaleString('id-ID');
-                        messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">Voucher diterapkan!</span>';
+                        
+                        if (data.assigned) {
+                            messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">Diskon Voucher Otomatis Terpasang!</span>';
+                            inputEl.value = data.code;
+                            inputEl.readOnly = true;
+                            inputEl.classList.add('bg-slate-50', 'text-slate-400');
+                            btn.classList.add('hidden');
+                        } else {
+                            messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">Voucher berhasil dipasang!</span>';
+                        }
                         updateTotal();
-                    } else {
+                    } else if (code) { // Only show error if user manually clicked/entered a code
                         currentDiscount = 0;
                         document.getElementById('row_voucher').classList.add('hidden');
                         messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">${data.message}</span>`;
                         updateTotal();
                     }
                 } catch (e) {
-                    messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">Error mengecek voucher</span>';
+                    if (code) messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">Error mengecek voucher</span>';
                 } finally {
                     btn.disabled = false; btn.innerText = 'Cek';
                 }
-            });
+            }
+
+            // Voucher AJAX Click
+            document.getElementById('btn_apply_voucher').addEventListener('click', () => applyVoucher());
 
             const disclaimers = document.querySelectorAll('.disclaimer-cb');
             const submitBtn = document.getElementById('btn_submit');

@@ -66,10 +66,32 @@ class CommunityTicketController extends Controller
 
     public function checkVoucher(Request $request)
     {
+        // First check if this participant already has an assigned voucher
+        $participantToken = $request->nik; // NIK context
+        $assignedVoucher = null;
+        if ($participantToken) {
+            $participant = Participant::where('nik', $participantToken)->first();
+            if ($participant) {
+                $assignedVoucher = Voucher::findAssigned($participant->id);
+            }
+        }
+
+        if ($assignedVoucher) {
+            $discount = $assignedVoucher->calculateDiscount($request->price);
+            return response()->json([
+                'valid' => true,
+                'discount' => $discount,
+                'type' => $assignedVoucher->type,
+                'value' => $assignedVoucher->value,
+                'code' => $assignedVoucher->code,
+                'assigned' => true
+            ]);
+        }
+
         $voucher = Voucher::findValid($request->code);
 
         if (!$voucher) {
-            return response()->json(['valid' => false, 'message' => 'Kode voucher tidak valid atau sudah digunakan.']);
+            return response()->json(['valid' => false, 'message' => 'Kode voucher tidak valid atau sudah digunakan oleh orang lain.']);
         }
 
         $discount = $voucher->calculateDiscount($request->price);
@@ -78,7 +100,9 @@ class CommunityTicketController extends Controller
             'valid' => true,
             'discount' => $discount,
             'type' => $voucher->type,
-            'value' => $voucher->value
+            'value' => $voucher->value,
+            'code' => $voucher->code,
+            'assigned' => false
         ]);
     }
 
@@ -133,25 +157,38 @@ class CommunityTicketController extends Controller
                 return redirect('/komunitas')->with('error', 'Maaf, tiket untuk kategori ini baru saja habis terjual.');
             }
 
-            $discountAmount = 0;
-            $voucher = null;
-            if ($request->voucher_code) {
+            // 1. Check for assigned voucher by NIK
+            $existingParticipant = Participant::where('nik', $nik)->first();
+            $voucher = Voucher::findAssigned($existingParticipant->id ?? null);
+            
+            if (!$voucher && $request->voucher_code) {
+                // 2. Try to claim new one if not assigned yet
                 $voucher = Voucher::findValid($request->voucher_code);
-                if ($voucher) {
-                    $discountAmount = $voucher->calculateDiscount($ticket->price);
-                }
+            }
+
+            $discountAmount = 0;
+            if ($voucher) {
+                $discountAmount = $voucher->calculateDiscount($ticket->price);
             }
 
             $adminFee = 4500;
             $totalPrice = ($ticket->price - $discountAmount) + $adminFee;
 
-            // Find or Create Participant Profile (One NIK = One Participant)
+            // 3. Find or Create Participant Profile (One NIK = One Participant)
             $participant = Participant::updateOrCreate(
                 ['nik' => $nik],
                 \Illuminate\Support\Arr::except($validated, ['ticket_id', 'voucher_code'])
             );
 
-            // Create Order
+            // 4. Link voucher to participant if newly claimed
+            if ($voucher && !$voucher->participant_id) {
+                $voucher->update([
+                    'participant_id' => $participant->id,
+                    'used_at' => now()
+                ]);
+            }
+
+            // 5. Create Order
             $orderCode = 'IPBR26-' . strtoupper(Str::random(6));
             $order = Order::create([
                 'participant_id' => $participant->id,
@@ -162,15 +199,6 @@ class CommunityTicketController extends Controller
                 'voucher_code' => $voucher ? $voucher->code : null,
                 'discount_amount' => $discountAmount,
             ]);
-
-            // Mark voucher as used
-            if ($voucher) {
-                $voucher->update([
-                    'is_used' => true,
-                    'used_at' => now(),
-                    'participant_id' => $participant->id
-                ]);
-            }
 
             // Create Race Entry
             $participant->raceEntries()->create([

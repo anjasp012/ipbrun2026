@@ -26,8 +26,13 @@ class Voucher extends Model
     public static function findValid($code)
     {
         return self::where('code', $code)
-            ->where('is_used', false)
+            ->whereNull('participant_id')
             ->first();
+    }
+
+    public static function findAssigned($participantId)
+    {
+        return self::where('participant_id', $participantId)->first();
     }
 
     public function calculateDiscount($originalPrice)

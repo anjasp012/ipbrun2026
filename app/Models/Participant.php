@@ -31,4 +31,9 @@ class Participant extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function vouchers(): HasMany
+    {
+        return $this->hasMany(Voucher::class);
+    }
 }
