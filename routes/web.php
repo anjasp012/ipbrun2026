@@ -91,6 +91,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::get('/blast', [\App\Http\Controllers\Admin\BlastController::class, 'index'])->name('admin.blast');
         Route::post('/blast/email', [\App\Http\Controllers\Admin\BlastController::class, 'blastEmail'])->name('admin.blast.email');
         Route::post('/blast/whatsapp', [\App\Http\Controllers\Admin\BlastController::class, 'blastWhatsapp'])->name('admin.blast.whatsapp');
+    });
 
     // Superadmin & Admin Only (PIC Restricted)
     Route::middleware(['role:superadmin,admin'])->group(function () {
