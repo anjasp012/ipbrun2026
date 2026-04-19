@@ -18,7 +18,7 @@
                         <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
                     </div>
                     <div>
-                        <p class="text-rose-700 font-black text-sm uppercase tracking-wider">Periode Flashsale Telah Berakhir</p>
+                        <p class="text-rose-700 font-black text-sm uppercase tracking-wider">Periode {{ $activePeriod->name ?? '' }} Telah Berakhir</p>
                         <p class="text-rose-500 text-xs font-semibold mt-0.5">Periode <span class="font-black">{{ $activePeriod->name ?? '' }}</span> telah habis. Nantikan periode berikutnya!</p>
                     </div>
                     <div class="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-rose-100/50 to-transparent pointer-events-none"></div>
@@ -268,7 +268,7 @@
                         <h2 style="font-size: 22px; font-weight: 900; color: #003366; text-transform: uppercase; letter-spacing: -0.5px; margin-bottom: 10px;">Periode Berakhir!</h2>
                         <div style="display: inline-block; background: #fff0f0; border: 1px solid #fecaca; color: #dc2626; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; padding: 4px 14px; border-radius: 100px; margin-bottom: 16px;">${periodName}</div>
                         <p style="color: #64748b; font-size: 14px; line-height: 1.7; font-weight: 500;">
-                            Periode flashsale <strong style="color: #003366;">${periodName}</strong> telah berakhir dan kuota telah habis.
+                            Periode <strong style="color: #003366;">${periodName}</strong> telah berakhir dan kuota telah habis.
                         </p>
                         <p style="color: #94a3b8; font-size: 13px; margin-top: 10px; font-weight: 600;">
                             🔔 Nantikan periode berikutnya untuk mendapatkan tiket IPB Run 2026!
