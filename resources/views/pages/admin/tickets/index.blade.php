@@ -64,11 +64,17 @@
                                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v12a2 2 0 002 2z"></path></svg>
                             </div>
                             <div>
-                                <div class="flex items-center gap-4">
+                                <div class="flex items-center gap-3 flex-wrap">
                                     <h4 class="text-xl font-black text-slate-800 uppercase tracking-tight">{{ $period->name }}</h4>
                                     @if($period->is_active)
                                         <span class="inline-flex px-3 py-1 rounded-full bg-emerald-100 text-emerald-700 text-[11px] font-black uppercase tracking-widest border border-emerald-200">
                                             ACTIVE
+                                        </span>
+                                    @endif
+                                    @if($period->is_sold_out)
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-[11px] font-black uppercase tracking-widest border border-rose-200">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524L13.477 14.89zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/></svg>
+                                            SOLD OUT
                                         </span>
                                     @endif
                                 </div>
@@ -78,8 +84,26 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-6">
-                            {{-- Switcher --}}
+                        <div class="flex items-center gap-3">
+                            {{-- Sold Out Toggle --}}
+                            <form action="{{ route('periods.toggle-sold-out', $period) }}" method="POST" @click.stop=""
+                                  onsubmit="return confirm('{{ $period->is_sold_out ? 'Buka kembali periode ini untuk pembelian?' : 'Tandai periode ini sebagai SOLD OUT? Komunitas tidak dapat membeli tiket.' }}')">
+                                @csrf
+                                <button type="submit" @class([
+                                    'rounded-md px-5 h-12 text-[11px] font-black uppercase tracking-widest transition-all flex items-center gap-2',
+                                    'bg-rose-500 text-white hover:bg-rose-600' => !$period->is_sold_out,
+                                    'bg-emerald-500 text-white hover:bg-emerald-600' => $period->is_sold_out,
+                                ])>
+                                    @if($period->is_sold_out)
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                        Buka Kembali
+                                    @else
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                                        Sold Out
+                                    @endif
+                                </button>
+                            </form>
+                            {{-- Aktifkan Periode --}}
                             @if(!$period->is_active)
                                 <form action="{{ route('periods.toggle', $period) }}" method="POST" @click.stop="">
                                     @csrf

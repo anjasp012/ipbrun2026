@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['name', 'is_active'])]
+#[Fillable(['name', 'is_active', 'is_sold_out'])]
 class Period extends Model
 {
     use HasUuids;

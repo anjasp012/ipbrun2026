@@ -79,6 +79,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::put('/tickets/{ticket}', [AdminTicket::class, 'update'])->name('tickets.update');
         Route::delete('/tickets/{ticket}', [AdminTicket::class, 'destroy'])->name('tickets.destroy');
         Route::post('/periods/{period}/toggle', [AdminTicket::class, 'togglePeriod'])->name('periods.toggle');
+        Route::post('/periods/{period}/toggle-sold-out', [AdminTicket::class, 'toggleSoldOut'])->name('periods.toggle-sold-out');
 
         Route::get('/categories', [AdminCategory::class, 'index']);
         Route::post('/categories', [AdminCategory::class, 'store'])->name('categories.store');

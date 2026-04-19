@@ -34,6 +34,9 @@ class CommunityTicketController extends Controller
         $ticketSaleStart = Setting::where('key', 'ticket_sale_start')->first()?->value;
         $ticketSaleStartValue = $ticketSaleStart ? \Carbon\Carbon::parse($ticketSaleStart, 'Asia/Jakarta') : null;
 
+        $activePeriod = \App\Models\Period::where('is_active', true)->first();
+        $isPeriodSoldOut = $activePeriod?->is_sold_out ?? false;
+
         $tickets_ipb = Ticket::where('type', 'ipb')->whereHas('period', function ($query) {
             $query->where('is_active', true);
         })->with(['category', 'period'])->withCount(['raceEntries as participants_count' => function ($query) {
@@ -46,13 +49,17 @@ class CommunityTicketController extends Controller
             $query->whereIn('status', ['pending', 'paid']);
         }])->get();
 
-        return view('pages.enduser.komunitas.index', compact('tickets_ipb', 'tickets_public', 'isMaintenance', 'ticketSaleStart', 'ticketSaleStartValue'));
+        return view('pages.enduser.komunitas.index', compact('tickets_ipb', 'tickets_public', 'isMaintenance', 'ticketSaleStart', 'ticketSaleStartValue', 'isPeriodSoldOut', 'activePeriod'));
     }
 
     public function checkout(Ticket $ticket)
     {
         if (!$ticket->period || !$ticket->period->is_active) {
             return redirect('/komunitas')->with('error', 'Maaf, periode pendaftaran untuk tiket ini tidak aktif.');
+        }
+
+        if ($ticket->period->is_sold_out) {
+            return redirect('/komunitas')->with('period_sold_out', $ticket->period->name);
         }
 
         $usedQty = RaceEntry::where('ticket_id', $ticket->id)
@@ -134,6 +141,12 @@ class CommunityTicketController extends Controller
     {
         $ticket = Ticket::findOrFail($request->ticket_id);
         $nimRule = ($ticket->type === 'ipb') ? 'required|string|min:6' : 'nullable|string|min:6';
+
+        // Block registration if period is sold out
+        if ($ticket->period && $ticket->period->is_sold_out) {
+            return redirect('/komunitas')->with('period_sold_out', $ticket->period->name);
+        }
+
         
         $validated = $request->validate([
             'ticket_id' => 'required',
