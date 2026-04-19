@@ -19,7 +19,7 @@
                     </div>
                     <div>
                         <p class="text-rose-700 font-black text-sm uppercase tracking-wider">Periode {{ $activePeriod->name ?? '' }} Telah Berakhir</p>
-                        <p class="text-rose-500 text-xs font-semibold mt-0.5">Periode <span class="font-black">{{ $activePeriod->name ?? '' }}</span> telah habis. Nantikan periode berikutnya!</p>
+                        <p class="text-rose-500 text-xs font-semibold mt-0.5">Tiket Periode <span class="font-black">{{ $activePeriod->name ?? '' }}</span> telah habis. Nantikan periode berikutnya!</p>
                     </div>
                     <div class="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-rose-100/50 to-transparent pointer-events-none"></div>
                 </div>
