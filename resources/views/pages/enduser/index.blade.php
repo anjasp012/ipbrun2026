@@ -10,6 +10,21 @@
 
             <!-- Content Area -->
             <div class="relative pr-2 custom-scrollbar flex-grow">
+
+                @if($isPeriodSoldOut)
+                <!-- Sold Out Banner -->
+                <div class="mb-8 relative overflow-hidden rounded-2xl border-2 border-rose-200 bg-gradient-to-r from-rose-50 via-red-50 to-rose-50 px-6 py-5 flex items-center gap-5 shadow-sm">
+                    <div class="flex-shrink-0 w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-rose-700 font-black text-sm uppercase tracking-wider">Periode Flashsale Telah Berakhir</p>
+                        <p class="text-rose-500 text-xs font-semibold mt-0.5">Periode <span class="font-black">{{ $activePeriod->name ?? '' }}</span> telah habis. Nantikan periode berikutnya!</p>
+                    </div>
+                    <div class="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-rose-100/50 to-transparent pointer-events-none"></div>
+                </div>
+                @endif
+
                 @php
                     $ticketGroups = [
                         ['data' => $tickets_ipb, 'title' => 'Keluarga Besar IPB', 'id' => 'ipb'],
@@ -108,7 +123,7 @@
                                                     {{ number_format($ticket->price, 0, ',', '.') }}</span>
                                             </div> -->
 
-                                            @if ($qty > 0)
+                                            @if ($qty > 0 && !$isPeriodSoldOut)
                                                 @auth
                                                 @else
                                                     <a href="{{ route('checkout', $ticket->id) }}"
@@ -116,6 +131,12 @@
                                                         Daftar
                                                     </a>
                                                 @endauth
+                                            @elseif($isPeriodSoldOut)
+                                                <button onclick="showSoldOutPopup('{{ $ticket->period->name ?? 'Flashsale' }}')"
+                                                    class="w-full py-2 md:py-2.5 bg-rose-500 text-white text-center rounded-lg md:rounded-xl font-[900] text-[12px] md:text-[15px] uppercase tracking-wider hover:bg-rose-600 transition-all active:scale-95 flex items-center justify-center gap-2">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                    Sold Out
+                                                </button>
                                             @else
                                                 <div
                                                     class="w-full py-2 md:py-2.5 bg-slate-100 text-slate-400 text-center rounded-lg md:rounded-xl font-[900] text-[12px] md:text-[15px] uppercase tracking-wider cursor-not-allowed">
@@ -231,7 +252,40 @@
                     title: "{{ session('success') }}"
                 });
             @endif
+
+            @if (session('period_sold_out'))
+                showSoldOutPopup("{{ session('period_sold_out') }}");
+            @endif
         });
+
+        function showSoldOutPopup(periodName) {
+            Swal.fire({
+                html: `
+                    <div style="padding: 8px 0">
+                        <div style="width: 72px; height: 72px; background: linear-gradient(135deg, #fee2e2, #fecaca); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                            <svg width="36" height="36" fill="none" stroke="#dc2626" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                        </div>
+                        <h2 style="font-size: 22px; font-weight: 900; color: #003366; text-transform: uppercase; letter-spacing: -0.5px; margin-bottom: 10px;">Periode Berakhir!</h2>
+                        <div style="display: inline-block; background: #fff0f0; border: 1px solid #fecaca; color: #dc2626; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; padding: 4px 14px; border-radius: 100px; margin-bottom: 16px;">${periodName}</div>
+                        <p style="color: #64748b; font-size: 14px; line-height: 1.7; font-weight: 500;">
+                            Periode flashsale <strong style="color: #003366;">${periodName}</strong> telah berakhir dan kuota telah habis.
+                        </p>
+                        <p style="color: #94a3b8; font-size: 13px; margin-top: 10px; font-weight: 600;">
+                            🔔 Nantikan periode berikutnya untuk mendapatkan tiket IPB Run 2026!
+                        </p>
+                    </div>
+                `,
+                showConfirmButton: true,
+                confirmButtonColor: '#003366',
+                confirmButtonText: 'MENGERTI, NANTIKAN PERIODE SELANJUTNYA',
+                showCancelButton: false,
+                customClass: {
+                    popup: 'rounded-3xl border border-rose-100 shadow-2xl',
+                    confirmButton: 'rounded-xl px-8 py-3 font-black uppercase tracking-widest text-xs'
+                },
+                backdrop: 'rgba(0,51,102,0.5) url("/assets/images/bg.png") center/cover no-repeat'
+            });
+        }
 
         function switchCategory(id) {
             // Hide all sections on mobile

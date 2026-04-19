@@ -44,7 +44,11 @@ class TicketController extends Controller
             // }
         }
 
-        // 3. Fetch tickets
+        // 3. Fetch active period + sold out status
+        $activePeriod = \App\Models\Period::where('is_active', true)->first();
+        $isPeriodSoldOut = $activePeriod?->is_sold_out ?? false;
+
+        // 4. Fetch tickets
         $tickets = Ticket::whereHas('period', function ($query) {
             $query->where('is_active', true);
         })->with(['category', 'period'])
@@ -62,7 +66,9 @@ class TicketController extends Controller
             'tickets_public',
             'ticketSaleStart',
             'ticketSaleStartValue',
-            'isMaintenance'
+            'isMaintenance',
+            'isPeriodSoldOut',
+            'activePeriod'
         ));
     }
 
@@ -161,6 +167,11 @@ class TicketController extends Controller
             return redirect('/')->with('error', 'Maaf, periode pendaftaran untuk tiket ini tidak aktif.');
         }
 
+        // 1b. Check if the period is sold out
+        if ($ticket->period->is_sold_out) {
+            return redirect('/')->with('period_sold_out', $ticket->period->name);
+        }
+
         // 2. Check current stock accurately (capacity - pending/paid)
         $usedQty = RaceEntry::where('ticket_id', $ticket->id)
             ->whereIn('status', ['pending', 'paid'])->count();
@@ -199,6 +210,11 @@ class TicketController extends Controller
         }
         $ticket = Ticket::findOrFail($request->ticket_id);
         $nimRule = ($ticket->type === 'ipb') ? 'required|string|min:6' : 'nullable|string|min:6';
+
+        // Block registration if period is sold out
+        if ($ticket->period && $ticket->period->is_sold_out) {
+            return redirect('/')->with('period_sold_out', $ticket->period->name);
+        }
 
         $validated = $request->validate([
             'ticket_id' => 'required',
