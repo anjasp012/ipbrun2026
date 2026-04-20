@@ -415,7 +415,14 @@ class TicketController extends Controller
             // 4. Find or Create Participant Profile (One NIK = One Participant)
             $participant = Participant::updateOrCreate(
                 ['nik' => $request->nik],
-                \Illuminate\Support\Arr::except($validated, ['email_confirmation', 'ticket_id', 'other_race_interest'])
+                \Illuminate\Support\Arr::except($validated, [
+                    'email_confirmation', 
+                    'ticket_id', 
+                    'other_race_interest', 
+                    'voucher_code', 
+                    'donation_event', 
+                    'donation_scholarship'
+                ])
             );
 
             // 5. Create the TRANSACTION (Order)
