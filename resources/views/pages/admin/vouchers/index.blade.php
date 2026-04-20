@@ -309,9 +309,9 @@
                                     <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Kategori</label>
                                     <select name="category_id" required x-model="categoryId" @change="categoryName = $event.target.options[$event.target.selectedIndex].dataset.name"
                                         class="w-full h-12 bg-white border border-slate-100 rounded-xl px-5 font-black text-[#003366] focus:ring-4 focus:ring-blue-500/10 transition-all outline-none uppercase tracking-widest text-xs">
-                                        <option value="" disabled selected>Pilih Kategori</option>
+                                        <option value="" disabled>Pilih Kategori</option>
                                         @foreach($categories as $cat)
-                                            <option value="{{ $cat->id }}" data-name="{{ $cat->name }}">{{ $cat->name }}</option>
+                                            <option value="{{ $cat->id }}" {{ $cat->id == old('category_id', $cat->name == '5K' ? 'selected' : '') }} data-name="{{ $cat->name }}">{{ $cat->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
