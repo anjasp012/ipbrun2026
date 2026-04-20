@@ -40,19 +40,6 @@ class VoucherController extends Controller
             }
         }
 
-        // 3. Check if THIS participant has used it
-        if ($nik) {
-            $participant = Participant::where('nik', $nik)->first();
-            if ($participant) {
-                $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
-                    ->where('participant_id', $participant->id)
-                    ->exists();
-                if ($alreadyUsed) {
-                    return response()->json(['valid' => false, 'message' => 'Voucher ini sudah pernah Anda gunakan.']);
-                }
-            }
-        }
-
         $discount = $voucher->calculateDiscount($price);
 
         return response()->json([
