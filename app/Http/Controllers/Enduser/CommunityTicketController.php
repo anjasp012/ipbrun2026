@@ -385,6 +385,22 @@ class CommunityTicketController extends Controller
                 'payment_url' => $snapResponse->redirect_url
             ]);
 
+            // Send WhatsApp notification
+            try {
+                $message = "📢 *Pembayaran Tiket – IPB Run 2026*\n\n" .
+                    "Halo *{$participant->name}*,\n\n" .
+                    "Pesanan tiket IPB Run 2026 kamu telah berhasil dibuat dengan kode order:\n" .
+                    "*{$order->order_code}*\n\n" .
+                    "Untuk mengamankan slot kamu, segera lakukan pembayaran melalui link berikut:\n" .
+                    "🔗 {$snapResponse->redirect_url}\n\n" .
+                    "⏳ *Perhatian:*\n" .
+                    "Pembayaran hanya diberikan waktu 10 menit. Jika terlewat, pesanan akan otomatis dibatalkan dan slot dialihkan ke peserta lain.\n\n" .
+                    "Terima kasih atas partisipasimu.";
+                \App\Jobs\SendWhatsAppBlast::dispatch($participant->phone_number, $message);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Fonnte notification failed: ' . $e->getMessage());
+            }
+
             return redirect($snapResponse->redirect_url);
         } catch (\Exception $e) {
             throw new \Exception('Midtrans integration failed: ' . $e->getMessage());
