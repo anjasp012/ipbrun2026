@@ -22,7 +22,9 @@
                 @foreach($participant->raceEntries as $entry)
                     <div class="group bg-white border-2 border-slate-100 rounded-[2.5rem] p-8 md:p-10 transition-all hover:border-blue-100 hover:shadow-2xl hover:shadow-blue-950/5 relative overflow-hidden">
                         {{-- Decorative status bar --}}
-                        <div class="absolute left-0 top-0 bottom-0 w-2 {{ $entry->status === 'paid' ? 'bg-emerald-500' : 'bg-orange-500 animate-pulse' }}"></div>
+                        <div class="absolute left-0 top-0 bottom-0 w-2 
+                            {{ $entry->status === 'paid' ? 'bg-emerald-500' : ($entry->status === 'failed' ? 'bg-rose-500' : 'bg-orange-500 animate-pulse') }}">
+                        </div>
                         
                         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-10">
                             <div class="flex-grow">
@@ -30,6 +32,10 @@
                                     @if($entry->status === 'paid')
                                         <span class="px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100 text-[10px] font-black uppercase tracking-widest italic flex items-center gap-2">
                                             <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Terverifikasi
+                                        </span>
+                                    @elseif($entry->status === 'failed')
+                                        <span class="px-4 py-1.5 bg-rose-50 text-rose-600 rounded-full border border-rose-100 text-[10px] font-black uppercase tracking-widest italic flex items-center gap-2">
+                                            <span class="w-1.5 h-1.5 bg-rose-500 rounded-full"></span> Pembayaran Kadaluwarsa / Gagal
                                         </span>
                                     @else
                                         <span class="px-4 py-1.5 bg-amber-50 text-amber-600 rounded-full border border-amber-100 text-[10px] font-black uppercase tracking-widest italic flex items-center gap-2">
@@ -64,6 +70,15 @@
                                     <div class="p-8 bg-slate-50 border border-slate-100 rounded-[2rem] text-center lg:text-right group-hover:bg-blue-50/50 transition-colors">
                                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 leading-none opacity-70">Nomor Dada (BIB)</p>
                                         <div class="text-5xl font-black text-[#003366] font-mono tracking-widest leading-none">{{ $entry->bib_number ?: 'TBA' }}</div>
+                                    </div>
+                                @elseif($entry->status === 'failed')
+                                    <div class="flex flex-col gap-4 text-center lg:text-right">
+                                        <p class="text-[10px] font-black text-rose-500 uppercase tracking-[2px] leading-relaxed">
+                                            Waktu pembayaran telah habis. Pesanan ini dibatalkan secara otomatis.
+                                        </p>
+                                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest opacity-60">
+                                            Silakan lakukan pendaftaran ulang jika ingin mengikuti kategori ini.
+                                        </p>
                                     </div>
                                 @else
                                     <div class="flex flex-col gap-4">
