@@ -656,6 +656,7 @@
                 const summarySecond = document.getElementById('row_second_ticket');
                 let secondPrice = 0;
                 if (isSecondTicketChecked && summarySecond) {
+                    summarySecond.classList.remove('hidden');
                     secondPrice = pairTicketPrice;
                 } else if (summarySecond) {
                     secondPrice = 0;
@@ -668,7 +669,7 @@
                 const lblVoucher = document.getElementById('lbl_voucher');
                 const txtDetail = document.getElementById('txt_voucher_detail');
 
-                if (currentVoucher.type === 'fixed') {
+                if (currentVoucher.type === 'nominal') {
                     voucherDiscount = currentVoucher.value;
                     if (txtDetail) txtDetail.innerText = '';
                 } else if (currentVoucher.type === 'percentage') {
@@ -705,11 +706,9 @@
                 btn.disabled = true; btn.innerText = '...'; 
                 
                 try {
-                    let donEvent = parseInt(document.getElementById('donation_event')?.value || 0);
-                    let donScholar = parseInt(document.getElementById('donation_scholarship')?.value || 0);
                     let isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
                     let secondPrice = isSecondChecked ? pairTicketPrice : 0;
-                    let subtotalPrice = ticketPrice + adminFee + donEvent + donScholar + secondPrice;
+                    let subtotalPrice = ticketPrice + secondPrice;
 
                     const response = await fetch('{{ route("voucher.check") }}', {
                         method: 'POST',
