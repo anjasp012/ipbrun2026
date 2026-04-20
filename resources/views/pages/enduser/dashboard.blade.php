@@ -108,8 +108,12 @@
                     <div class="flex-grow text-center lg:text-left">
                         <h4 class="text-2xl md:text-3xl font-black uppercase tracking-tight mb-6 leading-tight">Pendaftaran Tiket Tambahan</h4>
                         <p class="text-[12px] md:text-[13px] text-white/70 font-bold uppercase tracking-widest leading-loose italic opacity-80">
-                        Anda memenuhi kualifikasi untuk mengikuti kategori 10K (HARI MINGGU). Gunakan tombol di samping untuk mendaftar secara instan        
-                    </p>
+                            @php
+                                $recCatName = strtoupper($pairRecommendation->category->name);
+                                $recDay = (str_contains($recCatName, '5K') || str_contains($recCatName, '42K')) ? 'HARI SABTU' : 'HARI MINGGU';
+                            @endphp
+                            Anda memenuhi kualifikasi untuk mengikuti kategori {{ $recCatName }} ({{ $recDay }}). Gunakan tombol di samping untuk mendaftar secara instan
+                        </p>
                     </div>
 
                     <div class="w-full lg:w-auto text-center border-t lg:border-t-0 lg:border-l border-white/10 pt-10 lg:pt-0 lg:pl-16 flex flex-col items-center lg:items-end">
