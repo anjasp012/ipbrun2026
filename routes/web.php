@@ -71,7 +71,6 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     // Superadmin Only Routes
     Route::middleware(['role:superadmin'])->group(function () {
         Route::post('/toggle-running', [AdminDashboard::class, 'toggleRunning']);
-        Route::get('/participants/export', [AdminDashboard::class, 'exportParticipants'])->name('participants.export');
         Route::put('/participants/{participant}/change-password', [AdminDashboard::class, 'changePassword'])->name('participants.change-password');
 
         Route::get('/tickets', [AdminTicket::class, 'index']);
@@ -99,6 +98,8 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::get('/participants/{participant}', [AdminDashboard::class, 'participantShow']);
         Route::get('/participants/{participant}/resend-invoice', [AdminDashboard::class, 'resendInvoice'])->name('participants.resend-invoice');
         Route::put('/participants/{participant}', [AdminDashboard::class, 'participantUpdate'])->name('participants.update');
+        Route::get('/participants/export', [AdminDashboard::class, 'exportParticipants'])->name('participants.export');
+      
         
         Route::get('/vouchers', [\App\Http\Controllers\Admin\VoucherController::class, 'index'])->name('admin.vouchers.index');
         Route::post('/vouchers', [\App\Http\Controllers\Admin\VoucherController::class, 'store'])->name('admin.vouchers.store');
