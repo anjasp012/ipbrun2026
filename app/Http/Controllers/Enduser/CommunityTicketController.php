@@ -123,19 +123,6 @@ class CommunityTicketController extends Controller
             }
         }
 
-        // Check if this NIK has already used this voucher
-        if ($nik) {
-            $participant = Participant::where('nik', $nik)->first();
-            if ($participant) {
-                $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
-                    ->where('participant_id', $participant->id)
-                    ->exists();
-
-                if ($alreadyUsed) {
-                    return response()->json(['valid' => false, 'message' => 'Voucher ini sudah pernah Anda gunakan.']);
-                }
-            }
-        }
 
         $discount = $voucher->calculateDiscount($request->price);
 
