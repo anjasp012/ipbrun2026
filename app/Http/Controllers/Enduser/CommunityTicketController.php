@@ -111,6 +111,18 @@ class CommunityTicketController extends Controller
             return response()->json(['valid' => false, 'message' => 'Maaf, kuota pemakaian voucher ini sudah habis.']);
         }
 
+        if ($request->ticket_id) {
+            $ticket = Ticket::find($request->ticket_id);
+            if ($ticket) {
+                if ($voucher->ticket_type && strtolower($voucher->ticket_type) !== strtolower($ticket->type)) {
+                    return response()->json(['valid' => false, 'message' => 'Voucher tidak berlaku untuk tipe tiket ini.']);
+                }
+                if ($voucher->category_id && $voucher->category_id !== $ticket->category_id) {
+                    return response()->json(['valid' => false, 'message' => 'Voucher tidak berlaku untuk kategori tiket ini.']);
+                }
+            }
+        }
+
         // Check if this NIK has already used this voucher
         if ($nik) {
             $participant = Participant::where('nik', $nik)->first();
@@ -276,6 +288,12 @@ class CommunityTicketController extends Controller
                 if ($voucher) {
                     if (!$voucher->isAvailable()) {
                         throw new \Exception('Maaf, kuota voucher ini sudah habis.');
+                    }
+                    if ($voucher->ticket_type && strtolower($voucher->ticket_type) !== strtolower($ticket->type)) {
+                        throw new \Exception('Voucher tidak berlaku untuk tipe tiket ini.');
+                    }
+                    if ($voucher->category_id && $voucher->category_id !== $ticket->category_id) {
+                        throw new \Exception('Voucher tidak berlaku untuk kategori tiket ini.');
                     }
                     $discountAmount = $voucher->calculateDiscount($ticketSubtotal);
                 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Voucher;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -15,39 +16,46 @@ class VoucherController extends Controller
             ->latest()
             ->paginate(50);
             
-        return view('pages.admin.vouchers.index', compact('vouchers'));
+        $categories = Category::orderBy('name')->get();
+
+        return view('pages.admin.vouchers.index', compact('vouchers', 'categories'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'count' => 'required|integer|min:1|max:500',
             'type' => 'required|in:nominal,percentage',
             'value' => 'required|integer|min:1',
-            'usage_limit' => 'required|integer|min:1',
-            'prefix' => 'nullable|string|max:10',
+            'usage_limit' => 'nullable|integer|min:1',
+            'ticket_type' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'custom_code' => 'required|string|max:20',
+            'expired_at' => 'nullable|date'
         ]);
 
-        $count = $request->count;
+        $category = Category::findOrFail($request->category_id);
+        
+        $prefix = strtoupper($request->ticket_type) . '-' . strtoupper($category->name);
+        $code = $prefix . '-' . strtoupper(preg_replace('/[^a-zA-Z0-9]/', '', $request->custom_code));
 
-        for ($i = 0; $i < $count; $i++) {
-            $prefix = $request->prefix ? strtoupper($request->prefix) : 'VCH';
-            $code = $prefix . '-' . strtoupper(Str::random(6));
-            
-            // Ensure uniqueness
-            while (Voucher::where('code', $code)->exists()) {
-                $code = $prefix . '-' . strtoupper(Str::random(6));
-            }
-
-            Voucher::create([
-                'code' => $code,
-                'type' => $request->type,
-                'value' => $request->value,
-                'usage_limit' => $request->usage_limit,
-            ]);
+        if (Voucher::where('code', $code)->exists()) {
+            return back()->with('error', "Voucher dengan kode '$code' sudah ada. Silakan gunakan akhiran yang lain.");
         }
 
-        return back()->with('success', "$count voucher berhasil digenerate.");
+        $usageLimit = $request->has('is_unlimited_usage') && $request->is_unlimited_usage == '1' ? null : $request->usage_limit;
+        $expiredAt = $request->has('is_unlimited_date') && $request->is_unlimited_date == '1' ? null : $request->expired_at;
+
+        Voucher::create([
+            'code' => $code,
+            'type' => $request->type,
+            'value' => $request->value,
+            'usage_limit' => $usageLimit,
+            'expired_at' => $expiredAt,
+            'ticket_type' => $request->ticket_type,
+            'category_id' => $request->category_id,
+        ]);
+
+        return back()->with('success', "Voucher $code berhasil digenerate.");
     }
 
     public function destroy(Voucher $voucher)
@@ -58,5 +66,12 @@ class VoucherController extends Controller
 
         $voucher->delete();
         return back()->with('success', 'Voucher berhasil dihapus.');
+    }
+
+    public function toggleActive(Voucher $voucher)
+    {
+        $voucher->update(['is_active' => !$voucher->is_active]);
+        $status = $voucher->is_active ? 'diaktifkan' : 'dinonaktifkan';
+        return back()->with('success', "Voucher {$voucher->code} berhasil {$status}.");
     }
 }

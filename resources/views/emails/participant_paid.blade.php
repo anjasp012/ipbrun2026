@@ -64,6 +64,22 @@
                                     style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
                                     #{{ $order->order_code }}</td>
                             </tr>
+                            <tr>
+                                <td style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
+                                    Total Paid</td>
+                                <td
+                                    style="padding:10px 0;font-size:14px;color:#00875a;font-weight:bold;text-align:right;border-bottom:1px solid #edf0f5;">
+                                    IDR {{ number_format($order->total_price, 0, ',', '.') }}</td>
+                            </tr>
+                            @if($order->discount_amount > 0)
+                                <tr>
+                                    <td style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">
+                                        Voucher Discount</td>
+                                    <td
+                                        style="padding:10px 0;font-size:14px;color:#e8630a;font-weight:bold;text-align:right;border-bottom:1px solid #edf0f5;">
+                                        - IDR {{ number_format($order->discount_amount, 0, ',', '.') }}</td>
+                                </tr>
+                            @endif
 
                             <tr>
                                 <td style="padding:10px 0;font-size:13px;color:#778899;border-bottom:1px solid #edf0f5;">

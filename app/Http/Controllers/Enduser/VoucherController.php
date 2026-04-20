@@ -22,9 +22,22 @@ class VoucherController extends Controller
             return response()->json(['valid' => false, 'message' => 'Kode voucher tidak valid.']);
         }
 
-        // 1. Check global usage limit
+        // 1. Check if active and global usage limit
         if (!$voucher->isAvailable()) {
-            return response()->json(['valid' => false, 'message' => 'Maaf, kuota pemakaian voucher ini sudah habis.']);
+            return response()->json(['valid' => false, 'message' => 'Maaf, voucher tidak tersedia atau sudah habis/kedaluwarsa.']);
+        }
+
+        // 2. Check ticket compatibility if ticket_id provided
+        if ($request->ticket_id) {
+            $ticket = \App\Models\Ticket::find($request->ticket_id);
+            if ($ticket) {
+                if ($voucher->ticket_type && strtolower($voucher->ticket_type) !== strtolower($ticket->type)) {
+                    return response()->json(['valid' => false, 'message' => 'Voucher tidak berlaku untuk tipe tiket ini.']);
+                }
+                if ($voucher->category_id && $voucher->category_id !== $ticket->category_id) {
+                    return response()->json(['valid' => false, 'message' => 'Voucher tidak berlaku untuk kategori tiket ini.']);
+                }
+            }
         }
 
         // 3. Check if THIS participant has used it

@@ -263,6 +263,7 @@ class TicketController extends Controller
             'emergency_contact_phone_number' => 'Nomor HP Darurat',
             'emergency_contact_relationship' => 'Hubungan Kontak',
             'nim_nrp' => 'NIM / NRP',
+            'voucher_code' => 'Kode Voucher',
         ]);
 
         // --- CUSTOM IDENTITY VALIDATION LOGIC (1 NIK, 1 NRP, 1 EMAIL) ---
@@ -355,7 +356,8 @@ class TicketController extends Controller
             $adminFee = 4500;
             $donationEvent = (int) $request->input('donation_event', 0);
             $donationScholarship = (int) $request->input('donation_scholarship', 0);
-            $totalPrice = $ticket->price + $adminFee + $donationEvent + $donationScholarship;
+            
+            $ticketSubtotal = $ticket->price;
             $second_ticket_id = null;
 
             if ($request->other_race_interest) {
@@ -378,10 +380,37 @@ class TicketController extends Controller
 
                     if ($pairTicket) {
                         $second_ticket_id = $pairTicket->id;
-                        $totalPrice += $pairTicket->price;
+                        $ticketSubtotal += $pairTicket->price;
                     }
                 }
             }
+
+            // Voucher Validation (Only impacts ticket subtotal)
+            $voucher = null;
+            $discountAmount = 0;
+            if ($request->voucher_code || $request->nik) {
+                // Check if there is a voucher matching the code OR matching the NIK (auto-claim)
+                $voucher = Voucher::where('code', $request->voucher_code)
+                    ->when($request->nik, function($q) use ($request) {
+                        return $q->orWhere('code', $request->nik);
+                    })
+                    ->first();
+                
+                if ($voucher) {
+                    if (!$voucher->isAvailable()) {
+                        throw new \Exception('Maaf, kuota voucher ini sudah habis.');
+                    }
+                    if ($voucher->ticket_type && strtolower($voucher->ticket_type) !== strtolower($ticket->type)) {
+                        throw new \Exception('Voucher tidak berlaku untuk tipe tiket ini.');
+                    }
+                    if ($voucher->category_id && $voucher->category_id !== $ticket->category_id) {
+                        throw new \Exception('Voucher tidak berlaku untuk kategori tiket ini.');
+                    }
+                    $discountAmount = $voucher->calculateDiscount($ticketSubtotal);
+                }
+            }
+
+            $totalPrice = ($ticketSubtotal - $discountAmount) + $adminFee + $donationEvent + $donationScholarship;
 
             // 4. Find or Create Participant Profile (One NIK = One Participant)
             $participant = Participant::updateOrCreate(
@@ -399,7 +428,17 @@ class TicketController extends Controller
                 'donation_event' => $donationEvent,
                 'donation_scholarship' => $donationScholarship,
                 'total_price' => $totalPrice,
+                'discount_amount' => $discountAmount,
+                'voucher_code' => $voucher ? $voucher->code : null,
             ]);
+
+            if ($voucher) {
+                VoucherUsage::create([
+                    'voucher_id' => $voucher->id,
+                    'participant_id' => $participant->id,
+                    'order_id' => $order->id,
+                ]);
+            }
 
 
 

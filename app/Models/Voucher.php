@@ -15,6 +15,8 @@ class Voucher extends Model
     protected $casts = [
         'used_at' => 'datetime',
         'usage_limit' => 'integer',
+        'expired_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     public function usages(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -39,7 +41,19 @@ class Voucher extends Model
 
     public function isAvailable()
     {
-        return $this->used_count < $this->usage_limit;
+        if (!$this->is_active) {
+            return false;
+        }
+
+        if ($this->expired_at && now()->isAfter($this->expired_at)) {
+            return false;
+        }
+
+        if ($this->usage_limit !== null) {
+            return $this->used_count < $this->usage_limit;
+        }
+
+        return true;
     }
 
     public function participants(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -65,5 +79,10 @@ class Voucher extends Model
         }
 
         return 0;
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }

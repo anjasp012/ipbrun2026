@@ -715,7 +715,7 @@
                     const response = await fetch('{{ route("komunitas.check-voucher") }}', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ code: voucherCode, nik: nikValue, price: subtotalPrice })
+                        body: JSON.stringify({ code: voucherCode, nik: nikValue, price: subtotalPrice, ticket_id: '{{ $ticket->id }}' })
                     });
                     const data = await response.json();
 
