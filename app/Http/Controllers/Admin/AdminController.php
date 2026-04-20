@@ -9,6 +9,7 @@ use App\Models\Participant;
 use App\Models\Category;
 use App\Models\Setting;
 use App\Models\RaceEntry;
+use App\Models\Period;
 use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
@@ -107,20 +108,40 @@ class AdminController extends Controller
             });
         }
 
-        $participants = $query->latest()->paginate(25);
+        if ($request->filled('category_id')) {
+            $categoryId = $request->category_id;
+            $query->whereHas('raceEntries.ticket', function ($rq) use ($categoryId) {
+                $rq->where('category_id', $categoryId);
+            });
+        }
 
-        return view('pages.admin.participants.index', compact('participants'));
+        if ($request->filled('period_id')) {
+            $periodId = $request->period_id;
+            $query->whereHas('raceEntries.ticket', function ($rq) use ($periodId) {
+                $rq->where('period_id', $periodId);
+            });
+        }
+
+        $participants = $query->latest()->paginate(25);
+        
+        $categories = Category::orderBy('name')->get();
+        $periods = Period::orderBy('name')->get();
+
+        return view('pages.admin.participants.index', compact('participants', 'categories', 'periods'));
     }
 
     public function exportParticipants(Request $request)
     {
         $status = $request->status;
         $ticketType = $request->ticket_type;
+        $categoryId = $request->category_id;
+        $periodId = $request->period_id;
+        $search = $request->search;
 
         $query = Participant::query();
 
         // Constrain Relationship loading based on filters
-        $query->with(['raceEntries' => function ($q) use ($status, $ticketType) {
+        $query->with(['raceEntries' => function ($q) use ($status, $ticketType, $categoryId, $periodId) {
             if ($status) {
                 $q->whereHas('order', function ($oq) use ($status) {
                     $oq->where('status', $status);
@@ -131,10 +152,32 @@ class AdminController extends Controller
                     $tq->where('type', $ticketType);
                 });
             }
+            if ($categoryId) {
+                $q->whereHas('ticket', function ($tq) use ($categoryId) {
+                    $tq->where('category_id', $categoryId);
+                });
+            }
+            if ($periodId) {
+                $q->whereHas('ticket', function ($tq) use ($periodId) {
+                    $tq->where('period_id', $periodId);
+                });
+            }
             $q->with(['ticket.category', 'ticket.period', 'order']);
         }]);
 
         // Filter Participants (WhereHas ensures the participant has at least one matching entry)
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%")
+                    ->orWhere('nik', 'like', "%$search%")
+                    ->orWhere('phone_number', 'like', "%$search%")
+                    ->orWhereHas('raceEntries.order', function ($rq) use ($search) {
+                        $rq->where('order_code', 'like', "%$search%");
+                    });
+            });
+        }
+
         if ($status) {
             $query->whereHas('raceEntries.order', function ($rq) use ($status) {
                 $rq->where('status', $status);
@@ -144,6 +187,18 @@ class AdminController extends Controller
         if ($ticketType) {
             $query->whereHas('raceEntries.ticket', function ($rq) use ($ticketType) {
                 $rq->where('type', $ticketType);
+            });
+        }
+
+        if ($categoryId) {
+            $query->whereHas('raceEntries.ticket', function ($rq) use ($categoryId) {
+                $rq->where('category_id', $categoryId);
+            });
+        }
+
+        if ($periodId) {
+            $query->whereHas('raceEntries.ticket', function ($rq) use ($periodId) {
+                $rq->where('period_id', $periodId);
             });
         }
 

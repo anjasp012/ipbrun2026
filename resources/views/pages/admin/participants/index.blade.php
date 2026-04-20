@@ -1,45 +1,66 @@
 <x-layouts.admin title="Participant Master List">
     <div class="space-y-6" x-data="{ showExportModal: false, showPasswordModal: false, selectedParticipantId: null, selectedParticipantName: '' }">
         <!-- Filter & Search Bar -->
-        <div
-            class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row gap-6 items-center justify-between">
-            <form action="{{ url('/admin/participants') }}" method="GET" class="flex flex-1 gap-6 w-full">
-                <div class="relative flex-1">
-                    <input type="text" name="search" value="{{ request('search') }}"
-                        placeholder="Search Name, Email, NIK, or Order..."
-                        class="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-100 rounded-lg text-base font-medium focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all">
-                    <svg class="absolute left-5 top-4 w-6 h-6 text-slate-400" fill="none" stroke="currentColor"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
+        <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-6 w-full">
+            <form action="{{ url('/admin/participants') }}" method="GET" class="flex flex-col gap-4 w-full">
+                <div class="flex flex-col md:flex-row gap-4 w-full">
+                    <div class="relative flex-[2]">
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            placeholder="Search Name, Email, NIK, or Order..."
+                            class="w-full h-14 pl-14 pr-6 bg-slate-50 border border-slate-100 rounded-lg text-base font-medium focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all">
+                        <svg class="absolute left-5 top-4 w-6 h-6 text-slate-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
                 </div>
-                <select name="status"
-                    class="h-14 px-8 bg-slate-50 border border-slate-100 rounded-lg text-sm font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-100 transition-all">
-                    <option value="">All Payments</option>
-                    <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Settle / Paid</option>
-                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                    <option value="failed" {{ request('status') == 'failed' ? 'selected' : '' }}>Failed / Expired
-                    </option>
-                </select>
-                <select name="ticket_type"
-                    class="h-14 px-8 bg-slate-50 border border-slate-100 rounded-lg text-sm font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-100 transition-all">
-                    <option value="">All Types</option>
-                    <option value="ipb" {{ request('ticket_type') == 'ipb' ? 'selected' : '' }}>IPB Family</option>
-                    <option value="umum" {{ request('ticket_type') == 'umum' ? 'selected' : '' }}>Public (Umum)
-                    </option>
-                </select>
-                <button type="submit"
-                    class="h-14 px-10 bg-[#003366] text-white rounded-lg text-sm font-black uppercase tracking-widest hover:bg-[#002244] transition-all">Filter</button>
+                <div class="flex flex-col lg:flex-row gap-4 w-full justify-between items-center">
+                    <div class="flex flex-col md:flex-row gap-4 flex-1 w-full flex-wrap">
+                        <select name="status"
+                            class="h-14 px-8 bg-slate-50 border border-slate-100 rounded-lg text-sm font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-100 transition-all flex-1 min-w-[150px]">
+                            <option value="">All Payments</option>
+                            <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Settle / Paid</option>
+                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="failed" {{ request('status') == 'failed' ? 'selected' : '' }}>Failed / Expired
+                            </option>
+                        </select>
+                        <select name="ticket_type"
+                            class="h-14 px-8 bg-slate-50 border border-slate-100 rounded-lg text-sm font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-100 transition-all flex-1 min-w-[150px]">
+                            <option value="">All Types</option>
+                            <option value="ipb" {{ request('ticket_type') == 'ipb' ? 'selected' : '' }}>IPB Family</option>
+                            <option value="umum" {{ request('ticket_type') == 'umum' ? 'selected' : '' }}>Public (Umum)
+                            </option>
+                        </select>
+                        <select name="category_id"
+                            class="h-14 px-8 bg-slate-50 border border-slate-100 rounded-lg text-sm font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-100 transition-all flex-1 min-w-[150px]">
+                            <option value="">All Categories</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                        <select name="period_id"
+                            class="h-14 px-8 bg-slate-50 border border-slate-100 rounded-lg text-sm font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-100 transition-all flex-1 min-w-[150px]">
+                            <option value="">All Periods</option>
+                            @foreach($periods as $period)
+                                <option value="{{ $period->id }}" {{ request('period_id') == $period->id ? 'selected' : '' }}>{{ $period->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="flex gap-4 w-full lg:w-auto">
+                        <button type="submit"
+                            class="h-14 px-10 bg-[#003366] w-full lg:w-auto text-white rounded-lg text-sm font-black uppercase tracking-widest hover:bg-[#002244] transition-all">Filter</button>
+                        <button type="button" @click="showExportModal = true"
+                            class="h-14 px-10 bg-emerald-50 w-full lg:w-auto text-emerald-600 rounded-lg text-sm font-black uppercase tracking-widest border border-emerald-100 flex items-center justify-center gap-3 hover:bg-emerald-100 transition-all whitespace-nowrap">
+                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg> Export Data
+                        </button>
+                    </div>
+                </div>
             </form>
-            <button @click="showExportModal = true"
-                class="h-14 px-10 bg-emerald-50 text-emerald-600 rounded-lg text-sm font-black uppercase tracking-widest border border-emerald-100 flex items-center gap-3 hover:bg-emerald-100 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                    </path>
-                </svg> Export Data
-            </button>
         </div>
 
         <!-- Participants Table -->
@@ -184,16 +205,23 @@
                 </div>
 
                 <form action="{{ route('participants.export') }}" method="GET" @submit="showExportModal = false">
-                    <div class="p-10 space-y-8">
-                        <div class="grid grid-cols-2 gap-6">
-                            <div>
+                    <div class="p-10 space-y-6 max-h-[70vh] overflow-y-auto w-full">
+                        <div>
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Search By Keyword</label>
+                            <input type="text" name="search" value="{{ request('search') }}"
+                                class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all"
+                                placeholder="Name, Email, NIK, Order...">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-6 w-full">
+                            <div class="w-full">
                                 <label
                                     class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Start
                                     Date</label>
                                 <input type="date" name="start_date"
                                     class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
                             </div>
-                            <div>
+                            <div class="w-full">
                                 <label
                                     class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">End
                                     Date</label>
@@ -202,43 +230,53 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label
-                                class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Payment
-                                Status</label>
-                            <select name="status"
-                                class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
-                                <option value="">All Payments</option>
-                                <option value="paid">Settle / Paid Only</option>
-                                <option value="pending">Pending Only</option>
-                                <option value="failed">Failed / Expired Only</option>
-                            </select>
+                        <div class="grid grid-cols-2 gap-6 w-full">
+                            <div class="w-full">
+                                <label
+                                    class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Payment
+                                    Status</label>
+                                <select name="status"
+                                    class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
+                                    <option value="" {{ request('status') == '' ? 'selected' : '' }}>All Payments</option>
+                                    <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Settle / Paid Only</option>
+                                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending Only</option>
+                                    <option value="failed" {{ request('status') == 'failed' ? 'selected' : '' }}>Failed / Expired Only</option>
+                                </select>
+                            </div>
+                            <div class="w-full">
+                                <label
+                                    class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Ticket Type</label>
+                                <select name="ticket_type"
+                                    class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
+                                    <option value="" {{ request('ticket_type') == '' ? 'selected' : '' }}>All Types</option>
+                                    <option value="ipb" {{ request('ticket_type') == 'ipb' ? 'selected' : '' }}>IPB Family</option>
+                                    <option value="umum" {{ request('ticket_type') == 'umum' ? 'selected' : '' }}>Public (Umum)</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div>
-                            <label
-                                class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Ticket
-                                Category Type</label>
-                            <div class="grid grid-cols-2 gap-4">
-                                <label class="relative group cursor-pointer">
-                                    <input type="radio" name="ticket_type" value="" checked
-                                        class="sr-only peer">
-                                    <div
-                                        class="p-5 border-2 border-slate-100 rounded-xl text-center font-black text-[11px] uppercase tracking-widest text-slate-400 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 transition-all">
-                                        All Types</div>
-                                </label>
-                                <label class="relative group cursor-pointer">
-                                    <input type="radio" name="ticket_type" value="ipb" class="sr-only peer">
-                                    <div
-                                        class="p-5 border-2 border-slate-100 rounded-xl text-center font-black text-[11px] uppercase tracking-widest text-slate-400 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 transition-all">
-                                        IPB Family</div>
-                                </label>
-                                <label class="relative group cursor-pointer">
-                                    <input type="radio" name="ticket_type" value="umum" class="sr-only peer">
-                                    <div
-                                        class="p-5 border-2 border-slate-100 rounded-xl text-center font-black text-[11px] uppercase tracking-widest text-slate-400 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 transition-all">
-                                        Public</div>
-                                </label>
+                        <div class="grid grid-cols-2 gap-6 w-full">
+                            <div class="w-full">
+                                <label
+                                    class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Category</label>
+                                <select name="category_id"
+                                    class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
+                                    <option value="" {{ request('category_id') == '' ? 'selected' : '' }}>All Categories</option>
+                                    @foreach($categories as $cat)
+                                        <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="w-full">
+                                <label
+                                    class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Period</label>
+                                <select name="period_id"
+                                    class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
+                                    <option value="" {{ request('period_id') == '' ? 'selected' : '' }}>All Periods</option>
+                                    @foreach($periods as $period)
+                                        <option value="{{ $period->id }}" {{ request('period_id') == $period->id ? 'selected' : '' }}>{{ $period->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                     </div>
