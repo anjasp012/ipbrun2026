@@ -326,7 +326,7 @@
                             <div class="mt-4 p-4 border border-blue-100 bg-blue-50/50 rounded-xl">
                                 <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest">Preview Hasil Akhir:</p>
                                 <p class="text-base font-black text-[#003366] mt-1 break-words">
-                                    <span x-text="ticketType || 'UMUM'"></span>-<span x-text="categoryName || '5K'"></span>-<span x-text="(customCode || 'FAHRIL').toUpperCase().replace(/[^a-zA-Z0-9]/g, '')"></span>
+                                    <span x-text="ticketType || 'UMUM'"></span>-<span x-text="categoryName || '5K'"></span>-<span x-text="(customCode || '').toUpperCase().replace(/[^a-zA-Z0-9]/g, '')"></span>
                                 </p>
                             </div>
                         </div>
