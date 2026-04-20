@@ -224,7 +224,7 @@ class CommunityTicketController extends Controller
 
         if ($duplicateCheck) {
             return back()->withInput()->withErrors([
-                'nik' => "Peserta dengan NIK ini sudah terdaftar atau memiliki pesanan tertunda untuk kategori ({$ticket->category->name}).",
+                'nik' => "Peserta dengan NIK ini sudah terdaftar",
             ]);
         }
 
