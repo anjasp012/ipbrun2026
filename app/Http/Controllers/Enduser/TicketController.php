@@ -107,11 +107,19 @@ class TicketController extends Controller
 
         $pairRecommendation = null;
         if ($pairTarget && $firstEntry) {
-            $pairRecommendation = Ticket::whereHas('period', fn($q) => $q->where('is_active', true))
+            $recommendationCandidate = Ticket::whereHas('period', fn($q) => $q->where('is_active', true))
                 ->whereHas('category', fn($q) => $q->where('name', 'LIKE', "%$pairTarget%"))
                 ->where('type', $firstEntry->ticket->type)
                 ->with(['category', 'period'])
                 ->first();
+
+            if ($recommendationCandidate) {
+                $usedQty = RaceEntry::where('ticket_id', $recommendationCandidate->id)
+                    ->whereIn('status', ['pending', 'paid'])->count();
+                if ($usedQty < $recommendationCandidate->qty) {
+                    $pairRecommendation = $recommendationCandidate;
+                }
+            }
         }
 
         $potentialVoucher = null;
@@ -448,6 +456,13 @@ class TicketController extends Controller
             return redirect('/')->with('error', 'Data profil Anda belum ditemukan.');
         }
 
+        // Stock check
+        $usedQty = RaceEntry::where('ticket_id', $ticket->id)
+            ->whereIn('status', ['pending', 'paid'])->count();
+        if ($usedQty >= $ticket->qty) {
+            return redirect()->route('participant.dashboard')->with('error', 'Maaf, kuota untuk kategori tiket ini sudah habis.');
+        }
+
         // Duplicate check
         $exists = RaceEntry::whereHas('participant', function ($q) use ($participant) {
             $q->where('nik', $participant->nik);
@@ -493,7 +508,6 @@ class TicketController extends Controller
         if ($voucherCode) {
             $voucher = Voucher::where('code', $voucherCode)->first();
             if ($voucher && $voucher->isAvailable()) {
-                // Category/Type compatibility check (optional but recommended)
                 $canApply = true;
                 if ($voucher->ticket_type && strtolower($voucher->ticket_type) !== strtolower($ticket->type)) $canApply = false;
                 if ($voucher->category_id && $voucher->category_id !== $ticket->category_id) $canApply = false;
@@ -508,34 +522,45 @@ class TicketController extends Controller
             }
         }
 
-        $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
-        $adminFee = 4500;
-        $totalTicketPrice = $ticket->price;
-        $finalPrice = ($totalTicketPrice - $discountAmount) + $adminFee;
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($latestParticipant, $ticket, $voucher, $discountAmount) {
+            // Lock and verify stock
+            $lockedTicket = \App\Models\Ticket::where('id', $ticket->id)->lockForUpdate()->first();
+            $usedQty = \App\Models\RaceEntry::where('ticket_id', $lockedTicket->id)
+                ->whereIn('status', ['pending', 'paid'])->count();
 
-        $order = Order::create([
-            'participant_id' => $latestParticipant->id,
-            'order_code' => $orderCode,
-            'status' => 'pending',
-            'admin_fee' => $adminFee,
-            'total_price' => $finalPrice,
-        ]);
+            if ($usedQty >= $lockedTicket->qty) {
+                return redirect()->route('participant.dashboard')->with('error', 'Maaf, kuota untuk kategori ini baru saja habis terjual.');
+            }
 
-        if ($voucher) {
-            VoucherUsage::create([
-                'voucher_id' => $voucher->id,
+            $orderCode = 'IPBR26-' . strtoupper(\Illuminate\Support\Str::random(6));
+            $adminFee = 4500;
+            $totalTicketPrice = $ticket->price;
+            $finalPrice = ($totalTicketPrice - $discountAmount) + $adminFee;
+
+            $order = \App\Models\Order::create([
                 'participant_id' => $latestParticipant->id,
-                'order_id' => $order->id,
+                'order_code' => $orderCode,
+                'status' => 'pending',
+                'admin_fee' => $adminFee,
+                'total_price' => $finalPrice,
             ]);
-        }
 
-        $latestParticipant->raceEntries()->create([
-            'ticket_id' => $ticket->id,
-            'order_id' => $order->id,
-            'status' => 'pending',
-        ]);
+            if ($voucher) {
+                \App\Models\VoucherUsage::create([
+                    'voucher_id' => $voucher->id,
+                    'participant_id' => $latestParticipant->id,
+                    'order_id' => $order->id,
+                ]);
+            }
 
-        return $this->createMidtransTransaction($order);
+            $latestParticipant->raceEntries()->create([
+                'ticket_id' => $ticket->id,
+                'order_id' => $order->id,
+                'status' => 'pending',
+            ]);
+
+            return $this->createMidtransTransaction($order);
+        });
     }
 
     private function createMidtransTransaction(Order $order)
