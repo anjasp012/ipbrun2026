@@ -279,6 +279,113 @@
                                 </select>
                             </div>
                         </div>
+
+                        {{-- Selection Columns --}}
+                        <div class="pt-6 border-t border-slate-50">
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-6">Pilih Kolom Ekspor</label>
+                            
+                            <div class="space-y-8">
+                                <!-- Data Diri Section -->
+                                <div>
+                                    <h4 class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-4 border-b pb-2">Data Diri Peserta</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        @php
+                                            $personalFields = [
+                                                'name' => 'Nama Lengkap',
+                                                'email' => 'Email',
+                                                'phone' => 'Telepon',
+                                                'nik' => 'NIK',
+                                                'birth_date' => 'Tgl Lahir',
+                                                'sex' => 'Gender',
+                                                'blood_type' => 'Gol. Darah',
+                                                'jersey_size' => 'Ukuran Jersey',
+                                                'nim_nrp' => 'NIM/NRP',
+                                                'nationality' => 'Kewarganegaraan',
+                                                'address' => 'Alamat Lengkap',
+                                                'created_at' => 'Tgl Registrasi',
+                                            ];
+                                        @endphp
+                                        @foreach($personalFields as $key => $label)
+                                            <label class="flex items-center gap-3 cursor-pointer group p-2 rounded-lg hover:bg-slate-50 transition-all">
+                                                <input type="checkbox" name="columns[]" value="{{ $key }}" checked 
+                                                    class="w-4 h-4 rounded border-slate-200 text-emerald-500 focus:ring-emerald-500 transition-all">
+                                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-tight">{{ $label }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <!-- Info Tambahan Section -->
+                                <div>
+                                    <h4 class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-4 border-b pb-2">Info Tambahan & Medis</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        @php
+                                            $additionalFields = [
+                                                'running_community' => 'Komunitas Lari',
+                                                'medical_condition' => 'Kondisi Medis',
+                                                'shuttle_bus' => 'Shuttle Bus',
+                                                'best_time' => 'Best Time',
+                                                'previous_events' => 'Event Sebelumnya',
+                                            ];
+                                        @endphp
+                                        @foreach($additionalFields as $key => $label)
+                                            <label class="flex items-center gap-3 cursor-pointer group p-2 rounded-lg hover:bg-slate-50 transition-all">
+                                                <input type="checkbox" name="columns[]" value="{{ $key }}" checked 
+                                                    class="w-4 h-4 rounded border-slate-200 text-emerald-500 focus:ring-emerald-500 transition-all">
+                                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-tight">{{ $label }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <!-- Emergency & Address Section -->
+                                <div>
+                                    <h4 class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-4 border-b pb-2">Kontak Darurat</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        @php
+                                            $emergencyFields = [
+                                                'emergency_name' => 'Nama Kontak',
+                                                'emergency_phone' => 'No. Kontak',
+                                                'emergency_relationship' => 'Hubungan',
+                                            ];
+                                        @endphp
+                                        @foreach($emergencyFields as $key => $label)
+                                            <label class="flex items-center gap-3 cursor-pointer group p-2 rounded-lg hover:bg-slate-50 transition-all">
+                                                <input type="checkbox" name="columns[]" value="{{ $key }}" checked 
+                                                    class="w-4 h-4 rounded border-slate-200 text-emerald-500 focus:ring-emerald-500 transition-all">
+                                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-tight">{{ $label }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <!-- Order & Finance Section -->
+                                <div>
+                                    <h4 class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-4 border-b pb-2">Data Order & Keuangan</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        @php
+                                            $orderFields = [
+                                                'order_codes' => 'Order Codes',
+                                                'order_statuses' => 'Order Statuses',
+                                                'ticket_details' => 'Ticket Details',
+                                                'paid_amount' => 'Paid Amount (Price)',
+                                                'donation_scholarship' => 'Donation Scholarship',
+                                                'donation_event' => 'Donation Event',
+                                                'admin_fee' => 'Admin Fee',
+                                                'total_paid' => 'Total Paid Amount',
+                                            ];
+                                        @endphp
+                                        @foreach($orderFields as $key => $label)
+                                            <label class="flex items-center gap-3 cursor-pointer group p-2 rounded-lg hover:bg-slate-50 transition-all">
+                                                <input type="checkbox" name="columns[]" value="{{ $key }}" checked 
+                                                    class="w-4 h-4 rounded border-slate-200 text-emerald-500 focus:ring-emerald-500 transition-all">
+                                                <span class="text-[11px] font-bold text-slate-600 uppercase tracking-tight">{{ $label }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="p-8 bg-slate-50 flex items-center justify-end gap-4">

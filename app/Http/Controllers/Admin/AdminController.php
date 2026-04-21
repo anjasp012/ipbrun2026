@@ -142,6 +142,7 @@ class AdminController extends Controller
         $categoryId = $request->category_id;
         $periodId = $request->period_id;
         $search = $request->search;
+        $selectedColumns = $request->columns ?? [];
 
         $query = Participant::query();
 
@@ -219,7 +220,7 @@ class AdminController extends Controller
 
         $filename = "participants_export_" . date('Y-m-d_H-i-s') . ".xlsx";
 
-        return Excel::download(new ParticipantExport($participants, $status), $filename);
+        return Excel::download(new ParticipantExport($participants, $status, $selectedColumns), $filename);
     }
 
     public function participantShow(Participant $participant)
