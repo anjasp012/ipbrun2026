@@ -66,6 +66,7 @@ class Voucher extends Model
     public static function findValid($code)
     {
         return self::where('code', $code)
+            ->where('is_active', true)
             ->first();
     }
 

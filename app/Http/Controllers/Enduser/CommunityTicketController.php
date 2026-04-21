@@ -104,9 +104,12 @@ class CommunityTicketController extends Controller
         $nik = $request->nik;
         $code = $request->code;
         
-        $voucher = Voucher::where('code', $code)
-            ->when($nik, function($q) use ($nik) {
-                return $q->orWhere('code', $nik);
+        $voucher = Voucher::where('is_active', true)
+            ->where(function($q) use ($code, $nik) {
+                $q->where('code', $code);
+                if ($nik) {
+                    $q->orWhere('code', $nik);
+                }
             })
             ->first();
 
@@ -283,7 +286,7 @@ class CommunityTicketController extends Controller
 
             $vouchersApplied = [];
             foreach ($voucherCodes as $vCode) {
-                $v = Voucher::where('code', $vCode)->first();
+                $v = Voucher::findValid($vCode);
                 if (!$v) continue;
                 if (!$v->isAvailable()) {
                     throw new \Exception('Maaf, kuota voucher ' . $vCode . ' sudah habis.');

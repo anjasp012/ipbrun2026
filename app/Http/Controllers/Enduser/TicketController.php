@@ -374,7 +374,7 @@ class TicketController extends Controller
 
             $vouchersApplied = [];
             foreach ($voucherCodesInput as $vCode) {
-                $v = Voucher::where('code', $vCode)->first();
+                $v = Voucher::findValid($vCode);
                 if (!$v) continue;
                 if (!$v->isAvailable()) {
                     throw new \Exception('Maaf, kuota voucher ' . $vCode . ' sudah habis.');
@@ -513,7 +513,7 @@ class TicketController extends Controller
         $discountAmount = 0;
 
         if ($voucherCode) {
-            $voucher = Voucher::where('code', $voucherCode)->first();
+            $voucher = Voucher::findValid($voucherCode);
             if ($voucher && $voucher->isAvailable()) {
                 $canApply = true;
                 if ($voucher->ticket_type && strtolower($voucher->ticket_type) !== strtolower($ticket->type)) $canApply = false;

@@ -16,7 +16,7 @@ class VoucherController extends Controller
         $code = $request->code;
         $price = $request->price;
         
-        $voucher = Voucher::where('code', $code)->first();
+        $voucher = Voucher::findValid($code);
 
         if (!$voucher) {
             return response()->json(['valid' => false, 'message' => 'Kode voucher tidak valid.']);

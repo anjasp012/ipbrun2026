@@ -38,8 +38,9 @@ class VoucherController extends Controller
         $prefix = strtoupper($request->ticket_type) . '-' . strtoupper($category->name);
         $code = $prefix . '-' . strtoupper(preg_replace('/[^a-zA-Z0-9]/', '', $request->custom_code));
 
-        if (Voucher::where('code', $code)->exists()) {
-            return back()->with('error', "Voucher dengan kode '$code' sudah ada. Silakan gunakan akhiran yang lain.");
+        $activeVoucher = Voucher::where('code', $code)->where('is_active', true)->first();
+        if ($activeVoucher) {
+            return back()->with('error', "Voucher dengan kode '$code' sudah ada dan sedang AKTIF. Harap nonaktifkan dulu jika ingin membuat voucher baru dengan kode ini.");
         }
 
         $usageLimit = $request->has('is_unlimited_usage') && $request->is_unlimited_usage == '1' ? null : $request->usage_limit;
@@ -70,6 +71,18 @@ class VoucherController extends Controller
 
     public function toggleActive(Voucher $voucher)
     {
+        if (!$voucher->is_active) {
+            // Trying to turn ON
+            $anotherActive = Voucher::where('code', $voucher->code)
+                ->where('is_active', true)
+                ->where('id', '!=', $voucher->id)
+                ->exists();
+            
+            if ($anotherActive) {
+                return back()->with('error', "Gagal mengaktifkan. Sudah ada voucher lain dengan kode '{$voucher->code}' yang sedang AKTIF.");
+            }
+        }
+
         $voucher->update(['is_active' => !$voucher->is_active]);
         $status = $voucher->is_active ? 'diaktifkan' : 'dinonaktifkan';
         return back()->with('success', "Voucher {$voucher->code} berhasil {$status}.");
