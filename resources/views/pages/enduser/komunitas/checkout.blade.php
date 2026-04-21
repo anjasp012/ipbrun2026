@@ -409,12 +409,17 @@
 
                             @if ($pairTicket)
                                 <div id="row_second_ticket"
-                                    class="hidden flex justify-between items-center text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg">
-                                    <span class="text-[#E8630A] font-bold italic">Paket Tambahan:
-                                        {{ $pairTicket->category->name }}
-                                        ({{ $pairTicket->name ?: strtoupper($pairTicket->type) }})</span> <span
-                                        class="text-[#E8630A] font-black">Rp
-                                        {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
+                                    class="hidden flex justify-between items-start text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg gap-3">
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-[#E8630A] font-bold italic block">Tiket Tambahan:
+                                            {{ $pairTicket->category->name }}
+                                            ({{ $pairTicket->name ?: strtoupper($pairTicket->type) }})</span>
+                                        <div id="ticket2_voucher_tags" class="mt-1.5 flex flex-wrap gap-1"></div>
+                                    </div>
+                                    <div class="text-right flex-shrink-0">
+                                        <span id="ticket2_price_original" class="text-[#E8630A] font-black block">Rp {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
+                                        <span id="ticket2_price_final" class="hidden text-emerald-600 font-black block"></span>
+                                    </div>
                                 </div>
                             @endif
 
@@ -622,10 +627,12 @@
             const adminFee = 4500;
             const isIPB = "{{ $ticket->type }}" === "ipb";
             const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
+            const pairTicketId = {{ $pairTicket->id ?? 'null' }};
             const nimInput = document.getElementById('nim_nrp');
 
-            // Multi-Voucher State (max 2)
-            let appliedVouchers = []; // Array of { slot: 1|2, code, type, value, discount }
+            // Multi-Voucher State (max 2) — tiap voucher punya targetTicket (1 atau 2)
+            let appliedVouchers = []; // { code, type, value, targetTicket, discount }
+            let pendingVoucher = null; // voucher tervalidasi menunggu pemilihan target
 
             if (isIPB) {
                 document.getElementById('donateSection')?.classList.remove('hidden');
@@ -647,6 +654,53 @@
                 const count = appliedVouchers.length;
                 if (dot1) dot1.className = 'w-2 h-2 rounded-full transition-all ' + (count >= 1 ? 'bg-emerald-500 scale-125' : 'bg-slate-200');
                 if (dot2) dot2.className = 'w-2 h-2 rounded-full transition-all ' + (count >= 2 ? 'bg-teal-500 scale-125' : 'bg-slate-200');
+            }
+
+            // Helper: hitung diskon untuk 1 voucher terhadap harga tiket tertentu
+            function calcDisc(v, basePrice, alreadyDiscounted) {
+                if (v.type === 'nominal') return Math.min(v.value, Math.max(0, basePrice - alreadyDiscounted));
+                if (v.type === 'percentage') return Math.floor(basePrice * (v.value / 100));
+                return 0;
+            }
+
+            // Helper: buat HTML badge voucher
+            function voucherBadgeHTML(v, colorClass) {
+                const discLabel = v.type === 'percentage'
+                    ? `(${v.value}%) −Rp ${v.discount.toLocaleString('id-ID')}`
+                    : `−Rp ${v.discount.toLocaleString('id-ID')}`;
+                return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wide ${colorClass}">
+                    <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                    ${v.code} ${discLabel}
+                </span>`;
+            }
+
+            // Helper: render row tiket dengan badge+harga
+            function renderTicketRow(tagsId, origId, finalId, basePrice, matchFn) {
+                const tagsEl = document.getElementById(tagsId);
+                const origEl = document.getElementById(origId);
+                const finalEl = document.getElementById(finalId);
+
+                const myVouchers = appliedVouchers.filter(matchFn);
+                const badgeColors = ['bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200', 'bg-teal-50 text-teal-700 ring-1 ring-teal-200'];
+
+                // Hitung diskon per tiket
+                let disc1 = 0;
+                myVouchers.forEach((v, i) => {
+                    v.discount = calcDisc(v, basePrice, disc1);
+                    disc1 += v.discount;
+                });
+
+                if (myVouchers.length > 0 && tagsEl) {
+                    tagsEl.innerHTML = myVouchers.map((v, i) => voucherBadgeHTML(v, badgeColors[i])).join('');
+                    if (origEl) origEl.innerHTML = `<span class="line-through text-slate-400 font-medium text-xs">Rp ${basePrice.toLocaleString('id-ID')}</span>`;
+                    if (finalEl) { finalEl.classList.remove('hidden'); finalEl.innerText = 'Rp ' + (basePrice - disc1).toLocaleString('id-ID'); }
+                } else {
+                    if (tagsEl) tagsEl.innerHTML = '';
+                    if (origEl) origEl.innerHTML = 'Rp ' + basePrice.toLocaleString('id-ID');
+                    if (finalEl) finalEl.classList.add('hidden');
+                }
+
+                return disc1;
             }
 
             function updateTotal() {
@@ -672,73 +726,43 @@
                     }
                 }
 
-                let secondPrice = 0;
                 const summarySecond = document.getElementById('row_second_ticket');
                 if (isSecondChecked) {
-                    if (summarySecond) summarySecond.classList.remove('hidden');
-                    secondPrice = pairTicketPrice;
-                } else if (summarySecond) {
-                    summarySecond.classList.add('hidden');
+                    summarySecond?.classList.remove('hidden');
+                } else {
+                    summarySecond?.classList.add('hidden');
+                    // Reset vouchers assigned to ticket 2 kalau ticket 2 tidak dipilih
                 }
 
-                const ticketSubtotal = ticketPrice + secondPrice;
+                // Render Tiket 1
+                const disc1 = renderTicketRow('ticket_voucher_tags', 'ticket_price_original', 'ticket_price_final',
+                    ticketPrice, v => v.targetTicket === 1);
 
-                // Recalculate each voucher's discount
-                let totalDiscount = 0;
-                appliedVouchers.forEach((v) => {
-                    let disc = 0;
-                    if (v.type === 'nominal') {
-                        disc = Math.min(v.value, Math.max(0, ticketSubtotal - totalDiscount));
-                    } else if (v.type === 'percentage') {
-                        disc = Math.floor(ticketSubtotal * (v.value / 100));
-                    }
-                    v.discount = disc;
-                    totalDiscount += disc;
-                });
-
-                // Render voucher badges inline in ticket row
-                const tagsEl = document.getElementById('ticket_voucher_tags');
-                const origPriceEl = document.getElementById('ticket_price_original');
-                const finalPriceEl = document.getElementById('ticket_price_final');
-
-                if (appliedVouchers.length > 0 && tagsEl) {
-                    const badgeColors = [
-                        'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
-                        'bg-teal-50 text-teal-700 ring-1 ring-teal-200'
-                    ];
-                    tagsEl.innerHTML = appliedVouchers.map((v, idx) => {
-                        const discLabel = v.type === 'percentage'
-                            ? `(${v.value}%) −Rp ${v.discount.toLocaleString('id-ID')}`
-                            : `−Rp ${v.discount.toLocaleString('id-ID')}`;
-                        return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wide ${badgeColors[idx]}">
-                            <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                            ${v.code} ${discLabel}
-                        </span>`;
-                    }).join('');
-
-                    if (origPriceEl) origPriceEl.innerHTML = `<span class="line-through text-slate-400 font-medium text-xs">Rp ${ticketSubtotal.toLocaleString('id-ID')}</span>`;
-                    if (finalPriceEl) {
-                        finalPriceEl.classList.remove('hidden');
-                        finalPriceEl.innerText = 'Rp ' + (ticketSubtotal - totalDiscount).toLocaleString('id-ID');
-                    }
-                } else {
-                    if (tagsEl) tagsEl.innerHTML = '';
-                    if (origPriceEl) origPriceEl.innerHTML = 'Rp ' + ticketSubtotal.toLocaleString('id-ID');
-                    if (finalPriceEl) finalPriceEl.classList.add('hidden');
+                // Render Tiket 2 (pair ticket)
+                let disc2 = 0;
+                if (isSecondChecked && pairTicketPrice > 0) {
+                    disc2 = renderTicketRow('ticket2_voucher_tags', 'ticket2_price_original', 'ticket2_price_final',
+                        pairTicketPrice, v => v.targetTicket === 2);
                 }
 
                 updateSlotDots();
 
-                // Final Total Calculation
-                const total = (ticketSubtotal - totalDiscount) + adminFee + donEvent + donScholar;
+                const ticketSubtotal = ticketPrice + (isSecondChecked ? pairTicketPrice : 0);
+                const total = ticketSubtotal - disc1 - disc2 + adminFee + donEvent + donScholar;
                 document.getElementById('lbl_total').innerText = 'Rp ' + total.toLocaleString('id-ID');
             }
 
             document.getElementById('donation_event')?.addEventListener('change', updateTotal);
             document.getElementById('donation_scholarship')?.addEventListener('change', updateTotal);
-            document.getElementById('cb_second_ticket')?.addEventListener('change', updateTotal);
+            document.getElementById('cb_second_ticket')?.addEventListener('change', function() {
+                // Reset target ke tiket 1 jika tiket 2 tidak dicentang
+                if (!this.checked) {
+                    appliedVouchers.forEach(v => { if (v.targetTicket === 2) v.targetTicket = 1; });
+                }
+                updateTotal();
+            });
 
-            // Voucher Logic (Community Specific - Multi Voucher)
+            // Voucher Logic (Community Specific - Per Ticket Target)
             const nikInputForVoucher = document.getElementById('nik');
             if (nikInputForVoucher) {
                 nikInputForVoucher.addEventListener('input', function() {
@@ -746,6 +770,38 @@
                         applyVoucher(null, this.value);
                     }
                 });
+            }
+
+            function commitVoucher(voucherData, targetTicket) {
+                appliedVouchers.push({ ...voucherData, targetTicket });
+
+                if (appliedVouchers.length === 1) {
+                    document.getElementById('applied_voucher_code_1').value = voucherData.code;
+                } else if (appliedVouchers.length === 2) {
+                    document.getElementById('applied_voucher_code_2').value = voucherData.code;
+                }
+
+                const inputEl = document.getElementById('voucher_input');
+                const messageEl = document.getElementById('voucher_message');
+                const btn = document.getElementById('btn_apply_voucher');
+
+                inputEl.value = '';
+                const remaining = 2 - appliedVouchers.length;
+                if (remaining > 0) {
+                    messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">✓ Terpasang ke Tiket ${targetTicket}! Sisa slot: ${remaining}</span>`;
+                    inputEl.disabled = false;
+                    inputEl.placeholder = 'Masukkan voucher ke-' + (appliedVouchers.length + 1) + '...';
+                    btn.disabled = false; btn.innerText = 'Pasang';
+                } else {
+                    messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">✓ 2 Voucher berhasil dipasang!</span>';
+                    inputEl.disabled = true;
+                    inputEl.placeholder = 'Maks. 2 voucher sudah terpasang';
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    btn.classList.remove('hover:bg-[#FF7A21]');
+                }
+
+                updateTotal();
             }
 
             async function applyVoucher(code = null, nik = null) {
@@ -762,7 +818,6 @@
 
                 if (!voucherCode && !nikValue) return;
 
-                // Cegah input voucher yang sama
                 if (voucherCode && appliedVouchers.some(v => v.code === voucherCode)) {
                     messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-amber-500 tracking-widest">Voucher ini sudah dipasang.</span>';
                     return;
@@ -772,50 +827,68 @@
 
                 try {
                     const isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
-                    const secondPrice = isSecondChecked ? pairTicketPrice : 0;
-                    const subtotalPrice = ticketPrice + secondPrice;
-
-                    const response = await fetch('{{ route("komunitas.check-voucher") }}', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ code: voucherCode, nik: nikValue, price: subtotalPrice, ticket_id: '{{ $ticket->id }}' })
-                    });
-                    const data = await response.json();
-
-                    if (data.valid) {
-                        // Tambah ke array voucher
-                        appliedVouchers.push({ code: data.code, type: data.type, value: data.value, discount: 0 });
-
-                        // Update hidden fields
-                        if (appliedVouchers.length === 1) {
-                            document.getElementById('applied_voucher_code_1').value = data.code;
-                        } else if (appliedVouchers.length === 2) {
-                            document.getElementById('applied_voucher_code_2').value = data.code;
-                        }
-
-                        // Reset input
-                        inputEl.value = '';
-
-                        const remaining = 2 - appliedVouchers.length;
-                        if (remaining > 0) {
-                            messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">✓ Voucher <strong>${data.code}</strong> dipasang! Sisa slot: ${remaining}</span>`;
-                            inputEl.disabled = false;
-                            inputEl.placeholder = 'Masukkan voucher ke-' + (appliedVouchers.length + 1) + '...';
-                        } else {
-                            messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">✓ 2 Voucher berhasil dipasang!</span>';
-                            inputEl.disabled = true;
-                            inputEl.placeholder = 'Maks. 2 voucher sudah terpasang';
-                            btn.disabled = true;
-                            btn.classList.add('opacity-50', 'cursor-not-allowed');
-                            btn.classList.remove('hover:bg-[#FF7A21]');
-                        }
-
-                        updateTotal();
-                    } else if (voucherCode) {
-                        messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">${data.message}</span>`;
+                    
+                    // Coba ke Tiket 1 dulu
+                    let checkT1 = true;
+                    // Jika tiket 1 sudah punya voucher, coba cek tiket 2 dulu jika ada
+                    if (appliedVouchers.some(v => v.targetTicket === 1) && isSecondChecked && pairTicketId) {
+                        checkT1 = false;
                     }
+
+                    let validData = null;
+                    let targetFound = 0;
+
+                    if (checkT1) {
+                        const res1 = await fetch('{{ route("komunitas.check-voucher") }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify({ code: voucherCode, nik: nikValue, price: ticketPrice, ticket_id: '{{ $ticket->id }}' })
+                        });
+                        const data1 = await res1.json();
+                        if (data1.valid) {
+                            validData = data1;
+                            targetFound = 1;
+                        }
+                    }
+
+                    // Jika gagal t1 atau t1 sudah ada voucher, coba t2
+                    if (!targetFound && isSecondChecked && pairTicketId) {
+                        const res2 = await fetch('{{ route("komunitas.check-voucher") }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify({ code: voucherCode, nik: nikValue, price: pairTicketPrice, ticket_id: pairTicketId })
+                        });
+                        const data2 = await res2.json();
+                        if (data2.valid) {
+                            validData = data2;
+                            targetFound = 2;
+                        }
+                    }
+
+                    // Jika masih belum ketemu tapi t1 tadi di-skip, coba t1 sebagai fallback terakhir
+                    if (!targetFound && !checkT1) {
+                         const res1 = await fetch('{{ route("komunitas.check-voucher") }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify({ code: voucherCode, nik: nikValue, price: ticketPrice, ticket_id: '{{ $ticket->id }}' })
+                        });
+                        const data1 = await res1.json();
+                        if (data1.valid) {
+                            validData = data1;
+                            targetFound = 1;
+                        } else {
+                            // Tampilkan error dari t1 jika keduanya gagal
+                            messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">${data1.message}</span>`;
+                        }
+                    } else if (targetFound) {
+                        commitVoucher({ code: validData.code, type: validData.type, value: validData.value, discount: 0 }, targetFound);
+                    } else {
+                        // Jika memang tidak valid untuk tiket manapun
+                        messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">Voucher tidak cocok untuk tiket yang dipilih.</span>`;
+                    }
+
                 } catch (e) {
-                    if (voucherCode) messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">Error mengecek voucher</span>';
+                    messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">Error mengecek voucher</span>';
                 } finally {
                     if (appliedVouchers.length < 2) {
                         btn.disabled = false; btn.innerText = 'Pasang';
