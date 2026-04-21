@@ -284,7 +284,7 @@
                     } elseif (str_contains($categoryName, '10K') || str_contains($categoryName, '21K')) {
                         $pairCategory = '5K (Sabtu)';
                     }
-                @endphp @if ($pairCategory)
+                @endphp @if ($pairTicket)
                     <div class="mt-12 bg-orange-50/50 border border-orange-100 p-8 rounded-2xl">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div class="space-y-1">

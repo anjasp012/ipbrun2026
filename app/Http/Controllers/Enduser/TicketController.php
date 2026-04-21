@@ -162,13 +162,22 @@ class TicketController extends Controller
 
         $pairTicket = null;
         if ($pairTarget) {
-            $pairTicket = Ticket::where('period_id', $ticket->period_id)
-                ->where('type', $ticket->type) // Must match the same type (IPB/Umum)
+            $pairCandidate = Ticket::where('period_id', $ticket->period_id)
+                ->where('type', $ticket->type)
                 ->whereHas('category', function ($q) use ($pairTarget) {
                     $q->where('name', 'LIKE', "%$pairTarget%");
                 })
                 ->where('id', '!=', $ticket->id)
                 ->first();
+
+            if ($pairCandidate) {
+                // Stock check for pair ticket
+                $usedQty = \App\Models\RaceEntry::where('ticket_id', $pairCandidate->id)
+                    ->whereIn('status', ['pending', 'paid'])->count();
+                if ($usedQty < $pairCandidate->qty) {
+                    $pairTicket = $pairCandidate;
+                }
+            }
         }
 
         return view('pages.enduser.checkout', compact('ticket', 'pairTicket'));
