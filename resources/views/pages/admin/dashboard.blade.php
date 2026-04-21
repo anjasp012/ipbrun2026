@@ -139,29 +139,39 @@
             <!-- Summary Grid -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 {{-- Total Pendapatan --}}
-                <div class="bg-white p-8 rounded-xl border border-slate-100 shadow-sm border-l-[6px] border-l-blue-100">
-                    <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL PENDAPATAN
-                        TERBAYAR
-                    </p>
-                    <h4 class="text-2xl font-black text-slate-800">Rp
-                        {{ number_format($stats['total_revenue'], 0, ',', '.') }}
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL PENJUALAN TIKET
-                            Rp
-                            {{ number_format($stats['total_revenue'] - $stats['total_donation_scholarship'] - $stats['total_donation_event'] - $stats['total_admin'], 0, ',', '.') }}
-                        </p>
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL DONASI BEASISWA
-                            Rp
-                            {{ number_format($stats['total_donation_scholarship'], 0, ',', '.') }}
-                        </p>
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL DONASI EVENT
-                            Rp
-                            {{ number_format($stats['total_donation_event'], 0, ',', '.') }}
-                        </p>
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL BIAYA ADMIN
-                            Rp
-                            {{ number_format($stats['total_admin'], 0, ',', '.') }}
-                        </p>
+                <div class="md:col-span-1 bg-white p-8 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-600"></div>
+                    
+                    <div class="flex items-center justify-between mb-6">
+                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-[3px]">Total Pendapatan</p>
+                        <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3 1.343 3 3-1.343 3-3 3m0-12V6m0 12v2m1.343-12h-2.686m2.686 0c1.837 0 3.328 1.491 3.328 3.328 0 1.838-1.491 3.329-3.328 3.329m1.343 3.328h-2.686m-1.343 0c-1.838 0-3.329-1.491-3.329-3.328 0-1.838 1.491-3.329 3.329-3.329m1.343-3.328h2.686"></path></svg>
+                        </div>
+                    </div>
+
+                    <h4 class="text-3xl font-[900] text-slate-800 tracking-tighter mb-8 leading-none">
+                        Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}
+                        <span class="block text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-2">Terbayar (Paid)</span>
                     </h4>
+
+                    <div class="space-y-4 pt-6 border-t border-slate-50">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Penjualan Tiket</span>
+                            <span class="text-xs font-black text-slate-700 font-mono">Rp {{ number_format($stats['total_revenue'] - $stats['total_donation_scholarship'] - $stats['total_donation_event'] - $stats['total_admin'], 0, ',', '.') }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Donasi Beasiswa</span>
+                            <span class="text-xs font-black text-slate-700 font-mono">Rp {{ number_format($stats['total_donation_scholarship'], 0, ',', '.') }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Donasi Event</span>
+                            <span class="text-xs font-black text-slate-700 font-mono">Rp {{ number_format($stats['total_donation_event'], 0, ',', '.') }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Biaya Admin</span>
+                            <span class="text-xs font-black text-slate-700 font-mono">Rp {{ number_format($stats['total_admin'], 0, ',', '.') }}</span>
+                        </div>
+                    </div>
                 </div>
                 {{-- Total Tiket Terjual --}}
                 <div class="bg-white p-8 rounded-xl border border-slate-100 shadow-sm bg-blue-50/10">

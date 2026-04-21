@@ -238,10 +238,13 @@ class AdminController extends Controller
             'Emergency Contact Name',
             'Emergency Contact Phone',
             'Emergency Relationship',
-            // Consolidated Data
             'Order Codes',
             'Order Statuses',
             'Ticket Details',
+            'Paid Amount',
+            'Donation Scholarship',
+            'Donation Event',
+            'Admin Fee',
             'Total Paid Amount',
             'First Registered At'
         ];
@@ -261,6 +264,10 @@ class AdminController extends Controller
                     return "($type - $cat)";
                 })->implode(' | ');
 
+                $paidAmount = $p->raceEntries->where('status', 'paid')->unique('order_id')->sum(fn($e) => $e->order->total_price ?? 0);
+                $donationScholarship = $p->raceEntries->where('status', 'paid')->unique('order_id')->sum(fn($e) => $e->order->donation_scholarship ?? 0);
+                $donationEvent = $p->raceEntries->where('status', 'paid')->unique('order_id')->sum(fn($e) => $e->order->donation_event ?? 0);
+                $adminFee = $p->raceEntries->where('status', 'paid')->unique('order_id')->sum(fn($e) => $e->order->admin_fee ?? 0);
                 $totalPaid = $p->raceEntries->where('status', 'paid')->unique('order_id')->sum(fn($e) => $e->order->total_price ?? 0);
 
                 fputcsv($file, [
@@ -277,10 +284,13 @@ class AdminController extends Controller
                     $p->emergency_contact_name,
                     $p->emergency_contact_phone_number,
                     $p->emergency_contact_relationship,
-                    // Consolidated Data
                     $orderCodes,
                     $statuses,
                     $ticketDetails,
+                    $paidAmount,
+                    $donationScholarship,
+                    $donationEvent,
+                    $adminFee,
                     $totalPaid,
                     $p->created_at->format('Y-m-d H:i')
                 ]);
