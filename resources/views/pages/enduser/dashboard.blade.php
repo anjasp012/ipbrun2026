@@ -120,18 +120,7 @@
                         <p class="text-[9px] font-black text-white/40 uppercase tracking-[5px] mb-4 leading-none">Biaya Pendaftaran</p>
                         
                         <div class="mb-10 text-center lg:text-right">
-                            @if($potentialDiscount > 0)
-                                <div class="flex items-center justify-center lg:justify-end gap-3 mb-2">
-                                    <span class="text-xs font-bold text-white/30 line-through tracking-tighter italic decoration-orange-500/50 decoration-2">Rp {{ number_format($pairRecommendation->price, 0, ',', '.') }}</span>
-                                    <span class="px-2 py-0.5 bg-orange-500 text-white rounded text-[8px] font-black uppercase tracking-widest">-{{ $potentialVoucher->type === 'percentage' ? $potentialVoucher->value . '%' : 'Rp' . number_format($potentialVoucher->value, 0, ',', '.') }}</span>
-                                </div>
-                                <div class="text-4xl md:text-5xl font-[900] text-white leading-none tracking-tighter italic mb-3">Rp {{ number_format($pairRecommendation->price - $potentialDiscount, 0, ',', '.') }}</div>
-                                <div class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl">
-                                    <span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">🎟️ VOUCHER: {{ $potentialVoucher->code }}</span>
-                                </div>
-                            @else
-                                <div class="text-4xl md:text-5xl font-[900] text-white leading-none tracking-tighter italic">Rp {{ number_format($pairRecommendation->price, 0, ',', '.') }}</div>
-                            @endif
+                            <div class="text-4xl md:text-5xl font-[900] text-white leading-none tracking-tighter italic">Rp {{ number_format($pairRecommendation->price, 0, ',', '.') }}</div>
                         </div>
 
                         <a href="{{ route('participant.buy-more', $pairRecommendation->id) }}" 

@@ -116,43 +116,6 @@ class TicketController extends Controller
 
         $potentialVoucher = null;
         $potentialDiscount = 0;
-        if ($pairRecommendation) {
-            // Find existing voucher usage (Priority: Successful PAID usage history)
-            $lastUsage = VoucherUsage::where('participant_id', $participant->id)
-                ->whereHas('order', function ($q) {
-                    $q->where('status', 'paid');
-                })
-                ->latest()
-                ->first() 
-                ?? 
-                VoucherUsage::where('participant_id', $participant->id)
-                ->whereHas('order', function ($q) {
-                    $q->where('status', 'pending');
-                })
-                ->latest()
-                ->first();
-
-            if ($lastUsage) {
-                $potentialVoucher = $lastUsage->voucher;
-            } else {
-                // Fallback to NIK-based voucher if no history found
-                $potentialVoucher = Voucher::where('code', $participant->nik)->first();
-            }
-
-            if ($potentialVoucher) {
-                // Determine if this participant already used this specific voucher
-                $alreadyUsed = VoucherUsage::where('voucher_id', $potentialVoucher->id)
-                    ->where('participant_id', $participant->id)
-                    ->exists();
-
-                // Allow if either global stock is available OR this participant already used it (no extra quota cost)
-                if ($potentialVoucher->isAvailable() || $alreadyUsed) {
-                    $potentialDiscount = $potentialVoucher->calculateDiscount($pairRecommendation->price);
-                } else {
-                    $potentialVoucher = null; // Quota full and not a previous user
-                }
-            }
-        }
 
         return view('pages.enduser.dashboard', compact('participant', 'orders', 'pairRecommendation', 'potentialVoucher', 'potentialDiscount'));
     }
