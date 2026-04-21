@@ -263,7 +263,7 @@ class AdminController extends Controller
                     return "($type - $cat)";
                 })->implode(' | ');
 
-                $paidAmount = $p->raceEntries->where('status', $status)->unique('order_id')->sum(fn($e) => $e->order->total_price - $e->order->donation_scholarship - $e->order->donation_event - $e->order->admin_fee ?? 0);
+                $paidAmount = $p->raceEntries->where('status', $status)->unique('order_id')->sum(fn($e) => $e->order->total_price - $e->order->admin_fee ?? 0);
                 $donationScholarship = $p->raceEntries->where('status', $status)->unique('order_id')->sum(fn($e) => $e->order->donation_scholarship ?? 0);
                 $donationEvent = $p->raceEntries->where('status', $status)->unique('order_id')->sum(fn($e) => $e->order->donation_event ?? 0);
                 $adminFee = $p->raceEntries->where('status', $status)->unique('order_id')->sum(fn($e) => $e->order->admin_fee ?? 0);
