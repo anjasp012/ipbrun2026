@@ -215,9 +215,9 @@ class AdminController extends Controller
 
         $participants = $query->latest()->get();
 
-        $filename = "participants_export_" . date('Y-m-d_H-i-s') . ".xlsx";
+        $filename = "participants_export_" . date('Y-m-d_H-i-s') . ".csv";
         $headers = [
-            "Content-type"        => "text/xlsx",
+            "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$filename",
             "Pragma"              => "no-cache",
             "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
