@@ -147,11 +147,19 @@
                         {{ number_format($stats['total_revenue'], 0, ',', '.') }}
                         <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL PENJUALAN TIKET
                             Rp
-                            {{ number_format($stats['total_revenue'] - $stats['total_donation'], 0, ',', '.') }}
+                            {{ number_format($stats['total_revenue'] - $stats['total_donation_scholarship'] - $stats['total_donation_event'] - $stats['total_admin'], 0, ',', '.') }}
                         </p>
-                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL DONASI
+                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL DONASI BEASISWA
                             Rp
-                            {{ number_format($stats['total_donation'], 0, ',', '.') }}
+                            {{ number_format($stats['total_donation_scholarship'], 0, ',', '.') }}
+                        </p>
+                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL DONASI EVENT
+                            Rp
+                            {{ number_format($stats['total_donation_event'], 0, ',', '.') }}
+                        </p>
+                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL BIAYA ADMIN
+                            Rp
+                            {{ number_format($stats['total_admin'], 0, ',', '.') }}
                         </p>
                     </h4>
                 </div>
