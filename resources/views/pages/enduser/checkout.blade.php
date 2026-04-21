@@ -394,11 +394,18 @@
                     </div> <!-- Summary Content -->
                     <div class="p-8 pt-4 bg-slate-50/40 space-y-4">
                         <div class="space-y-3">
-                            <div class="flex justify-between items-center text-sm"> <span
-                                    class="text-slate-500 font-medium italic">Tiket {{ $ticket->category->name }}
-                                    ({{ $ticket->name ?: strtoupper($ticket->type) }})</span> <span
-                                    class="text-[#003366] font-bold">Rp
-                                    {{ number_format($ticket->price, 0, ',', '.') }}</span> </div>
+                            <!-- Ticket Row (Dynamic: shows voucher badges + price inline) -->
+                            <div id="row_ticket_main" class="flex justify-between items-start text-sm gap-3">
+                                <div class="flex-1 min-w-0">
+                                    <span class="text-slate-500 font-medium italic block">Tiket {{ $ticket->category->name }}
+                                        ({{ $ticket->name ?: strtoupper($ticket->type) }})</span>
+                                    <div id="ticket_voucher_tags" class="mt-1.5 flex flex-wrap gap-1"></div>
+                                </div>
+                                <div class="text-right flex-shrink-0">
+                                    <span id="ticket_price_original" class="text-[#003366] font-bold block">Rp {{ number_format($ticket->price, 0, ',', '.') }}</span>
+                                    <span id="ticket_price_final" class="hidden text-emerald-600 font-black block"></span>
+                                </div>
+                            </div>
                             <div class="flex justify-between items-center text-sm"> <span
                                     class="text-slate-500 font-medium italic">Biaya Layanan</span> <span
                                     class="text-[#003366] font-bold">Rp 4.500</span> </div>
@@ -424,18 +431,24 @@
                                     id="lbl_donation_scholarship" class="text-[#E8630A] font-bold">Rp 0</span>
                             </div>
 
-                            <div id="row_voucher" class="hidden flex justify-between items-center text-sm ring-2 ring-emerald-100 bg-emerald-50/30 p-2 rounded-lg">
-                                <span class="text-emerald-600 font-bold italic">Potongan Voucher (<span id="txt_voucher_code"></span><span id="txt_voucher_detail"></span>)</span>
-                                <span id="lbl_voucher" class="text-emerald-600 font-black">- Rp 0</span>
-                            </div>
+
                         </div>
 
-                        <!-- Voucher Input Area (Integrated) -->
-                        <div class="mt-6 pt-6 border-t border-dashed border-slate-200">
+                        <!-- Voucher Input Area (Multi Voucher) -->
+                        <div class="mt-6 pt-6 border-t border-dashed border-slate-200" id="voucher_section">
+                            <div class="flex items-center justify-between mb-3">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[2px]">Kode Voucher <span class="text-emerald-500">(maks. 2 voucher)</span></p>
+                                <div id="voucher_slots_indicator" class="flex gap-1">
+                                    <div id="slot_dot_1" class="w-2 h-2 rounded-full bg-slate-200 transition-all"></div>
+                                    <div id="slot_dot_2" class="w-2 h-2 rounded-full bg-slate-200 transition-all"></div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="applied_voucher_code_1" name="voucher_code">
+                            <input type="hidden" id="applied_voucher_code_2" name="voucher_code_2">
                             <div class="flex flex-col md:flex-row gap-3">
                                 <div class="flex-1 relative">
-                                    <input type="text" id="voucher_input" name="voucher_code" placeholder="Punya kode voucher?" 
-                                        class="w-full h-12 bg-white border-2 border-slate-100 rounded-xl px-4 font-black text-[#003366] focus:border-[#FF7A21] focus:ring-4 focus:ring-orange-500/10 transition-all outline-none uppercase tracking-widest text-xs placeholder:lowercase placeholder:font-medium placeholder:text-slate-300">
+                                    <input type="text" id="voucher_input" placeholder="Masukkan kode voucher..." 
+                                        class="w-full h-12 bg-white border-2 border-slate-100 rounded-xl px-4 font-black text-[#003366] focus:border-[#FF7A21] focus:ring-4 focus:ring-orange-500/10 transition-all outline-none uppercase tracking-widest text-xs placeholder:normal-case placeholder:font-medium placeholder:text-slate-300">
                                 </div>
                                 <button type="button" id="btn_apply_voucher"
                                     class="h-12 px-6 bg-[#003366] text-white rounded-xl font-black text-[10px] uppercase tracking-[2px] hover:bg-[#FF7A21] transition-all active:scale-95 shadow-lg shadow-blue-900/10">
@@ -618,8 +631,10 @@
             const isIPB = "{{ $ticket->type }}" === "ipb";
             const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
             const nimInput = document.getElementById('nim_nrp');
-            let currentVoucher = { type: null, value: 0 };
             const nikInputForVoucher = document.getElementById('nik');
+
+            // Multi-Voucher State (max 2)
+            let appliedVouchers = []; // Array of { code, type, value, discount }
 
             if (isIPB) {
                 document.getElementById('donateSection')?.classList.remove('hidden');
@@ -628,6 +643,14 @@
             } else {
                 if (nimInput) nimInput.value = '';
                 nimInput?.removeAttribute('required');
+            }
+
+            function updateSlotDots() {
+                const dot1 = document.getElementById('slot_dot_1');
+                const dot2 = document.getElementById('slot_dot_2');
+                const count = appliedVouchers.length;
+                if (dot1) dot1.className = 'w-2 h-2 rounded-full transition-all ' + (count >= 1 ? 'bg-emerald-500 scale-125' : 'bg-slate-200');
+                if (dot2) dot2.className = 'w-2 h-2 rounded-full transition-all ' + (count >= 2 ? 'bg-teal-500 scale-125' : 'bg-slate-200');
             }
 
             function updateTotal() {
@@ -663,48 +686,86 @@
                     summarySecond.classList.add('hidden');
                 }
 
-                let subtotalTicket = ticketPrice + secondPrice;
-                let voucherDiscount = 0;
-                const rowVoucher = document.getElementById('row_voucher');
-                const lblVoucher = document.getElementById('lbl_voucher');
-                const txtDetail = document.getElementById('txt_voucher_detail');
+                const subtotalTicket = ticketPrice + secondPrice;
 
-                if (currentVoucher.type === 'nominal') {
-                    voucherDiscount = currentVoucher.value;
-                    if (txtDetail) txtDetail.innerText = '';
-                } else if (currentVoucher.type === 'percentage') {
-                    voucherDiscount = (subtotalTicket * (currentVoucher.value / 100));
-                    if (txtDetail) txtDetail.innerText = ` - ${currentVoucher.value}%`;
-                }
+                // Recalculate each voucher's discount
+                let totalDiscount = 0;
+                appliedVouchers.forEach((v) => {
+                    let disc = 0;
+                    if (v.type === 'nominal') {
+                        disc = Math.min(v.value, Math.max(0, subtotalTicket - totalDiscount));
+                    } else if (v.type === 'percentage') {
+                        disc = Math.floor(subtotalTicket * (v.value / 100));
+                    }
+                    v.discount = disc;
+                    totalDiscount += disc;
+                });
 
-                if (voucherDiscount > 0) {
-                    rowVoucher?.classList.remove('hidden');
-                    if (lblVoucher) lblVoucher.innerText = '- Rp ' + voucherDiscount.toLocaleString('id-ID');
+                // Render voucher badges inline in ticket row
+                const tagsEl = document.getElementById('ticket_voucher_tags');
+                const origPriceEl = document.getElementById('ticket_price_original');
+                const finalPriceEl = document.getElementById('ticket_price_final');
+
+                if (appliedVouchers.length > 0 && tagsEl) {
+                    const badgeColors = [
+                        'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+                        'bg-teal-50 text-teal-700 ring-1 ring-teal-200'
+                    ];
+                    tagsEl.innerHTML = appliedVouchers.map((v, idx) => {
+                        const discLabel = v.type === 'percentage'
+                            ? `(${v.value}%) −Rp ${v.discount.toLocaleString('id-ID')}`
+                            : `−Rp ${v.discount.toLocaleString('id-ID')}`;
+                        return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wide ${badgeColors[idx]}">
+                            <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                            ${v.code} ${discLabel}
+                        </span>`;
+                    }).join('');
+
+                    if (origPriceEl) origPriceEl.innerHTML = `<span class="line-through text-slate-400 font-medium text-xs">Rp ${subtotalTicket.toLocaleString('id-ID')}</span>`;
+                    if (finalPriceEl) {
+                        finalPriceEl.classList.remove('hidden');
+                        finalPriceEl.innerText = 'Rp ' + (subtotalTicket - totalDiscount).toLocaleString('id-ID');
+                    }
                 } else {
-                    rowVoucher?.classList.add('hidden');
+                    if (tagsEl) tagsEl.innerHTML = '';
+                    if (origPriceEl) origPriceEl.innerHTML = 'Rp ' + subtotalTicket.toLocaleString('id-ID');
+                    if (finalPriceEl) finalPriceEl.classList.add('hidden');
                 }
 
-                let total = subtotalTicket + adminFee + donEvent + donScholar - voucherDiscount;
-                const formattedTotal = 'Rp ' + total.toLocaleString('id-ID');
+                updateSlotDots();
+
+                let total = subtotalTicket + adminFee + donEvent + donScholar - totalDiscount;
                 const lblTotal = document.getElementById('lbl_total');
-                if (lblTotal) lblTotal.innerText = formattedTotal;
+                if (lblTotal) lblTotal.innerText = 'Rp ' + total.toLocaleString('id-ID');
             }
 
             document.getElementById('donation_event')?.addEventListener('change', updateTotal);
             document.getElementById('donation_scholarship')?.addEventListener('change', updateTotal);
             document.getElementById('cb_second_ticket')?.addEventListener('change', updateTotal);
 
-            // Voucher Logic
+            // Multi-Voucher Logic
             async function applyVoucher(code = null, nik = null) {
+                if (appliedVouchers.length >= 2) {
+                    document.getElementById('voucher_message').innerHTML = '<span class="text-[10px] font-black uppercase text-amber-500 tracking-widest">Maksimal 2 voucher sudah dipasang.</span>';
+                    return;
+                }
+
                 const inputEl = document.getElementById('voucher_input');
-                const voucherCode = code || inputEl.value;
+                const voucherCode = (code || inputEl.value || '').trim().toUpperCase();
                 const messageEl = document.getElementById('voucher_message');
                 const btn = document.getElementById('btn_apply_voucher');
                 const nikValue = nik || nikInputForVoucher?.value;
 
                 if (!voucherCode && !nikValue) return;
-                btn.disabled = true; btn.innerText = '...'; 
-                
+
+                // Cegah voucher yang sama dipasang dua kali
+                if (voucherCode && appliedVouchers.some(v => v.code === voucherCode)) {
+                    messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-amber-500 tracking-widest">Voucher ini sudah dipasang.</span>';
+                    return;
+                }
+
+                btn.disabled = true; btn.innerText = '...';
+
                 try {
                     let isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
                     let secondPrice = isSecondChecked ? pairTicketPrice : 0;
@@ -718,38 +779,56 @@
                     const data = await response.json();
 
                     if (data.valid) {
-                        currentVoucher = { type: data.type, value: data.value };
-                        document.getElementById('txt_voucher_code').innerText = data.code;
-                        if (data.assigned || (!inputEl.value || inputEl.value === '')) {
-                            inputEl.value = data.code;
+                        appliedVouchers.push({ code: data.code, type: data.type, value: data.value, discount: 0 });
+
+                        // Update hidden inputs
+                        if (appliedVouchers.length === 1) {
+                            document.getElementById('applied_voucher_code_1').value = data.code;
+                        } else if (appliedVouchers.length === 2) {
+                            document.getElementById('applied_voucher_code_2').value = data.code;
                         }
-                        if (data.assigned) {
-                            messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">Voucher Otomatis Terpasang!</span>';
-                            inputEl.readOnly = true;
-                            inputEl.classList.add('bg-slate-50', 'text-slate-400');
-                            btn.classList.add('hidden');
+
+                        // Reset input for next voucher
+                        inputEl.value = '';
+
+                        const remaining = 2 - appliedVouchers.length;
+                        if (remaining > 0) {
+                            messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">✓ Voucher <strong>${data.code}</strong> dipasang! Sisa slot: ${remaining}</span>`;
+                            inputEl.disabled = false;
+                            inputEl.placeholder = 'Masukkan voucher ke-' + (appliedVouchers.length + 1) + '...';
                         } else {
-                            messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">Voucher berhasil dipasang!</span>';
+                            messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">✓ 2 Voucher berhasil dipasang!</span>';
+                            inputEl.disabled = true;
+                            inputEl.placeholder = 'Maks. 2 voucher sudah terpasang';
+                            btn.disabled = true;
+                            btn.classList.add('opacity-50', 'cursor-not-allowed');
+                            btn.classList.remove('hover:bg-[#FF7A21]');
                         }
+
                         updateTotal();
                     } else if (voucherCode) {
-                        currentVoucher = { type: null, value: 0 };
                         messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">${data.message}</span>`;
-                        updateTotal();
                     }
                 } catch (e) {
                     if (voucherCode) messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">Error mengecek voucher</span>';
                 } finally {
-                    btn.disabled = false; btn.innerText = 'Pasang';
+                    if (appliedVouchers.length < 2) {
+                        btn.disabled = false; btn.innerText = 'Pasang';
+                    }
                 }
             }
 
             document.getElementById('btn_apply_voucher')?.addEventListener('click', () => applyVoucher());
 
+            // Enter key
+            document.getElementById('voucher_input')?.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); applyVoucher(); }
+            });
+
             // Auto apply when NIK changes (for auto-claim vouchers)
             if (nikInputForVoucher) {
                 nikInputForVoucher.addEventListener('blur', function() {
-                    if (this.value.length >= 16) {
+                    if (this.value.length >= 16 && appliedVouchers.length === 0) {
                         applyVoucher(null, this.value);
                     }
                 });

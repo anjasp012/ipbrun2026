@@ -170,6 +170,7 @@ class CommunityTicketController extends Controller
             'shuttle_bus' => 'nullable|string',
             'medical_condition' => 'nullable|string',
             'voucher_code' => 'nullable|string',
+            'voucher_code_2' => 'nullable|string',
             'donation_event' => 'nullable|numeric',
             'donation_scholarship' => 'nullable|numeric',
         ], [
@@ -262,28 +263,34 @@ class CommunityTicketController extends Controller
                 }
             }
 
-            // Voucher Validation (Only impacts ticket subtotal)
-            $voucher = null;
+            // Voucher Validation (Mendukung 2 voucher)
+            $voucher1 = null;
+            $voucher2 = null;
             $discountAmount = 0;
-            if ($request->voucher_code || $request->nik) {
-                $voucher = Voucher::where('code', $request->voucher_code)
-                    ->when($request->nik, function($q) use ($request) {
-                        return $q->orWhere('code', $request->nik);
-                    })
-                    ->first();
-                
-                if ($voucher) {
-                    if (!$voucher->isAvailable()) {
-                        throw new \Exception('Maaf, kuota voucher ini sudah habis.');
-                    }
-                    if ($voucher->ticket_type && strtolower($voucher->ticket_type) !== strtolower($ticket->type)) {
-                        throw new \Exception('Voucher tidak berlaku untuk tipe tiket ini.');
-                    }
-                    if ($voucher->category_id && $voucher->category_id !== $ticket->category_id) {
-                        throw new \Exception('Voucher tidak berlaku untuk kategori tiket ini.');
-                    }
-                    $discountAmount = $voucher->calculateDiscount($ticketSubtotal);
+
+            $voucherCodes = array_filter([
+                $request->voucher_code ?: ($request->nik ?: null),
+                $request->voucher_code_2 ?: null,
+            ]);
+            $voucherCodes = array_unique($voucherCodes);
+
+            $vouchersApplied = [];
+            foreach ($voucherCodes as $vCode) {
+                $v = Voucher::where('code', $vCode)->first();
+                if (!$v) continue;
+                if (!$v->isAvailable()) {
+                    throw new \Exception('Maaf, kuota voucher ' . $vCode . ' sudah habis.');
                 }
+                if ($v->ticket_type && strtolower($v->ticket_type) !== strtolower($ticket->type)) {
+                    throw new \Exception('Voucher ' . $vCode . ' tidak berlaku untuk tipe tiket ini.');
+                }
+                if ($v->category_id && $v->category_id !== $ticket->category_id) {
+                    throw new \Exception('Voucher ' . $vCode . ' tidak berlaku untuk kategori tiket ini.');
+                }
+                $disc = $v->calculateDiscount($ticketSubtotal - $discountAmount);
+                $discountAmount += $disc;
+                $vouchersApplied[] = $v;
+                if (count($vouchersApplied) >= 2) break;
             }
 
             $totalPrice = ($ticketSubtotal - $discountAmount) + $adminFee + $donationEvent + $donationScholarship;
@@ -291,7 +298,7 @@ class CommunityTicketController extends Controller
             $participant = Participant::updateOrCreate(
                 ['nik' => $nik],
                 array_merge(
-                    \Illuminate\Support\Arr::except($validated, ['email_confirmation', 'ticket_id', 'other_race_interest', 'voucher_code', 'donation_event', 'donation_scholarship']),
+                    \Illuminate\Support\Arr::except($validated, ['email_confirmation', 'ticket_id', 'other_race_interest', 'voucher_code', 'voucher_code_2', 'donation_event', 'donation_scholarship']),
                     ['is_community' => true]
                 )
             );
@@ -307,12 +314,16 @@ class CommunityTicketController extends Controller
                 'total_price' => $totalPrice,
             ]);
 
-            if ($voucher) {
-                VoucherUsage::create([
-                    'voucher_id' => $voucher->id,
-                    'participant_id' => $participant->id,
-                    'order_id' => $order->id,
-                ]);
+            if (!empty($vouchersApplied)) {
+                $voucherCodesStr = implode('+', array_map(fn($v) => $v->code, $vouchersApplied));
+                foreach ($vouchersApplied as $v) {
+                    VoucherUsage::create([
+                        'voucher_id' => $v->id,
+                        'participant_id' => $participant->id,
+                        'order_id' => $order->id,
+                    ]);
+                }
+                $order->update(['voucher_code' => $voucherCodesStr, 'discount_amount' => $discountAmount]);
             }
 
             $participant->raceEntries()->create([
