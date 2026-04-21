@@ -627,7 +627,7 @@
             const adminFee = 4500;
             const isIPB = "{{ $ticket->type }}" === "ipb";
             const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
-            const pairTicketId = {{ $pairTicket->id ?? 'null' }};
+            const pairTicketId = "{{ $pairTicket->id ?? '' }}";
             const nimInput = document.getElementById('nim_nrp');
 
             // Multi-Voucher State (max 2) — tiap voucher punya targetTicket (1 atau 2)

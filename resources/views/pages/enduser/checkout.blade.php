@@ -630,7 +630,7 @@
             const adminFee = 4500;
             const isIPB = "{{ $ticket->type }}" === "ipb";
             const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
-            const pairTicketId = {{ $pairTicket->id ?? 'null' }};
+            const pairTicketId = "{{ $pairTicket->id ?? '' }}";
             const nimInput = document.getElementById('nim_nrp');
             const nikInputForVoucher = document.getElementById('nik');
 
