@@ -26,6 +26,7 @@ class AdminController extends Controller
 
         $stats = [
             'total_revenue' => \App\Models\Order::where('status', 'paid')->sum('total_price'),
+            'total_donation' => \App\Models\Order::where('status', 'paid')->sum('donation_scholarship') + \App\Models\Order::where('status', 'paid')->sum('donation_event'),
             'total_participant' => User::where('role', 'participant')->count(),
             'total_tickets_sold' => $totalTicketsSold,
             'total_remaining_tickets' => $totalCapacity - $totalTicketsSold,

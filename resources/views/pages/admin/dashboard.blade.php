@@ -145,6 +145,14 @@
                     </p>
                     <h4 class="text-2xl font-black text-slate-800">Rp
                         {{ number_format($stats['total_revenue'], 0, ',', '.') }}
+                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL PENJUALAN TIKET
+                            Rp
+                            {{ number_format($stats['total_revenue'] - $stats['total_donation'], 0, ',', '.') }}
+                        </p>
+                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-3">TOTAL DONASI
+                            Rp
+                            {{ number_format($stats['total_donation'], 0, ',', '.') }}
+                        </p>
                     </h4>
                 </div>
                 {{-- Total Tiket Terjual --}}
