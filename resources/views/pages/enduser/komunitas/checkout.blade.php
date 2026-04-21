@@ -417,7 +417,7 @@
                                         <div id="ticket2_voucher_tags" class="mt-1.5 flex flex-wrap gap-1"></div>
                                     </div>
                                     <div class="text-right flex-shrink-0">
-                                        <span id="ticket2_price_original" class="text-[#E8630A] font-black block">Rp {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
+                                        <span id="ticket2_price_original" class="text-[#E8630A] font-bold block">Rp {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
                                         <span id="ticket2_price_final" class="hidden text-emerald-600 font-black block"></span>
                                     </div>
                                 </div>

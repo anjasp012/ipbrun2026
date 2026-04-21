@@ -406,21 +406,22 @@
                                     <span id="ticket_price_final" class="hidden text-emerald-600 font-black block"></span>
                                 </div>
                             </div>
-                            <div class="flex justify-between items-center text-sm"> <span
-                                    class="text-slate-500 font-medium italic">Biaya Layanan</span> <span
-                                    class="text-[#003366] font-bold">Rp 4.500</span> </div>
-                            
-
                             @if ($pairTicket)
                                 <div id="row_second_ticket"
-                                    class="hidden flex justify-between items-center text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg">
-                                    <span class="text-[#E8630A] font-bold italic">Tiket Tambahan:
-                                        {{ $pairTicket->category->name }}
-                                        ({{ $pairTicket->name ?: strtoupper($pairTicket->type) }})</span> <span
-                                        class="text-[#E8630A] font-black">Rp
-                                        {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
+                                    class="hidden flex justify-between items-start text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg gap-3">
+                                    <div class="flex-1 min-w-0">
+                                        <span class="text-[#E8630A] font-bold italic block">Tiket Tambahan:
+                                            {{ $pairTicket->category->name }}
+                                            ({{ $pairTicket->name ?: strtoupper($pairTicket->type) }})</span>
+                                        <div id="ticket2_voucher_tags" class="mt-1.5 flex flex-wrap gap-1"></div>
+                                    </div>
+                                    <div class="text-right flex-shrink-0">
+                                        <span id="ticket2_price_original" class="text-[#E8630A] font-bold block">Rp {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
+                                        <span id="ticket2_price_final" class="hidden text-emerald-600 font-black block"></span>
+                                    </div>
                                 </div>
                             @endif
+
                             <div id="row_donation_event" class="hidden flex justify-between items-center text-sm">
                                 <span class="text-slate-500 font-medium italic">Donasi Event</span> <span
                                     id="lbl_donation_event" class="text-[#E8630A] font-bold">Rp 0</span>
@@ -430,6 +431,10 @@
                                     class="text-slate-500 font-medium italic">Donasi Beasiswa</span> <span
                                     id="lbl_donation_scholarship" class="text-[#E8630A] font-bold">Rp 0</span>
                             </div>
+
+                            <div class="flex justify-between items-center text-sm"> <span
+                                    class="text-slate-500 font-medium italic">Biaya Layanan</span> <span
+                                    class="text-[#003366] font-bold">Rp 4.500</span> </div>
 
 
                         </div>
