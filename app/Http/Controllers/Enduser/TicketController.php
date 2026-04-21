@@ -501,39 +501,8 @@ class TicketController extends Controller
             return back()->with('error', 'Anda sudah terdaftar atau memiliki pesanan tertunda untuk kategori ini!');
         }
 
-        // Find existing voucher usage (Priority: Successful PAID usage history)
-        $lastUsage = VoucherUsage::where('participant_id', $participant->id)
-            ->whereHas('order', function ($q) {
-                $q->where('status', 'paid');
-            })
-            ->latest()
-            ->first() 
-            ?? 
-            VoucherUsage::where('participant_id', $participant->id)
-            ->whereHas('order', function ($q) {
-                $q->where('status', 'pending');
-            })
-            ->latest()
-            ->first();
-
-        if ($lastUsage) {
-            $voucher = $lastUsage->voucher;
-        } else {
-            $voucher = Voucher::where('code', $participant->nik)->first();
-        }
-
+        $voucher = null;
         $discountAmount = 0;
-        if ($voucher) {
-            $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
-                ->where('participant_id', $participant->id)
-                ->exists();
-
-            if ($voucher->isAvailable() || $alreadyUsed) {
-                $discountAmount = $voucher->calculateDiscount($ticket->price);
-            } else {
-                $voucher = null;
-            }
-        }
 
         return view('pages.enduser.buy_more', compact('participant', 'ticket', 'voucher', 'discountAmount'));
     }
@@ -559,35 +528,23 @@ class TicketController extends Controller
             return back()->with('error', 'Anda sudah terdaftar atau memiliki pesanan tertunda untuk kategori ini!');
         }
 
-        // Find existing voucher usage (Priority: Successful PAID usage history)
-        $lastUsage = VoucherUsage::where('participant_id', $latestParticipant->id)
-            ->whereHas('order', function ($q) {
-                $q->where('status', 'paid');
-            })
-            ->latest()
-            ->first() 
-            ?? 
-            VoucherUsage::where('participant_id', $latestParticipant->id)
-            ->whereHas('order', function ($q) {
-                $q->where('status', 'pending');
-            })
-            ->latest()
-            ->first();
-
-        if ($lastUsage) {
-            $voucher = $lastUsage->voucher;
-        } else {
-            $voucher = Voucher::where('code', $latestParticipant->nik)->first();
-        }
-
+        $voucherCode = request('voucher_code');
+        $voucher = null;
         $discountAmount = 0;
-        if ($voucher) {
-            $alreadyUsed = VoucherUsage::where('voucher_id', $voucher->id)
-                ->where('participant_id', $latestParticipant->id)
-                ->exists();
 
-            if ($voucher->isAvailable() || $alreadyUsed) {
-                $discountAmount = $voucher->calculateDiscount($ticket->price);
+        if ($voucherCode) {
+            $voucher = Voucher::where('code', $voucherCode)->first();
+            if ($voucher && $voucher->isAvailable()) {
+                // Category/Type compatibility check (optional but recommended)
+                $canApply = true;
+                if ($voucher->ticket_type && strtolower($voucher->ticket_type) !== strtolower($ticket->type)) $canApply = false;
+                if ($voucher->category_id && $voucher->category_id !== $ticket->category_id) $canApply = false;
+
+                if ($canApply) {
+                    $discountAmount = $voucher->calculateDiscount($ticket->price);
+                } else {
+                    $voucher = null;
+                }
             } else {
                 $voucher = null;
             }

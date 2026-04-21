@@ -299,10 +299,9 @@
                                     {{ old('other_race_interest') ? 'checked' : '' }}>
                                 <div
                                     class="w-20 h-10 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-10 after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-8 after:w-8 after:transition-all peer-checked:bg-[#FF7A21] shadow-inner ring-4 ring-slate-100 peer-checked:ring-orange-100">
-                                </div> <span
-                                    class="ml-4 text-xs font-black text-slate-400 peer-checked:text-[#FF7A21] uppercase tracking-widest transition-colors">
-                                    <span class="group-peer-checked:hidden">TIDAK</span> <span
-                                        class="hidden group-peer-checked:inline">YA, IKUT!</span> </span>
+                                </div> 
+                                <span class="ml-4 text-xs font-black text-slate-400 peer-checked:hidden uppercase tracking-widest transition-colors">TIDAK</span>
+                                <span class="ml-4 hidden peer-checked:inline text-xs font-black text-[#FF7A21] uppercase tracking-widest transition-colors">YA, IKUT!</span>
                             </label>
                         </div>
                         <div class="mt-6 pt-6 border-t border-orange-100/50">
