@@ -11,6 +11,8 @@ use App\Models\Setting;
 use App\Models\RaceEntry;
 use App\Models\Period;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ParticipantExport;
 
 class AdminController extends Controller
 {
@@ -215,90 +217,9 @@ class AdminController extends Controller
 
         $participants = $query->latest()->get();
 
-        $filename = "participants_export_" . date('Y-m-d_H-i-s') . ".csv";
-        $headers = [
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=$filename",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        ];
+        $filename = "participants_export_" . date('Y-m-d_H-i-s') . ".xlsx";
 
-        $columns = [
-            'Name',
-            'Email',
-            'Phone',
-            'NIK',
-            'Birth Date',
-            'Gender',
-            'Blood Type',
-            'Jersey Size',
-            'NIM/NRP',
-            'Emergency Contact Name',
-            'Emergency Contact Phone',
-            'Emergency Relationship',
-            'Order Codes',
-            'Order Statuses',
-            'Ticket Details',
-            'Paid Amount',
-            'Donation Scholarship',
-            'Donation Event',
-            'Admin Fee',
-            'Total Paid Amount',
-            'First Registered At'
-        ];
-
-        $callback = function () use ($participants, $columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
-
-            foreach ($participants as $p) {
-                // Aggregate Entry Data
-                $orderCodes = $p->raceEntries->map(fn($e) => $e->order->order_code ?? '-')->unique()->implode(' | ');
-                $statuses = $p->raceEntries->map(fn($e) => strtoupper($e->order->status ?? ($e->status ?? 'unknown')))->implode(' | ');
-                
-                $ticketDetails = $p->raceEntries->map(function($e) {
-                    $cat = $e->ticket->category->name ?? '-';
-                    $type = strtoupper($e->ticket->type ?? '-');
-                    return "($type - $cat)";
-                })->implode(' | ');
-
-                $paidAmount = $p->raceEntries->where('status', $status)->unique('order_id')->sum(fn($e) => $e->order->total_price - $e->order->admin_fee ?? 0);
-                $donationScholarship = $p->raceEntries->where('status', $status)->unique('order_id')->sum(fn($e) => $e->order->donation_scholarship ?? 0);
-                $donationEvent = $p->raceEntries->where('status', $status)->unique('order_id')->sum(fn($e) => $e->order->donation_event ?? 0);
-                $adminFee = $p->raceEntries->where('status', $status)->unique('order_id')->sum(fn($e) => $e->order->admin_fee ?? 0);
-                $totalPaid = $p->raceEntries->where('status', $status)->unique('order_id')->sum(fn($e) => $e->order->total_price ?? 0);
-
-                fputcsv($file, [
-                    // Participant
-                    $p->name,
-                    $p->email,
-                    $p->phone_number,
-                    $p->nik,
-                    $p->date_birth,
-                    strtoupper($p->sex),
-                    $p->blood_type,
-                    $p->jersey_size,
-                    $p->nim_nrp ?: '-',
-                    $p->emergency_contact_name,
-                    $p->emergency_contact_phone_number,
-                    $p->emergency_contact_relationship,
-                    $orderCodes,
-                    $statuses,
-                    $ticketDetails,
-                    $paidAmount,
-                    $donationScholarship,
-                    $donationEvent,
-                    $adminFee,
-                    $totalPaid,
-                    $p->created_at->format('Y-m-d H:i')
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return Excel::download(new ParticipantExport($participants, $status), $filename);
     }
 
     public function participantShow(Participant $participant)
