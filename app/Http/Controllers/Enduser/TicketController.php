@@ -423,6 +423,7 @@ class TicketController extends Controller
                     'ticket_id', 
                     'other_race_interest', 
                     'voucher_code', 
+                    'voucher_code_2', 
                     'donation_event', 
                     'donation_scholarship'
                 ])
@@ -438,8 +439,6 @@ class TicketController extends Controller
                 'donation_event' => $donationEvent,
                 'donation_scholarship' => $donationScholarship,
                 'total_price' => $totalPrice,
-                'discount_amount' => $discountAmount,
-                'voucher_code' => null,
             ]);
 
             if (!empty($vouchersApplied)) {
@@ -451,10 +450,6 @@ class TicketController extends Controller
                         'order_id' => $order->id,
                     ]);
                 }
-                $order->update([
-                    'voucher_code' => $voucherCodesStr,
-                    'discount_amount' => $discountAmount,
-                ]);
             }
 
 
@@ -561,8 +556,6 @@ class TicketController extends Controller
             'status' => 'pending',
             'admin_fee' => $adminFee,
             'total_price' => $finalPrice,
-            'discount_amount' => $discountAmount,
-            'voucher_code' => $voucher ? $voucher->code : null,
         ]);
 
         if ($voucher) {

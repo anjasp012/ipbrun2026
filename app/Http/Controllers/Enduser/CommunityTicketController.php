@@ -323,7 +323,6 @@ class CommunityTicketController extends Controller
                         'order_id' => $order->id,
                     ]);
                 }
-                $order->update(['voucher_code' => $voucherCodesStr, 'discount_amount' => $discountAmount]);
             }
 
             $participant->raceEntries()->create([
