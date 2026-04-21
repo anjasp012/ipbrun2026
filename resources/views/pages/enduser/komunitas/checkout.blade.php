@@ -285,20 +285,25 @@
                         $pairCategory = '5K (Sabtu)';
                     }
                 @endphp @if ($pairTicket)
-                    <div class="mt-12 bg-orange-50/50 border border-orange-100 p-8 rounded-2xl">
+                    <div class="mt-12 bg-orange-50/50 border border-orange-100 p-8 rounded-2xl {{ $isPairSoldOut ? 'opacity-60' : '' }}">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div class="space-y-1">
                                 <p
                                     class="text-[11px] font-bold text-[#E8630A]/80 uppercase tracking-widest leading-loose">
                                     APAKAH ANDA INGIN MENGIKUTI KATEGORI <span
                                         class="text-[#E8630A] underline underline-offset-4 decoration-2">{{ $pairCategory }}</span>
-                                    JUGA? </p>
-                            </div> <label class="relative inline-flex items-center cursor-pointer group"> <input
+                                    JUGA? 
+                                    @if($isPairSoldOut)
+                                        <span class="ml-2 px-2 py-0.5 bg-rose-500 text-white text-[9px] rounded font-black italic">KUOTA HABIS</span>
+                                    @endif
+                                </p>
+                            </div> <label class="relative inline-flex items-center {{ $isPairSoldOut ? 'cursor-not-allowed' : 'cursor-pointer' }} group"> <input
                                     type="checkbox" name="other_race_interest" id="cb_second_ticket"
                                     value="{{ $pairCategory }}" class="sr-only peer"
-                                    {{ old('other_race_interest') ? 'checked' : '' }}>
+                                    {{ old('other_race_interest') ? 'checked' : '' }}
+                                    {{ $isPairSoldOut ? 'disabled' : '' }}>
                                 <div
-                                    class="w-20 h-10 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-10 after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-8 after:w-8 after:transition-all peer-checked:bg-[#FF7A21] shadow-inner ring-4 ring-slate-100 peer-checked:ring-orange-100">
+                                    class="w-20 h-10 {{ $isPairSoldOut ? 'bg-slate-300' : 'bg-slate-200' }} peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-10 after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-8 after:w-8 after:transition-all peer-checked:bg-[#FF7A21] shadow-inner ring-4 ring-slate-100 peer-checked:ring-orange-100">
                                 </div> 
                                 <span class="ml-4 text-xs font-black text-slate-400 peer-checked:hidden uppercase tracking-widest transition-colors">TIDAK</span>
                                 <span class="ml-4 hidden peer-checked:inline text-xs font-black text-[#FF7A21] uppercase tracking-widest transition-colors">YA, IKUT!</span>

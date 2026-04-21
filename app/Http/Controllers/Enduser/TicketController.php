@@ -161,8 +161,9 @@ class TicketController extends Controller
         }
 
         $pairTicket = null;
+        $isPairSoldOut = false;
         if ($pairTarget) {
-            $pairCandidate = Ticket::where('period_id', $ticket->period_id)
+            $pairTicket = Ticket::where('period_id', $ticket->period_id)
                 ->where('type', $ticket->type)
                 ->whereHas('category', function ($q) use ($pairTarget) {
                     $q->where('name', 'LIKE', "%$pairTarget%");
@@ -170,17 +171,14 @@ class TicketController extends Controller
                 ->where('id', '!=', $ticket->id)
                 ->first();
 
-            if ($pairCandidate) {
-                // Stock check for pair ticket
-                $usedQty = \App\Models\RaceEntry::where('ticket_id', $pairCandidate->id)
+            if ($pairTicket) {
+                $usedQty = \App\Models\RaceEntry::where('ticket_id', $pairTicket->id)
                     ->whereIn('status', ['pending', 'paid'])->count();
-                if ($usedQty < $pairCandidate->qty) {
-                    $pairTicket = $pairCandidate;
-                }
+                $isPairSoldOut = ($usedQty >= $pairTicket->qty);
             }
         }
 
-        return view('pages.enduser.checkout', compact('ticket', 'pairTicket'));
+        return view('pages.enduser.checkout', compact('ticket', 'pairTicket', 'isPairSoldOut'));
     }
 
     public function register(Request $request)
