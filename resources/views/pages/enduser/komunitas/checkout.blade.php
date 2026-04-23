@@ -759,9 +759,28 @@
             document.getElementById('donation_event')?.addEventListener('change', updateTotal);
             document.getElementById('donation_scholarship')?.addEventListener('change', updateTotal);
             document.getElementById('cb_second_ticket')?.addEventListener('change', function() {
-                // Reset target ke tiket 1 jika tiket 2 tidak dicentang
                 if (!this.checked) {
-                    appliedVouchers.forEach(v => { if (v.targetTicket === 2) v.targetTicket = 1; });
+                    appliedVouchers = appliedVouchers.filter(v => v.targetTicket !== 2);
+                    
+                    document.getElementById('applied_voucher_code_1').value = appliedVouchers.length > 0 ? appliedVouchers[0].code : '';
+                    document.getElementById('applied_voucher_code_2').value = appliedVouchers.length > 1 ? appliedVouchers[1].code : '';
+
+                    const inputEl = document.getElementById('voucher_input');
+                    const messageEl = document.getElementById('voucher_message');
+                    const btn = document.getElementById('btn_apply_voucher');
+                    
+                    inputEl.value = '';
+                    const remaining = 2 - appliedVouchers.length;
+                    
+                    if (remaining > 0) {
+                        messageEl.innerHTML = '';
+                        inputEl.disabled = false;
+                        inputEl.placeholder = 'Masukkan voucher ke-' + (appliedVouchers.length + 1) + '...';
+                        btn.disabled = false;
+                        btn.innerText = 'Pasang';
+                        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        btn.classList.add('hover:bg-[#FF7A21]');
+                    }
                 }
                 updateTotal();
             });
