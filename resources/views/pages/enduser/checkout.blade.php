@@ -446,7 +446,10 @@
                         <!-- Voucher Input Area (Multi Voucher) -->
                         <div class="mt-6 pt-6 border-t border-dashed border-slate-200" id="voucher_section">
                             <div class="flex items-center justify-between mb-3">
-                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[2px]">Kode Voucher <span id="voucher_limit_label" class="text-emerald-500">(maks. 2 voucher)</span></p>
+                                <div class="flex flex-col">
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[2px]">Kode Voucher <span id="voucher_limit_label" class="text-emerald-500">(maks. 2 voucher)</span></p>
+                                    <p class="text-[9px] font-bold text-orange-500 uppercase tracking-wider mt-0.5">Maks. 1 Voucher untuk 1 Kategori</p>
+                                </div>
                                 <div id="voucher_slots_indicator" class="flex gap-1">
                                     <div id="slot_dot_1" class="w-2 h-2 rounded-full bg-slate-200 transition-all"></div>
                                     <div id="slot_dot_2" class="w-2 h-2 rounded-full bg-slate-200 transition-all"></div>
@@ -678,6 +681,30 @@
                 }
             }
 
+            function syncVoucherInputState() {
+                const inputEl = document.getElementById('voucher_input');
+                const btn = document.getElementById('btn_apply_voucher');
+                const messageEl = document.getElementById('voucher_message');
+                const isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
+                const limit = isSecondChecked ? 2 : 1;
+                const count = appliedVouchers.length;
+
+                if (count >= limit) {
+                    inputEl.disabled = true;
+                    inputEl.placeholder = `Maks. ${limit} voucher sudah terpasang`;
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    btn.classList.remove('hover:bg-[#FF7A21]');
+                } else {
+                    inputEl.disabled = false;
+                    inputEl.placeholder = count === 0 ? 'Masukkan kode voucher...' : `Masukkan voucher ke-${count + 1}...`;
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    btn.classList.add('hover:bg-[#FF7A21]');
+                    btn.innerText = 'Pasang';
+                }
+            }
+
             function calcDisc(v, basePrice, alreadyDiscounted) {
                 if (v.type === 'nominal') return Math.min(v.value, Math.max(0, basePrice - alreadyDiscounted));
                 if (v.type === 'percentage') return Math.floor(basePrice * (v.value / 100));
@@ -773,52 +800,32 @@
                     document.getElementById('applied_voucher_code_1').value = appliedVouchers.length > 0 ? appliedVouchers[0].code : '';
                     document.getElementById('applied_voucher_code_2').value = appliedVouchers.length > 1 ? appliedVouchers[1].code : '';
 
-                    const inputEl = document.getElementById('voucher_input');
                     const messageEl = document.getElementById('voucher_message');
-                    const btn = document.getElementById('btn_apply_voucher');
-                    
-                    inputEl.value = '';
-                    const remaining = 2 - appliedVouchers.length;
-                    
-                    if (remaining > 0) {
+                    if (appliedVouchers.length < (this.checked ? 2 : 1)) {
                         messageEl.innerHTML = '';
-                        inputEl.disabled = false;
-                        inputEl.placeholder = 'Masukkan voucher ke-' + (appliedVouchers.length + 1) + '...';
-                        btn.disabled = false;
-                        btn.innerText = 'Pasang';
-                        btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                        btn.classList.add('hover:bg-[#FF7A21]');
                     }
                 }
+                syncVoucherInputState();
                 updateTotal();
-            });
-
-            function commitVoucher(voucherData, targetTicket) {
+                    function commitVoucher(voucherData, targetTicket) {
                 appliedVouchers.push({ ...voucherData, targetTicket });
                 if (appliedVouchers.length === 1) document.getElementById('applied_voucher_code_1').value = voucherData.code;
                 else if (appliedVouchers.length === 2) document.getElementById('applied_voucher_code_2').value = voucherData.code;
 
-                const inputEl = document.getElementById('voucher_input');
                 const messageEl = document.getElementById('voucher_message');
-                const btn = document.getElementById('btn_apply_voucher');
-                inputEl.value = '';
+                const isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
+                const limit = isSecondChecked ? 2 : 1;
+                const remaining = limit - appliedVouchers.length;
 
-                const remaining = 2 - appliedVouchers.length;
                 if (remaining > 0) {
                     messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">✓ Terpasang ke Tiket ${targetTicket}! Sisa slot: ${remaining}</span>`;
-                    inputEl.disabled = false;
-                    inputEl.placeholder = 'Masukkan voucher ke-' + (appliedVouchers.length + 1) + '...';
-                    btn.disabled = false; btn.innerText = 'Pasang';
                 } else {
-                    messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">✓ 2 Voucher berhasil dipasang!</span>';
-                    inputEl.disabled = true;
-                    inputEl.placeholder = 'Maks. 2 voucher sudah terpasang';
-                    btn.disabled = true;
-                    btn.classList.add('opacity-50', 'cursor-not-allowed');
-                    btn.classList.remove('hover:bg-[#FF7A21]');
+                    messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">✓ ${limit} Voucher berhasil dipasang!</span>`;
                 }
+
+                syncVoucherInputState();
                 updateTotal();
-            }
+            }            }
 
             // Multi-Voucher Logic
             async function applyVoucher(code = null, nik = null) {
