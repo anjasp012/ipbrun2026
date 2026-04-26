@@ -807,7 +807,9 @@
                 }
                 syncVoucherInputState();
                 updateTotal();
-                    function commitVoucher(voucherData, targetTicket) {
+            });
+
+            function commitVoucher(voucherData, targetTicket) {
                 appliedVouchers.push({ ...voucherData, targetTicket });
                 if (appliedVouchers.length === 1) document.getElementById('applied_voucher_code_1').value = voucherData.code;
                 else if (appliedVouchers.length === 2) document.getElementById('applied_voucher_code_2').value = voucherData.code;
@@ -825,7 +827,7 @@
 
                 syncVoucherInputState();
                 updateTotal();
-            }            }
+            }
 
             // Multi-Voucher Logic
             async function applyVoucher(code = null, nik = null) {
