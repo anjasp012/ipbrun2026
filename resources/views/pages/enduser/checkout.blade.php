@@ -446,7 +446,7 @@
                         <!-- Voucher Input Area (Multi Voucher) -->
                         <div class="mt-6 pt-6 border-t border-dashed border-slate-200" id="voucher_section">
                             <div class="flex items-center justify-between mb-3">
-                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[2px]">Kode Voucher <span class="text-emerald-500">(maks. 2 voucher)</span></p>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[2px]">Kode Voucher <span id="voucher_limit_label" class="text-emerald-500">(maks. 2 voucher)</span></p>
                                 <div id="voucher_slots_indicator" class="flex gap-1">
                                     <div id="slot_dot_1" class="w-2 h-2 rounded-full bg-slate-200 transition-all"></div>
                                     <div id="slot_dot_2" class="w-2 h-2 rounded-full bg-slate-200 transition-all"></div>
@@ -659,9 +659,23 @@
             function updateSlotDots() {
                 const dot1 = document.getElementById('slot_dot_1');
                 const dot2 = document.getElementById('slot_dot_2');
+                const limitLabel = document.getElementById('voucher_limit_label');
+                const isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
+                const limit = isSecondChecked ? 2 : 1;
+
+                if (limitLabel) limitLabel.innerText = `(maks. ${limit} voucher)`;
+
                 const count = appliedVouchers.length;
                 if (dot1) dot1.className = 'w-2 h-2 rounded-full transition-all ' + (count >= 1 ? 'bg-emerald-500 scale-125' : 'bg-slate-200');
-                if (dot2) dot2.className = 'w-2 h-2 rounded-full transition-all ' + (count >= 2 ? 'bg-teal-500 scale-125' : 'bg-slate-200');
+                
+                if (dot2) {
+                    if (limit === 1) {
+                        dot2.classList.add('hidden');
+                    } else {
+                        dot2.classList.remove('hidden');
+                        dot2.className = 'w-2 h-2 rounded-full transition-all ' + (count >= 2 ? 'bg-teal-500 scale-125' : 'bg-slate-200');
+                    }
+                }
             }
 
             function calcDisc(v, basePrice, alreadyDiscounted) {
@@ -808,8 +822,11 @@
 
             // Multi-Voucher Logic
             async function applyVoucher(code = null, nik = null) {
-                if (appliedVouchers.length >= 2) {
-                    document.getElementById('voucher_message').innerHTML = '<span class="text-[10px] font-black uppercase text-amber-500 tracking-widest">Maksimal 2 voucher sudah dipasang.</span>';
+                const isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
+                const limit = isSecondChecked ? 2 : 1;
+
+                if (appliedVouchers.length >= limit) {
+                    document.getElementById('voucher_message').innerHTML = `<span class="text-[10px] font-black uppercase text-amber-500 tracking-widest">Maksimal ${limit} voucher sudah dipasang.</span>`;
                     return;
                 }
 
