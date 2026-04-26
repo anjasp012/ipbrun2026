@@ -845,7 +845,7 @@
                         const res1 = await fetch('{{ route("voucher.check") }}', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                            body: JSON.stringify({ code: voucherCode, nik: nikValue, price: ticketPrice, ticket_id: '{{ $ticket->id }}' })
+                            body: JSON.stringify({ code: voucherCode, nik: nikValue, price: ticketPrice, ticket_id: '{{ $ticket->id }}', existing_codes: appliedVouchers.map(v => v.code) })
                         });
                         const data1 = await res1.json();
                         if (data1.valid) {
@@ -859,7 +859,7 @@
                         const res2 = await fetch('{{ route("voucher.check") }}', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                            body: JSON.stringify({ code: voucherCode, nik: nikValue, price: pairTicketPrice, ticket_id: pairTicketId })
+                            body: JSON.stringify({ code: voucherCode, nik: nikValue, price: pairTicketPrice, ticket_id: pairTicketId, existing_codes: appliedVouchers.map(v => v.code) })
                         });
                         const data2 = await res2.json();
                         if (data2.valid) {
@@ -873,7 +873,7 @@
                          const res1 = await fetch('{{ route("voucher.check") }}', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                            body: JSON.stringify({ code: voucherCode, nik: nikValue, price: ticketPrice, ticket_id: '{{ $ticket->id }}' })
+                            body: JSON.stringify({ code: voucherCode, nik: nikValue, price: ticketPrice, ticket_id: '{{ $ticket->id }}', existing_codes: appliedVouchers.map(v => v.code) })
                         });
                         const data1 = await res1.json();
                         if (data1.valid) {

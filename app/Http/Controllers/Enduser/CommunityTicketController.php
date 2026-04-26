@@ -141,6 +141,17 @@ class CommunityTicketController extends Controller
             }
         }
 
+        // Check against existing_codes in current session
+        if ($request->has('existing_codes') && is_array($request->existing_codes)) {
+            foreach ($request->existing_codes as $exCode) {
+                if (!$exCode) continue;
+                $exVoucher = Voucher::where('code', $exCode)->where('is_active', true)->first();
+                if ($exVoucher && $exVoucher->category_id === $voucher->category_id && $exVoucher->ticket_type === $voucher->ticket_type) {
+                    return response()->json(['valid' => false, 'message' => 'Anda sudah memasang voucher untuk kategori dan tipe tiket ini.']);
+                }
+            }
+        }
+
         $discount = $voucher->calculateDiscount($request->price);
 
         return response()->json([
