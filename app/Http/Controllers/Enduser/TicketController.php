@@ -385,6 +385,19 @@ class TicketController extends Controller
                 if ($v->category_id && $v->category_id !== $ticket->category_id) {
                     throw new \Exception('Voucher ' . $vCode . ' tidak berlaku untuk kategori tiket ini.');
                 }
+
+                // Duplicate check by category and type
+                $existingParticipant = Participant::where('nik', $request->nik)->first();
+                if ($existingParticipant && $v->isDuplicateForParticipant($existingParticipant->id)) {
+                    throw new \Exception('Voucher ' . $vCode . ' tidak bisa digunakan karena Anda sudah menggunakan voucher untuk kategori dan tipe tiket yang sama.');
+                }
+
+                foreach ($vouchersApplied as $appliedV) {
+                    if ($appliedV->category_id === $v->category_id && $appliedV->ticket_type === $v->ticket_type) {
+                        throw new \Exception('Anda tidak dapat menggunakan dua voucher dengan kategori dan tipe tiket yang sama dalam satu pesanan.');
+                    }
+                }
+
                 $disc = $v->calculateDiscount($ticketSubtotal - $discountAmount);
                 $discountAmount += $disc;
                 $vouchersApplied[] = $v;
@@ -518,6 +531,11 @@ class TicketController extends Controller
                 $canApply = true;
                 if ($voucher->ticket_type && strtolower($voucher->ticket_type) !== strtolower($ticket->type)) $canApply = false;
                 if ($voucher->category_id && $voucher->category_id !== $ticket->category_id) $canApply = false;
+
+                // Duplicate check by category and type
+                if ($canApply && $latestParticipant && $voucher->isDuplicateForParticipant($latestParticipant->id)) {
+                    $canApply = false;
+                }
 
                 if ($canApply) {
                     $discountAmount = $voucher->calculateDiscount($ticket->price);

@@ -133,6 +133,13 @@ class CommunityTicketController extends Controller
             }
         }
 
+        // Check for duplicate usage by category/type
+        if ($nik) {
+            $participant = Participant::where('nik', $nik)->first();
+            if ($participant && $voucher->isDuplicateForParticipant($participant->id)) {
+                return response()->json(['valid' => false, 'message' => 'Anda sudah menggunakan voucher untuk kategori dan tipe tiket ini.']);
+            }
+        }
 
         $discount = $voucher->calculateDiscount($request->price);
 
@@ -297,6 +304,19 @@ class CommunityTicketController extends Controller
                 if ($v->category_id && $v->category_id !== $ticket->category_id) {
                     throw new \Exception('Voucher ' . $vCode . ' tidak berlaku untuk kategori tiket ini.');
                 }
+
+                // Duplicate check by category and type
+                $existingParticipant = Participant::where('nik', $nik)->first();
+                if ($existingParticipant && $v->isDuplicateForParticipant($existingParticipant->id)) {
+                    throw new \Exception('Voucher ' . $vCode . ' tidak bisa digunakan karena Anda sudah menggunakan voucher untuk kategori dan tipe tiket yang sama.');
+                }
+
+                foreach ($vouchersApplied as $appliedV) {
+                    if ($appliedV->category_id === $v->category_id && $appliedV->ticket_type === $v->ticket_type) {
+                        throw new \Exception('Anda tidak dapat menggunakan dua voucher dengan kategori dan tipe tiket yang sama dalam satu pesanan.');
+                    }
+                }
+
                 $disc = $v->calculateDiscount($ticketSubtotal - $discountAmount);
                 $discountAmount += $disc;
                 $vouchersApplied[] = $v;

@@ -86,4 +86,19 @@ class Voucher extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function isDuplicateForParticipant($participantId)
+    {
+        if (!$participantId) return false;
+
+        return VoucherUsage::where('participant_id', $participantId)
+            ->whereHas('order', function ($q) {
+                $q->whereIn('status', ['pending', 'paid']);
+            })
+            ->whereHas('voucher', function ($q) {
+                $q->where('category_id', $this->category_id)
+                  ->where('ticket_type', $this->ticket_type);
+            })
+            ->exists();
+    }
 }

@@ -40,6 +40,14 @@ class VoucherController extends Controller
             }
         }
 
+        // 3. Check for duplicate usage by category/type
+        if ($nik) {
+            $participant = Participant::where('nik', $nik)->first();
+            if ($participant && $voucher->isDuplicateForParticipant($participant->id)) {
+                return response()->json(['valid' => false, 'message' => 'Anda sudah menggunakan voucher untuk kategori dan tipe tiket ini.']);
+            }
+        }
+
         $discount = $voucher->calculateDiscount($price);
 
         return response()->json([
