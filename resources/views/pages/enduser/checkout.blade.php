@@ -840,6 +840,7 @@
 
                     let validData = null;
                     let targetFound = 0;
+                    let errorMsg = '';
 
                     if (checkT1) {
                         const res1 = await fetch('{{ route("voucher.check") }}', {
@@ -851,6 +852,8 @@
                         if (data1.valid) {
                             validData = data1;
                             targetFound = 1;
+                        } else {
+                            errorMsg = data1.message;
                         }
                     }
 
@@ -865,6 +868,8 @@
                         if (data2.valid) {
                             validData = data2;
                             targetFound = 2;
+                        } else {
+                            if (data2.message.includes('sudah') || !errorMsg) errorMsg = data2.message;
                         }
                     }
 
@@ -880,14 +885,14 @@
                             validData = data1;
                             targetFound = 1;
                         } else {
-                            // Tampilkan error dari t1 jika keduanya gagal
-                            messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">${data1.message}</span>`;
+                            errorMsg = data1.message;
                         }
-                    } else if (targetFound) {
+                    } 
+                    
+                    if (targetFound) {
                         commitVoucher({ code: validData.code, type: validData.type, value: validData.value, discount: 0 }, targetFound);
                     } else {
-                        // Jika memang tidak valid untuk tiket manapun
-                        messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">Voucher tidak cocok untuk tiket.</span>`;
+                        messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">${errorMsg || 'Voucher tidak cocok untuk tiket.'}</span>`;
                     }
                 } catch (e) {
                     messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">Error mengecek voucher</span>';
