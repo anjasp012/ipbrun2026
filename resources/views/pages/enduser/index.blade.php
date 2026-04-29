@@ -59,6 +59,8 @@
                                 </h2>
                             </div>
 
+                            <img src="{{ asset('/assets/images/Voucher Dekstop.png') }}" class="block w-full h-auto" alt="Voucher.png">
+
                             <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
                                 @foreach ($group['data'] as $ticket)
                                     @php
