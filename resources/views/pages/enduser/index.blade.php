@@ -9,7 +9,7 @@
             class="max-w-7xl mx-auto w-full bg-white/95 rounded-2xl shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 relative flex flex-col p-6 md:p-16 overflow-hidden">
 
             <!-- Content Area -->
-            <div class="relative pr-2 custom-scrollbar flex-grow">
+            <div class="relative custom-scrollbar flex-grow">
 
                 @if($isPeriodSoldOut)
                 <!-- Sold Out Banner -->
@@ -33,7 +33,7 @@
                 @endphp
 
                  <img src="{{ asset('/assets/images/Voucher Dekstop.png') }}" class="hidden lg:block w-full h-auto rounded mb-16" alt="Voucher.png">
-                 <img src="{{ asset('/assets/images/Voucher HP.png') }}" class="block lg:hidden w-full h-auto rounded mb-4" alt="Voucher.png">
+                 <img src="{{ asset('/assets/images/Voucher HP.png') }}" class="block md:hidden w-full h-auto rounded mb-4" alt="Voucher.png">
 
                 <!-- Tab Switcher (Mobile Only) -->
                 <div class="flex justify-center mb-8 md:hidden">
