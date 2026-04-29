@@ -32,7 +32,7 @@
                     ];
                 @endphp
 
-                 <img src="{{ asset('/assets/images/Voucher Dekstop.png') }}" class="hidden lg:block w-full h-auto rounded mb-16" alt="Voucher.png">
+                 <img src="{{ asset('/assets/images/Voucher Dekstop.png') }}" class="hidden md:block w-full h-auto rounded mb-16" alt="Voucher.png">
                  <img src="{{ asset('/assets/images/Voucher HP.png') }}" class="block md:hidden w-full h-auto rounded mb-4" alt="Voucher.png">
 
                 <!-- Tab Switcher (Mobile Only) -->
