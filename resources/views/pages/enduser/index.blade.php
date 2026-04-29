@@ -32,6 +32,9 @@
                     ];
                 @endphp
 
+                 <img src="{{ asset('/assets/images/Voucher Dekstop.png') }}" class="hidden lg:block w-full h-auto rounded mb-16" alt="Voucher.png">
+                 <img src="{{ asset('/assets/images/Voucher Mobile.png') }}" class="block lg:hidden w-full h-auto rounded mb-4" alt="Voucher.png">
+
                 <!-- Tab Switcher (Mobile Only) -->
                 <div class="flex justify-center mb-8 md:hidden">
                     <div class="inline-flex gap-2 p-1 bg-slate-50 rounded-xl border border-slate-200 shadow-sm w-full">
@@ -45,8 +48,6 @@
                         </button>
                     </div>
                 </div>
-
-                <img src="{{ asset('/assets/images/Voucher Dekstop.png') }}" class="block w-full h-auto rounded mb-16" alt="Voucher.png">
 
                 @foreach ($ticketGroups as $group)
                     @if (count($group['data']) > 0)
