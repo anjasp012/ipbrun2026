@@ -38,19 +38,22 @@ class TicketController extends Controller
         if (auth()->check()) {
             if (auth()->user()->role === 'participant') {
                 return redirect()->route('participant.dashboard');
-            } 
+            }
             // else {
             //     return redirect('/admin/dashboard');
             // }
         }
 
         // 3. Fetch active period + sold out status
-        $activePeriod = \App\Models\Period::where('is_active', true)->first();
+        $activePeriod = \App\Models\Period::where('is_active', true)
+            ->where('name', '!=', 'Invitation & Sponsorship')
+            ->first();
         $isPeriodSoldOut = $activePeriod?->is_sold_out ?? false;
 
         // 4. Fetch tickets
         $tickets = Ticket::whereHas('period', function ($query) {
-            $query->where('is_active', true);
+            $query->where('is_active', true)
+                ->where('name', '!=', 'Invitation & Sponsorship');
         })->with(['category', 'period'])
             ->withCount(['raceEntries as participants_count' => function ($query) {
                 $query->whereIn('status', ['pending', 'paid']);
@@ -283,7 +286,7 @@ class TicketController extends Controller
             }
         }
 
-        // 5. Cleanup logic: If NIK/Email exists but only has FAILED/EXPIRED orders, 
+        // 5. Cleanup logic: If NIK/Email exists but only has FAILED/EXPIRED orders,
         // we allow them to re-register by cleaning up the old (unused) participant records.
         $allIdentities = Participant::where('email', $email)
             ->orWhere('nik', $nik)
@@ -295,7 +298,7 @@ class TicketController extends Controller
             if (!$hasActive) {
                 // If the participant has NO active/pending orders, we delete the record so they can start fresh
                 // This handles cases where they registered but let the 10-minute window expire.
-                $p->delete(); 
+                $p->delete();
             }
         }
         // --- END CUSTOM VALIDATION ---
@@ -335,7 +338,7 @@ class TicketController extends Controller
             $adminFee = 4500;
             $donationEvent = (int) $request->input('donation_event', 0);
             $donationScholarship = (int) $request->input('donation_scholarship', 0);
-            
+
             $ticketSubtotal = $ticket->price;
             $second_ticket_id = null;
 
@@ -410,12 +413,12 @@ class TicketController extends Controller
             $participant = Participant::updateOrCreate(
                 ['nik' => $request->nik],
                 \Illuminate\Support\Arr::except($validated, [
-                    'email_confirmation', 
-                    'ticket_id', 
-                    'other_race_interest', 
-                    'voucher_code', 
-                    'voucher_code_2', 
-                    'donation_event', 
+                    'email_confirmation',
+                    'ticket_id',
+                    'other_race_interest',
+                    'voucher_code',
+                    'voucher_code_2',
+                    'donation_event',
                     'donation_scholarship'
                 ])
             );

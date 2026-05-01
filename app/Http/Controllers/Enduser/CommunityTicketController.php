@@ -34,17 +34,21 @@ class CommunityTicketController extends Controller
         $ticketSaleStart = Setting::where('key', 'ticket_sale_start')->first()?->value;
         $ticketSaleStartValue = $ticketSaleStart ? \Carbon\Carbon::parse($ticketSaleStart, 'Asia/Jakarta') : null;
 
-        $activePeriod = \App\Models\Period::where('is_active', true)->first();
+        $activePeriod = \App\Models\Period::where('is_active', true)
+            ->where('name', '!=', 'Invitation & Sponsorship')
+            ->first();
         $isPeriodSoldOut = $activePeriod?->is_sold_out ?? false;
 
         $tickets_ipb = Ticket::where('type', 'ipb')->whereHas('period', function ($query) {
-            $query->where('is_active', true);
+            $query->where('is_active', true)
+                ->where('name', '!=', 'Invitation & Sponsorship');
         })->with(['category', 'period'])->withCount(['raceEntries as participants_count' => function ($query) {
             $query->whereIn('status', ['pending', 'paid']);
         }])->get();
 
         $tickets_public = Ticket::where('type', 'umum')->whereHas('period', function ($query) {
-            $query->where('is_active', true);
+            $query->where('is_active', true)
+                ->where('name', '!=', 'Invitation & Sponsorship');
         })->with(['category', 'period'])->withCount(['raceEntries as participants_count' => function ($query) {
             $query->whereIn('status', ['pending', 'paid']);
         }])->get();

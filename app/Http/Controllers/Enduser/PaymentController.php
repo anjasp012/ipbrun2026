@@ -13,9 +13,12 @@ use Midtrans\Config;
 use Midtrans\Notification;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Traits\PaymentHandlerTrait;
 
 class PaymentController extends Controller
 {
+    use PaymentHandlerTrait;
+
     public function __construct()
     {
         Config::$serverKey = config('midtrans.server_key');
@@ -93,122 +96,6 @@ class PaymentController extends Controller
             });
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
-        }
-    }
-
-    private function handleSuccessPayment($order, $participant)
-    {
-        // Don't repeat if already paid
-        if ($order->status === 'paid') {
-            return;
-        }
-
-        // 1. Update Order & Race Entry Status
-        $order->update(['status' => 'paid']);
-        foreach ($order->raceEntries as $entry) {
-            $entry->update(['status' => 'paid']);
-        }
-
-        $entries = $order->raceEntries; 
-
-        // 2. Create or Get User Account & Determine Credentials
-        $isCommunity = $participant->is_community;
-        $user = null;
-        $userExists = false;
-        $password = "";
-        $loginIdentifier = "";
-
-        if ($isCommunity) {
-            $loginIdentifier = $participant->nik;
-            $userExists = User::where('username', $participant->nik)->exists();
-            $password = $participant->nik; // Credential for community is always NIK
-
-            $user = User::updateOrCreate(
-                ['username' => $participant->nik],
-                [
-                    'name' => $participant->name,
-                    'email' => $participant->email,
-                    'password' => Hash::make($password),
-                    'role' => 'participant'
-                ]
-            );
-        } else {
-            $loginIdentifier = $participant->email;
-            $userExists = User::where('email', $participant->email)->exists();
-            $password = Str::random(8);
-
-            $user = User::firstOrCreate(
-                ['email' => $participant->email],
-                [
-                    'name' => $participant->name,
-                    'username' => $participant->email,
-                    'password' => Hash::make($password),
-                    'role' => 'participant'
-                ]
-            );
-        }
-
-        // 3. Link Participant to User
-        $participant->update(['user_id' => $user->id]);
-
-        // 4. Send Email Notification
-        try {
-            \App\Jobs\SendQueuedEmail::dispatch($participant->email, new ParticipantPaidNotification($participant, $password, $order, $userExists));
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Email Queuing Failed: ' . $e->getMessage());
-        }
-
-        // 5. Send WhatsApp Notification
-        try {
-            $url = "https://dev.ipbrun2026.id/login";
-            
-            if ($isCommunity) {
-                if ($userExists) {
-                    $message = "📢 *Konfirmasi Pendaftaran Komunitas – IPB Run 2026*\n\n" .
-                        "Halo *{$participant->name}*,\n\n" .
-                        "Pembayaran untuk kode order *{$order->order_code}* telah berhasil dikonfirmasi ✅\n" .
-                        "*Selamat! Tiket komunitas kamu resmi terdaftar di IPB Run 2026* 🏁\n\n" .
-                        "Silakan cek detail tiket kamu di dashboard menggunakan akun NIK yang sudah ada:\n" .
-                        "URL: {$url}\n\n" .
-                        "Sampai jumpa di garis start! 🏃‍♂️🔥";
-                } else {
-                    $message = "📢 *Konfirmasi Pendaftaran Komunitas – IPB Run 2026*\n\n" .
-                        "Halo *{$participant->name}*,\n\n" .
-                        "Pembayaran untuk kode order *{$order->order_code}* telah berhasil dikonfirmasi ✅\n" .
-                        "*Selamat! Kamu resmi terdaftar sebagai peserta IPB Run 2026* 🏁\n\n" .
-                        "🔐 Gunakan NIK kamu untuk akses dashboard:\n" .
-                        "Username: *{$participant->nik}*\n" .
-                        "Password: *{$participant->nik}*\n" .
-                        "URL: {$url}\n\n" .
-                        "Sampai jumpa di garis start! 🏃‍♂️🔥";
-                }
-            } else {
-                // Regular Flow
-                if ($userExists) {
-                    $message = "📢 *Konfirmasi Pembayaran Tambahan – IPB Run 2026*\n\n" .
-                        "Halo *{$participant->name}*,\n\n" .
-                        "Pembayaran untuk kode order *{$order->order_code}* telah berhasil dikonfirmasi ✅\n" .
-                        "*Selamat! Tiket tambahan kamu resmi terdaftar di IPB Run 2026* 🏁\n\n" .
-                        "Silakan cek detail tiket baru kamu di dashboard:\n" .
-                        "URL: {$url}\n\n" .
-                        "Terima kasih atas partisipasinya,\n" .
-                        "Sampai jumpa di garis start! 🏃‍♂️🔥";
-                } else {
-                    $message = "📢 *Konfirmasi Pendaftaran – IPB Run 2026*\n\n" .
-                        "*Halo {$participant->name}*,\n\n" .
-                        "Pembayaran untuk kode order *{$order->order_code}* telah berhasil dikonfirmasi ✅\n" .
-                        "*Selamat! Kamu resmi menjadi peserta IPB Run 2026* 🏁\n\n" .
-                        "🔐 Berikut akses dashboard kamu:\n" .
-                        "Email: *{$participant->email}*\n" .
-                        "Password: *{$password}*\n" .
-                        "URL: {$url}\n\n" .
-                        "Terima kasih atas partisipasinya,\n" .
-                        "Sampai jumpa di garis start! 🏃‍♂️🔥";
-                }
-            }
-            \App\Jobs\SendWhatsAppBlast::dispatch($participant->phone_number, $message);
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Fonnte success notification failed: ' . $e->getMessage());
         }
     }
 

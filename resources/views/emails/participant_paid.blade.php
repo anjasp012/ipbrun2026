@@ -247,9 +247,12 @@
                                 style="background-color:rgba(255,255,255,0.1);border-radius:8px;margin-bottom:25px;">
                                 <tr>
                                     <td align="center" style="padding:15px;border-right:1px solid rgba(255,255,255,0.2);">
+                                        @php
+                                            $isSponsorship = str_starts_with($order->order_code, 'IPBR26-SP-');
+                                        @endphp
                                         <span
-                                            style="font-size:11px;opacity:0.7;text-transform:uppercase;">{{ $participant->is_community ? 'Username (NIK)' : 'Username/Email' }}</span><br>
-                                        <strong style="font-size:14px;">{{ $participant->is_community ? $participant->nik : $participant->email }}</strong> </td>
+                                            style="font-size:11px;opacity:0.7;text-transform:uppercase;">{{ ($participant->is_community || $isSponsorship) ? 'Username (NIK)' : 'Username/Email' }}</span><br>
+                                        <strong style="font-size:14px;">{{ ($participant->is_community || $isSponsorship) ? $participant->nik : $participant->email }}</strong> </td>
                                     <td align="center" style="padding:15px;"> <span
                                             style="font-size:11px;opacity:0.7;text-transform:uppercase;">Password</span><br>
                                         <strong style="font-size:14px;">{{ $password }}</strong> </td>

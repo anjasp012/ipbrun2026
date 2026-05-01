@@ -11,6 +11,7 @@ use App\Http\Controllers\Enduser\TestController;
 use App\Http\Controllers\Auth\AuthController;
 
 use App\Http\Controllers\Enduser\ToolController;
+use App\Http\Controllers\Enduser\SponsorshipController;
 
 // Auth Routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -36,6 +37,11 @@ Route::get('/rules', function () {
 })->name('rules');
 Route::get('/dashboard', [EnduserTicket::class, 'dashboard'])->name('participant.dashboard')->middleware('auth');
 Route::get('/payment/finish', [PaymentController::class, 'finish'])->name('payment.finish');
+
+// Sponsorship Routes
+Route::get('/sponsorship', [SponsorshipController::class, 'index'])->name('sponsorship.index');
+Route::get('/sponsorship/checkout/{ticket}', [SponsorshipController::class, 'checkout'])->name('sponsorship.checkout');
+Route::post('/sponsorship/register', [SponsorshipController::class, 'register'])->name('sponsorship.register');
 
 // Komunitas Flow
 Route::prefix('komunitas')->group(function () {

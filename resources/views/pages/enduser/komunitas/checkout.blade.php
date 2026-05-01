@@ -8,7 +8,8 @@
         <div
             class="max-w-[1000px] w-full bg-white border border-slate-100 rounded-2xl shadow-sm md:p-14 p-8 transition-all duration-300">
             <div class="mb-10 text-center">
-                <h1 class="text-3xl font-[800] text-[#003366] uppercase tracking-tight">Formulir Data Pelari (Komunitas)</h1>
+                <h1 class="text-3xl font-[800] text-[#003366] uppercase tracking-tight">Formulir Data Pelari (Komunitas)
+                </h1>
                 <!-- Ticket Card Head (Top Part of Index Card Style) -->
                 <div class="mt-10 relative bg-white border border-slate-100 rounded-t-2xl overflow-hidden">
                     <div class="p-6 text-center">
@@ -35,8 +36,9 @@
                     </div>
                 </div>
             </div>
-            <form id="registrationForm" action="{{ route('komunitas.register') }}" method="POST"> @csrf <input type="hidden"
-                    name="ticket_id" value="{{ $ticket->id }}"> <!-- General Error Alert (Duplicate, etc) -->
+            <form id="registrationForm" action="{{ route('komunitas.register') }}" method="POST"> @csrf <input
+                    type="hidden" name="ticket_id" value="{{ $ticket->id }}">
+                <!-- General Error Alert (Duplicate, etc) -->
                 @if ($errors->has('duplicate') || $errors->has('midtrans'))
                     <div class="mb-8 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl">
                         <div class="flex items-center gap-3"> <svg class="w-5 h-5 text-red-500" fill="none"
@@ -285,28 +287,35 @@
                         $pairCategory = '5K (Sabtu)';
                     }
                 @endphp @if ($pairTicket)
-                    <div class="mt-12 bg-orange-50/50 border border-orange-100 p-8 rounded-2xl {{ $isPairSoldOut ? 'opacity-60' : '' }}">
+                    <div
+                        class="mt-12 bg-orange-50/50 border border-orange-100 p-8 rounded-2xl {{ $isPairSoldOut ? 'opacity-60' : '' }}">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <div class="space-y-1">
                                 <p
                                     class="text-[11px] font-bold text-[#E8630A]/80 uppercase tracking-widest leading-loose">
                                     APAKAH ANDA INGIN MENGIKUTI KATEGORI <span
                                         class="text-[#E8630A] underline underline-offset-4 decoration-2">{{ $pairCategory }}</span>
-                                    JUGA? 
-                                    @if($isPairSoldOut)
-                                        <span class="ml-2 px-2 py-0.5 bg-rose-500 text-white text-[9px] rounded font-black italic">KUOTA HABIS</span>
+                                    JUGA?
+                                    @if ($isPairSoldOut)
+                                        <span
+                                            class="ml-2 px-2 py-0.5 bg-rose-500 text-white text-[9px] rounded font-black italic">KUOTA
+                                            HABIS</span>
                                     @endif
                                 </p>
-                            </div> <label class="relative inline-flex items-center {{ $isPairSoldOut ? 'cursor-not-allowed' : 'cursor-pointer' }} group"> <input
-                                    type="checkbox" name="other_race_interest" id="cb_second_ticket"
+                            </div> <label
+                                class="relative inline-flex items-center {{ $isPairSoldOut ? 'cursor-not-allowed' : 'cursor-pointer' }} group">
+                                <input type="checkbox" name="other_race_interest" id="cb_second_ticket"
                                     value="{{ $pairCategory }}" class="sr-only peer"
                                     {{ old('other_race_interest') ? 'checked' : '' }}
                                     {{ $isPairSoldOut ? 'disabled' : '' }}>
                                 <div
                                     class="w-20 h-10 {{ $isPairSoldOut ? 'bg-slate-300' : 'bg-slate-200' }} peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-10 after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-8 after:w-8 after:transition-all peer-checked:bg-[#FF7A21] shadow-inner ring-4 ring-slate-100 peer-checked:ring-orange-100">
-                                </div> 
-                                <span class="ml-4 text-xs font-black text-slate-400 peer-checked:hidden uppercase tracking-widest transition-colors">TIDAK</span>
-                                <span class="ml-4 hidden peer-checked:inline text-xs font-black text-[#FF7A21] uppercase tracking-widest transition-colors">YA, IKUT!</span>
+                                </div>
+                                <span
+                                    class="ml-4 text-xs font-black text-slate-400 peer-checked:hidden uppercase tracking-widest transition-colors">TIDAK</span>
+                                <span
+                                    class="ml-4 hidden peer-checked:inline text-xs font-black text-[#FF7A21] uppercase tracking-widest transition-colors">YA,
+                                    IKUT!</span>
                             </label>
                         </div>
                         <div class="mt-6 pt-6 border-t border-orange-100/50">
@@ -340,36 +349,48 @@
                                 ]"
                                 :selected="old('donation_scholarship')" /> </div>
                     </div>
-                </div> 
+                </div>
 
                 <!-- Disclaimer Section -->
                 <div class="mt-8">
-                    <h3 class="text-sm font-black text-[#003366] uppercase tracking-[2px] mb-4 pb-2 border-b border-slate-100">
+                    <h3
+                        class="text-sm font-black text-[#003366] uppercase tracking-[2px] mb-4 pb-2 border-b border-slate-100">
                         Persetujuan & Disclaimer
                     </h3>
                     <div class="space-y-0">
                         <label class="flex items-start gap-4 cursor-pointer group py-4 bg-slate-50/50 transition-all">
                             <div class="flex-shrink-0 mt-0.5">
-                                <input type="checkbox" name="disclaimer_1" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer disclaimer-cb">
+                                <input type="checkbox" name="disclaimer_1" required
+                                    class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer disclaimer-cb">
                             </div>
                             <span class="text-xs text-slate-600 leading-relaxed font-medium">
-                                Saya sebagai peserta IPB RUN 2026 akan mematuhi ketentuan lomba & memahami kegiatan outdoor ini memliliki risiko kematian, cidera dll. Dan risiko yang timbul selama mengikuti kegiatan ini akibat tindakan yang tidak sesuai dengan aturan, ketentuan, dan arahan panitia menjadi tanggung jawab saya pribadi. Panitia penyelenggara dibebaskan dari segala tuntutan atas kejadian tersebut. <span class="text-red-500 font-black">*</span>
+                                Saya sebagai peserta IPB RUN 2026 akan mematuhi ketentuan lomba & memahami kegiatan
+                                outdoor ini memliliki risiko kematian, cidera dll. Dan risiko yang timbul selama
+                                mengikuti kegiatan ini akibat tindakan yang tidak sesuai dengan aturan, ketentuan, dan
+                                arahan panitia menjadi tanggung jawab saya pribadi. Panitia penyelenggara dibebaskan
+                                dari segala tuntutan atas kejadian tersebut. <span
+                                    class="text-red-500 font-black">*</span>
                             </span>
                         </label>
                         <label class="flex items-start gap-4 cursor-pointer group py-4 bg-slate-50/50 transition-all">
                             <div class="flex-shrink-0 mt-0.5">
-                                <input type="checkbox" name="disclaimer_2" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer disclaimer-cb">
+                                <input type="checkbox" name="disclaimer_2" required
+                                    class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer disclaimer-cb">
                             </div>
                             <span class="text-xs text-slate-600 leading-relaxed font-medium">
-                                Saya memberikan hak penuh kepada panitia untuk menggunakan foto atau video peserta selama acara untuk keperluan resmi tanpa tuntutan kompensasi. <span class="text-red-500 font-black">*</span>
+                                Saya memberikan hak penuh kepada panitia untuk menggunakan foto atau video peserta
+                                selama acara untuk keperluan resmi tanpa tuntutan kompensasi. <span
+                                    class="text-red-500 font-black">*</span>
                             </span>
                         </label>
                         <label class="flex items-start gap-4 cursor-pointer group py-4 bg-slate-50/50 transition-all">
                             <div class="flex-shrink-0 mt-0.5">
-                                <input type="checkbox" name="disclaimer_3" required class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer disclaimer-cb">
+                                <input type="checkbox" name="disclaimer_3" required
+                                    class="w-5 h-5 rounded border-slate-300 text-[#003366] focus:ring-[#003366] cursor-pointer disclaimer-cb">
                             </div>
                             <span class="text-xs text-slate-600 leading-relaxed font-medium">
-                                Saya menjamin bahwa seluruh data yang telah saya isikan pada formulir di atas adalah benar dan akurat. <span class="text-red-500 font-black">*</span>
+                                Saya menjamin bahwa seluruh data yang telah saya isikan pada formulir di atas adalah
+                                benar dan akurat. <span class="text-red-500 font-black">*</span>
                             </span>
                         </label>
                     </div>
@@ -401,13 +422,16 @@
                             <!-- Ticket Row (Dynamic: shows voucher badges + price inline) -->
                             <div id="row_ticket_main" class="flex justify-between items-start text-sm gap-3">
                                 <div class="flex-1 min-w-0">
-                                    <span class="text-slate-500 font-medium italic block">Tiket {{ $ticket->category->name }}
+                                    <span class="text-slate-500 font-medium italic block">Tiket
+                                        {{ $ticket->category->name }}
                                         ({{ $ticket->name ?: strtoupper($ticket->type) }})</span>
                                     <div id="ticket_voucher_tags" class="mt-1.5 flex flex-wrap gap-1"></div>
                                 </div>
                                 <div class="text-right flex-shrink-0">
-                                    <span id="ticket_price_original" class="text-[#003366] font-bold block">Rp {{ number_format($ticket->price, 0, ',', '.') }}</span>
-                                    <span id="ticket_price_final" class="hidden text-emerald-600 font-black block"></span>
+                                    <span id="ticket_price_original" class="text-[#003366] font-bold block">Rp
+                                        {{ number_format($ticket->price, 0, ',', '.') }}</span>
+                                    <span id="ticket_price_final"
+                                        class="hidden text-emerald-600 font-black block"></span>
                                 </div>
                             </div>
 
@@ -421,8 +445,10 @@
                                         <div id="ticket2_voucher_tags" class="mt-1.5 flex flex-wrap gap-1"></div>
                                     </div>
                                     <div class="text-right flex-shrink-0">
-                                        <span id="ticket2_price_original" class="text-[#E8630A] font-bold block">Rp {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
-                                        <span id="ticket2_price_final" class="hidden text-emerald-600 font-black block"></span>
+                                        <span id="ticket2_price_original" class="text-[#E8630A] font-bold block">Rp
+                                            {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
+                                        <span id="ticket2_price_final"
+                                            class="hidden text-emerald-600 font-black block"></span>
                                     </div>
                                 </div>
                             @endif
@@ -448,19 +474,24 @@
                             <!-- Label Slot Voucher -->
                             <div class="flex items-center justify-between mb-3">
                                 <div class="flex flex-col">
-                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[2px]">Kode Voucher <span id="voucher_limit_label" class="text-emerald-500">(maks. 2 voucher)</span></p>
-                                    <p class="text-[9px] font-bold text-orange-500 uppercase tracking-wider mt-0.5">Maks. 1 Voucher untuk 1 Kategori</p>
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[2px]">Kode
+                                        Voucher <span id="voucher_limit_label" class="text-emerald-500">(maks. 2
+                                            voucher)</span></p>
+                                    <p class="text-[9px] font-bold text-orange-500 uppercase tracking-wider mt-0.5">
+                                        Maks. 1 Voucher untuk 1 Kategori</p>
                                 </div>
                                 <div id="voucher_slots_indicator" class="flex gap-1">
-                                    <div id="slot_dot_1" class="w-2 h-2 rounded-full bg-slate-200 transition-all"></div>
-                                    <div id="slot_dot_2" class="w-2 h-2 rounded-full bg-slate-200 transition-all"></div>
+                                    <div id="slot_dot_1" class="w-2 h-2 rounded-full bg-slate-200 transition-all">
+                                    </div>
+                                    <div id="slot_dot_2" class="w-2 h-2 rounded-full bg-slate-200 transition-all">
+                                    </div>
                                 </div>
                             </div>
                             <input type="hidden" id="applied_voucher_code_1" name="voucher_code">
                             <input type="hidden" id="applied_voucher_code_2" name="voucher_code_2">
                             <div class="flex flex-col md:flex-row gap-3">
                                 <div class="flex-1 relative">
-                                    <input type="text" id="voucher_input" placeholder="Masukkan kode voucher..." 
+                                    <input type="text" id="voucher_input" placeholder="Masukkan kode voucher..."
                                         class="w-full h-12 bg-white border-2 border-slate-100 rounded-xl px-4 font-black text-[#003366] focus:border-[#FF7A21] focus:ring-4 focus:ring-orange-500/10 transition-all outline-none uppercase tracking-widest text-xs placeholder:normal-case placeholder:font-medium placeholder:text-slate-300">
                                 </div>
                                 <button type="button" id="btn_apply_voucher"
@@ -470,25 +501,25 @@
                             </div>
                             <div id="voucher_message" class="mt-2 min-h-[14px]"></div>
                         </div>
-                        <div
-                            class="pt-5 border-t border-dashed border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                            <div class="flex flex-col"> <span
-                                    class="text-[10px] text-slate-400 font-[800] uppercase tracking-wider block mb-1">Total
-                                    Bayar</span>
-                                <div id="lbl_total"
-                                    class="text-[28px] font-[900] text-[#003366] leading-none font-['Plus_Jakarta_Sans']">
-                                    Rp 0</div>
-                            </div> <x-button type="submit" id="btn_submit"
-                                class="w-full md:w-auto px-10 py-3.5 bg-[#003366] text-white rounded-xl font-[800] text-[15px] transition-all active:scale-95 hover:bg-[#002244] flex items-center justify-center">
-                                Lanjut Pembayaran </x-button>
-                        </div>
+                    </div>
+                    <div
+                        class="p-5 border-t border-dashed border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                        <div class="flex flex-col"> <span
+                                class="text-[10px] text-slate-400 font-[800] uppercase tracking-wider block mb-1">Total
+                                Bayar</span>
+                            <div id="lbl_total"
+                                class="text-[28px] font-[900] text-[#003366] leading-none font-['Plus_Jakarta_Sans']">
+                                Rp 0</div>
+                        </div> <x-button type="submit" id="btn_submit"
+                            class="w-full md:w-auto px-10 py-3.5 bg-[#003366] text-white rounded-xl font-[800] text-[15px] transition-all active:scale-95 hover:bg-[#002244] flex items-center justify-center">
+                            Lanjut Pembayaran </x-button>
                     </div>
                 </div>
-                <div class="mt-8 text-center"> <a href="{{ url('/komunitas') }}"
-                        class="inline-flex items-center gap-2 text-slate-400 font-bold text-sm hover:text-[#003366] transition-all">
-                        ← Batal & Kembali </a> </div>
             </form>
         </div>
+        <div class="mt-8 text-center"> <a href="{{ url('/komunitas') }}"
+                class="inline-flex items-center gap-2 text-slate-400 font-bold text-sm hover:text-[#003366] transition-all">
+                ← Batal & Kembali </a> </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -665,14 +696,16 @@
                 if (limitLabel) limitLabel.innerText = `(maks. ${limit} voucher)`;
 
                 const count = appliedVouchers.length;
-                if (dot1) dot1.className = 'w-2 h-2 rounded-full transition-all ' + (count >= 1 ? 'bg-emerald-500 scale-125' : 'bg-slate-200');
-                
+                if (dot1) dot1.className = 'w-2 h-2 rounded-full transition-all ' + (count >= 1 ?
+                    'bg-emerald-500 scale-125' : 'bg-slate-200');
+
                 if (dot2) {
                     if (limit === 1) {
                         dot2.classList.add('hidden');
                     } else {
                         dot2.classList.remove('hidden');
-                        dot2.className = 'w-2 h-2 rounded-full transition-all ' + (count >= 2 ? 'bg-teal-500 scale-125' : 'bg-slate-200');
+                        dot2.className = 'w-2 h-2 rounded-full transition-all ' + (count >= 2 ?
+                            'bg-teal-500 scale-125' : 'bg-slate-200');
                     }
                 }
             }
@@ -694,7 +727,8 @@
                     btn.classList.remove('hover:bg-[#FF7A21]');
                 } else {
                     inputEl.disabled = false;
-                    inputEl.placeholder = count === 0 ? 'Masukkan kode voucher...' : `Masukkan voucher ke-${count + 1}...`;
+                    inputEl.placeholder = count === 0 ? 'Masukkan kode voucher...' :
+                        `Masukkan voucher ke-${count + 1}...`;
                     btn.disabled = false;
                     btn.classList.remove('opacity-50', 'cursor-not-allowed');
                     btn.classList.add('hover:bg-[#FF7A21]');
@@ -710,9 +744,9 @@
 
             // Helper: buat HTML badge voucher
             function voucherBadgeHTML(v, colorClass) {
-                const discLabel = v.type === 'percentage'
-                    ? `(${v.value}%) −Rp ${v.discount.toLocaleString('id-ID')}`
-                    : `−Rp ${v.discount.toLocaleString('id-ID')}`;
+                const discLabel = v.type === 'percentage' ?
+                    `(${v.value}%) −Rp ${v.discount.toLocaleString('id-ID')}` :
+                    `−Rp ${v.discount.toLocaleString('id-ID')}`;
                 return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wide ${colorClass}">
                     <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
                     ${v.code} ${discLabel}
@@ -726,7 +760,9 @@
                 const finalEl = document.getElementById(finalId);
 
                 const myVouchers = appliedVouchers.filter(matchFn);
-                const badgeColors = ['bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200', 'bg-teal-50 text-teal-700 ring-1 ring-teal-200'];
+                const badgeColors = ['bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+                    'bg-teal-50 text-teal-700 ring-1 ring-teal-200'
+                ];
 
                 // Hitung diskon per tiket
                 let disc1 = 0;
@@ -737,8 +773,12 @@
 
                 if (myVouchers.length > 0 && tagsEl) {
                     tagsEl.innerHTML = myVouchers.map((v, i) => voucherBadgeHTML(v, badgeColors[i])).join('');
-                    if (origEl) origEl.innerHTML = `<span class="line-through text-slate-400 font-medium text-xs">Rp ${basePrice.toLocaleString('id-ID')}</span>`;
-                    if (finalEl) { finalEl.classList.remove('hidden'); finalEl.innerText = 'Rp ' + (basePrice - disc1).toLocaleString('id-ID'); }
+                    if (origEl) origEl.innerHTML =
+                        `<span class="line-through text-slate-400 font-medium text-xs">Rp ${basePrice.toLocaleString('id-ID')}</span>`;
+                    if (finalEl) {
+                        finalEl.classList.remove('hidden');
+                        finalEl.innerText = 'Rp ' + (basePrice - disc1).toLocaleString('id-ID');
+                    }
                 } else {
                     if (tagsEl) tagsEl.innerHTML = '';
                     if (origEl) origEl.innerHTML = 'Rp ' + basePrice.toLocaleString('id-ID');
@@ -756,7 +796,8 @@
                 if (document.getElementById('row_donation_event')) {
                     if (donEvent > 0) {
                         document.getElementById('row_donation_event').classList.remove('hidden');
-                        document.getElementById('lbl_donation_event').innerText = 'Rp ' + donEvent.toLocaleString('id-ID');
+                        document.getElementById('lbl_donation_event').innerText = 'Rp ' + donEvent.toLocaleString(
+                            'id-ID');
                     } else {
                         document.getElementById('row_donation_event').classList.add('hidden');
                     }
@@ -765,7 +806,8 @@
                 if (document.getElementById('row_donation_scholarship')) {
                     if (donScholar > 0) {
                         document.getElementById('row_donation_scholarship').classList.remove('hidden');
-                        document.getElementById('lbl_donation_scholarship').innerText = 'Rp ' + donScholar.toLocaleString('id-ID');
+                        document.getElementById('lbl_donation_scholarship').innerText = 'Rp ' + donScholar
+                            .toLocaleString('id-ID');
                     } else {
                         document.getElementById('row_donation_scholarship').classList.add('hidden');
                     }
@@ -802,9 +844,11 @@
             document.getElementById('cb_second_ticket')?.addEventListener('change', function() {
                 if (!this.checked) {
                     appliedVouchers = appliedVouchers.filter(v => v.targetTicket !== 2);
-                    
-                    document.getElementById('applied_voucher_code_1').value = appliedVouchers.length > 0 ? appliedVouchers[0].code : '';
-                    document.getElementById('applied_voucher_code_2').value = appliedVouchers.length > 1 ? appliedVouchers[1].code : '';
+
+                    document.getElementById('applied_voucher_code_1').value = appliedVouchers.length > 0 ?
+                        appliedVouchers[0].code : '';
+                    document.getElementById('applied_voucher_code_2').value = appliedVouchers.length > 1 ?
+                        appliedVouchers[1].code : '';
 
                     const messageEl = document.getElementById('voucher_message');
                     if (appliedVouchers.length < (this.checked ? 2 : 1)) {
@@ -826,9 +870,14 @@
             }
 
             function commitVoucher(voucherData, targetTicket) {
-                appliedVouchers.push({ ...voucherData, targetTicket });
-                if (appliedVouchers.length === 1) document.getElementById('applied_voucher_code_1').value = voucherData.code;
-                else if (appliedVouchers.length === 2) document.getElementById('applied_voucher_code_2').value = voucherData.code;
+                appliedVouchers.push({
+                    ...voucherData,
+                    targetTicket
+                });
+                if (appliedVouchers.length === 1) document.getElementById('applied_voucher_code_1').value =
+                    voucherData.code;
+                else if (appliedVouchers.length === 2) document.getElementById('applied_voucher_code_2').value =
+                    voucherData.code;
 
                 const messageEl = document.getElementById('voucher_message');
                 const isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
@@ -836,9 +885,11 @@
                 const remaining = limit - appliedVouchers.length;
 
                 if (remaining > 0) {
-                    messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">✓ Terpasang ke Tiket ${targetTicket}! Sisa slot: ${remaining}</span>`;
+                    messageEl.innerHTML =
+                        `<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">✓ Terpasang ke Tiket ${targetTicket}! Sisa slot: ${remaining}</span>`;
                 } else {
-                    messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">✓ ${limit} Voucher berhasil dipasang!</span>`;
+                    messageEl.innerHTML =
+                        `<span class="text-[10px] font-black uppercase text-emerald-600 tracking-widest">✓ ${limit} Voucher berhasil dipasang!</span>`;
                 }
 
                 syncVoucherInputState();
@@ -850,7 +901,8 @@
                 const limit = isSecondChecked ? 2 : 1;
 
                 if (appliedVouchers.length >= limit) {
-                    document.getElementById('voucher_message').innerHTML = `<span class="text-[10px] font-black uppercase text-amber-500 tracking-widest">Maksimal ${limit} voucher sudah dipasang.</span>`;
+                    document.getElementById('voucher_message').innerHTML =
+                        `<span class="text-[10px] font-black uppercase text-amber-500 tracking-widest">Maksimal ${limit} voucher sudah dipasang.</span>`;
                     return;
                 }
 
@@ -863,15 +915,17 @@
                 if (!voucherCode && !nikValue) return;
 
                 if (voucherCode && appliedVouchers.some(v => v.code === voucherCode)) {
-                    messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-amber-500 tracking-widest">Voucher ini sudah dipasang.</span>';
+                    messageEl.innerHTML =
+                        '<span class="text-[10px] font-black uppercase text-amber-500 tracking-widest">Voucher ini sudah dipasang.</span>';
                     return;
                 }
 
-                btn.disabled = true; btn.innerText = '...';
+                btn.disabled = true;
+                btn.innerText = '...';
 
                 try {
                     const isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
-                    
+
                     // Coba ke Tiket 1 dulu
                     let checkT1 = true;
                     // Jika tiket 1 sudah punya voucher, coba cek tiket 2 dulu jika ada
@@ -884,10 +938,19 @@
                     let errorMsg = '';
 
                     if (checkT1) {
-                        const res1 = await fetch('{{ route("komunitas.check-voucher") }}', {
+                        const res1 = await fetch('{{ route('komunitas.check-voucher') }}', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                            body: JSON.stringify({ code: voucherCode, nik: nikValue, price: ticketPrice, ticket_id: '{{ $ticket->id }}', existing_codes: appliedVouchers.map(v => v.code) })
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                code: voucherCode,
+                                nik: nikValue,
+                                price: ticketPrice,
+                                ticket_id: '{{ $ticket->id }}',
+                                existing_codes: appliedVouchers.map(v => v.code)
+                            })
                         });
                         const data1 = await res1.json();
                         if (data1.valid) {
@@ -900,10 +963,19 @@
 
                     // Jika gagal t1 atau t1 sudah ada voucher, coba t2
                     if (!targetFound && isSecondChecked && pairTicketId) {
-                        const res2 = await fetch('{{ route("komunitas.check-voucher") }}', {
+                        const res2 = await fetch('{{ route('komunitas.check-voucher') }}', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                            body: JSON.stringify({ code: voucherCode, nik: nikValue, price: pairTicketPrice, ticket_id: pairTicketId, existing_codes: appliedVouchers.map(v => v.code) })
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                code: voucherCode,
+                                nik: nikValue,
+                                price: pairTicketPrice,
+                                ticket_id: pairTicketId,
+                                existing_codes: appliedVouchers.map(v => v.code)
+                            })
                         });
                         const data2 = await res2.json();
                         if (data2.valid) {
@@ -916,10 +988,19 @@
 
                     // Jika masih belum ketemu tapi t1 tadi di-skip, coba t1 sebagai fallback terakhir
                     if (!targetFound && !checkT1) {
-                         const res1 = await fetch('{{ route("komunitas.check-voucher") }}', {
+                        const res1 = await fetch('{{ route('komunitas.check-voucher') }}', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                            body: JSON.stringify({ code: voucherCode, nik: nikValue, price: ticketPrice, ticket_id: '{{ $ticket->id }}', existing_codes: appliedVouchers.map(v => v.code) })
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                code: voucherCode,
+                                nik: nikValue,
+                                price: ticketPrice,
+                                ticket_id: '{{ $ticket->id }}',
+                                existing_codes: appliedVouchers.map(v => v.code)
+                            })
                         });
                         const data1 = await res1.json();
                         if (data1.valid) {
@@ -928,19 +1009,27 @@
                         } else {
                             errorMsg = data1.message;
                         }
-                    } 
-                    
+                    }
+
                     if (targetFound) {
-                        commitVoucher({ code: validData.code, type: validData.type, value: validData.value, discount: 0 }, targetFound);
+                        commitVoucher({
+                            code: validData.code,
+                            type: validData.type,
+                            value: validData.value,
+                            discount: 0
+                        }, targetFound);
                     } else {
-                        messageEl.innerHTML = `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">${errorMsg || 'Voucher tidak cocok untuk tiket yang dipilih.'}</span>`;
+                        messageEl.innerHTML =
+                            `<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">${errorMsg || 'Voucher tidak cocok untuk tiket yang dipilih.'}</span>`;
                     }
 
                 } catch (e) {
-                    messageEl.innerHTML = '<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">Error mengecek voucher</span>';
+                    messageEl.innerHTML =
+                        '<span class="text-[10px] font-black uppercase text-rose-500 tracking-widest">Error mengecek voucher</span>';
                 } finally {
                     if (appliedVouchers.length < 2) {
-                        btn.disabled = false; btn.innerText = 'Pasang';
+                        btn.disabled = false;
+                        btn.innerText = 'Pasang';
                     }
                 }
             }
@@ -949,7 +1038,10 @@
 
             // Enter key on input
             document.getElementById('voucher_input')?.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') { e.preventDefault(); applyVoucher(); }
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    applyVoucher();
+                }
             });
 
             updateTotal();
@@ -959,7 +1051,9 @@
 
             function checkDisclaimers() {
                 let allChecked = true;
-                disclaimers.forEach(cb => { if (!cb.checked) allChecked = false; });
+                disclaimers.forEach(cb => {
+                    if (!cb.checked) allChecked = false;
+                });
                 if (submitBtn) {
                     if (allChecked) {
                         submitBtn.disabled = false;
