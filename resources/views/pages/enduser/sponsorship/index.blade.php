@@ -10,23 +10,32 @@
 
             <!-- Title Section for Sponsorship -->
             <div class="text-center mb-6 relative z-10">
-                <h1 class="text-3xl md:text-5xl font-black text-[#003366] uppercase tracking-tighter mb-4">Registrasi Sponsorship</h1>
-                <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px] md:text-xs">Halaman pendaftaran khusus mitra dan sponsor IPB Run 2026</p>
+                <h1 class="text-3xl md:text-5xl font-black text-[#003366] uppercase tracking-tighter mb-4">Registrasi
+                    Sponsorship</h1>
+                <p class="text-slate-500 font-bold uppercase tracking-widest text-[10px] md:text-xs">Halaman pendaftaran
+                    khusus mitra dan sponsor IPB Run 2026</p>
                 <div class="h-1.5 w-20 bg-orange-500 mx-auto rounded-full mt-6"></div>
             </div>
 
-            @if($isPeriodSoldOut)
-            <!-- Sold Out Banner -->
-            <div class="mb-6 relative overflow-hidden rounded-2xl border-2 border-rose-200 bg-gradient-to-r from-rose-50 via-red-50 to-rose-50 px-6 py-5 flex items-center gap-5 shadow-sm">
-                <div class="flex-shrink-0 w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+            @if ($isPeriodSoldOut)
+                <!-- Sold Out Banner -->
+                <div
+                    class="mb-6 relative overflow-hidden rounded-2xl border-2 border-rose-200 bg-gradient-to-r from-rose-50 via-red-50 to-rose-50 px-6 py-5 flex items-center gap-5 shadow-sm">
+                    <div class="flex-shrink-0 w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-rose-700 font-black text-sm uppercase tracking-wider">Kuota Telah Habis</p>
+                        <p class="text-rose-500 text-xs font-semibold mt-0.5">Tiket untuk kategori sponsorship telah
+                            habis terjual.</p>
+                    </div>
+                    <div
+                        class="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-rose-100/50 to-transparent pointer-events-none">
+                    </div>
                 </div>
-                <div>
-                    <p class="text-rose-700 font-black text-sm uppercase tracking-wider">Kuota Telah Habis</p>
-                    <p class="text-rose-500 text-xs font-semibold mt-0.5">Tiket untuk kategori sponsorship telah habis terjual.</p>
-                </div>
-                <div class="absolute right-0 top-0 h-full w-32 bg-gradient-to-l from-rose-100/50 to-transparent pointer-events-none"></div>
-            </div>
             @endif
 
             <!-- Content Area -->
@@ -40,14 +49,15 @@
 
                 <!-- Tab Switcher -->
                 <div class="flex justify-center mb-6">
-                    <div class="inline-flex gap-2 p-1.5 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm w-full md:w-auto md:min-w-[400px]">
+                    <div
+                        class="inline-flex gap-2 p-1.5 bg-slate-50 rounded-2xl border border-slate-200 shadow-sm w-full md:w-auto md:min-w-[400px]">
                         <button onclick="switchCategory('ipb')" id="tab-ipb"
                             class="flex-1 category-tab bg-[#00ACB1] text-white shadow-md px-4 py-2 rounded-lg text-xs md:text-sm font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap border border-transparent">
-                             Kategori <br class="md:hidden"> Keluarga IPB
+                            Kategori <br class="md:hidden"> Keluarga IPB
                         </button>
                         <button onclick="switchCategory('umum')" id="tab-umum"
                             class="flex-1 category-tab inactive-tab-pulse px-4 py-2 rounded-lg text-xs md:text-sm font-[800] uppercase tracking-[1px] transition-all duration-300 active:scale-[0.98] whitespace-nowrap text-slate-500 hover:text-[#00ACB1] border border-transparent">
-                             Kategori <br class="md:hidden"> Umum
+                            Kategori <br class="md:hidden"> Umum
                         </button>
                     </div>
                 </div>
@@ -56,7 +66,7 @@
                     @if (count($group['data']) > 0)
                         <div id="section-{{ $group['id'] }}"
                             class="ticket-section {{ $group['id'] !== 'ipb' ? 'hidden' : '' }} lg:mb-16 last:mb-0">
-                            
+
                             {{-- Section Header --}}
                             <div class="flex items-center gap-4 mb-8">
                                 <div class="w-1.5 h-8 bg-[#003366] rounded-full"></div>
@@ -86,8 +96,8 @@
                                                 <div class="flex-shrink-0">
                                                     @if ($qty <= 0)
                                                         <span
-                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-slate-100 text-slate-500 border border-slate-200">Sold
-                                                            Out</span>
+                                                            class="inline-flex items-center px-1.5 md:px-3 py-0.5 md:py-1 rounded text-[8px] md:text-[10px] font-black uppercase bg-slate-100 text-slate-500 border border-slate-200">Tidak
+                                                            Tersedia</span>
                                                     @endif
                                                 </div>
                                             </div>
@@ -118,7 +128,7 @@
                                             @else
                                                 <div
                                                     class="w-full py-2 md:py-2.5 bg-slate-100 text-slate-400 text-center rounded-lg md:rounded-xl font-[900] text-[12px] md:text-[15px] uppercase tracking-wider cursor-not-allowed">
-                                                    Sold Out</div>
+                                                    Daftar</div>
                                             @endif
                                         </div>
 
@@ -136,7 +146,8 @@
 
                 @if (count($tickets_ipb) == 0 && count($tickets_public) == 0)
                     <div class="text-center py-20 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
-                        <p class="text-slate-400 font-[800] text-lg font-['Plus_Jakarta_Sans']">Pendaftaran sponsorship sedang tidak
+                        <p class="text-slate-400 font-[800] text-lg font-['Plus_Jakarta_Sans']">Pendaftaran sponsorship
+                            sedang tidak
                             tersedia.</p>
                     </div>
                 @endif
@@ -147,12 +158,15 @@
 
     <style>
         @keyframes inactiveTabPulseGlow {
-            0%, 100% {
+
+            0%,
+            100% {
                 box-shadow: 0 0 10px 2px rgba(255, 247, 0, 0.6);
                 border-color: #ffea00ff;
                 color: #000000ff;
                 background-color: rgba(255, 251, 0, 0.05);
             }
+
             50% {
                 box-shadow: 0 0 25px 6px rgba(255, 247, 0, 0.6);
                 border-color: #ffea00ff;
