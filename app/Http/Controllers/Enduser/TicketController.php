@@ -91,16 +91,19 @@ class TicketController extends Controller
 
         $orders = Order::where('participant_id', $participant->id)->with('raceEntries.ticket.category')->latest()->get();
 
-        $firstEntry = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->with('ticket.category')->first();
+        $firstEntry = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->with(['ticket.category', 'ticket.period'])->first();
         $ownedCategoryNames = $participant->raceEntries()->whereIn('status', ['paid', 'pending'])->get()->pluck('ticket.category.name')->map(fn($n) => strtoupper($n))->toArray();
 
         $pairTarget = '';
         if ($firstEntry) {
-            $firstCatName = strtoupper($firstEntry->ticket->category->name);
-            if (str_contains($firstCatName, '5K') || str_contains($firstCatName, '42K')) {
-                $pairTarget = '10K';
-            } elseif (str_contains($firstCatName, '10K') || str_contains($firstCatName, '21K')) {
-                $pairTarget = '5K';
+            $isSponsorship = $firstEntry->ticket->period && $firstEntry->ticket->period->name === 'Invitation & Sponsorship';
+            if (!$isSponsorship) {
+                $firstCatName = strtoupper($firstEntry->ticket->category->name);
+                if (str_contains($firstCatName, '5K') || str_contains($firstCatName, '42K')) {
+                    $pairTarget = '10K';
+                } elseif (str_contains($firstCatName, '10K') || str_contains($firstCatName, '21K')) {
+                    $pairTarget = '5K';
+                }
             }
         }
 

@@ -154,55 +154,7 @@
                     </div>
                 </div>
 
-                <!-- Other Race Interest Section -->
-                @php
-                    $categoryName = strtoupper($ticket->category->name ?? '');
-                    $pairCategory = '';
-                    if (str_contains($categoryName, '5K') || str_contains($categoryName, '42K')) {
-                        $pairCategory = '10K (Minggu)';
-                    } elseif (str_contains($categoryName, '10K') || str_contains($categoryName, '21K')) {
-                        $pairCategory = '5K (Sabtu)';
-                    }
-                @endphp
-                @if ($pairTicket)
-                    <div
-                        class="mt-12 bg-orange-50/50 border border-orange-100 p-8 rounded-2xl {{ $isPairSoldOut ? 'opacity-60' : '' }}">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                            <div class="space-y-1">
-                                <p
-                                    class="text-[11px] font-bold text-[#E8630A]/80 uppercase tracking-widest leading-loose">
-                                    APAKAH ANDA INGIN MENGIKUTI KATEGORI <span
-                                        class="text-[#E8630A] underline underline-offset-4 decoration-2">{{ $pairCategory }}</span>
-                                    JUGA?
-                                    @if ($isPairSoldOut)
-                                        <span
-                                            class="ml-2 px-2 py-0.5 bg-rose-500 text-white text-[9px] rounded font-black italic">KUOTA
-                                            HABIS</span>
-                                    @endif
-                                </p>
-                            </div> <label
-                                class="relative inline-flex items-center {{ $isPairSoldOut ? 'cursor-not-allowed' : 'cursor-pointer' }} group">
-                                <input type="checkbox" name="other_race_interest" id="cb_second_ticket"
-                                    value="{{ $pairCategory }}" class="sr-only peer"
-                                    {{ old('other_race_interest') ? 'checked' : '' }}
-                                    {{ $isPairSoldOut ? 'disabled' : '' }}>
-                                <div
-                                    class="w-20 h-10 {{ $isPairSoldOut ? 'bg-slate-300' : 'bg-slate-200' }} peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-10 after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-8 after:w-8 after:transition-all peer-checked:bg-[#FF7A21] shadow-inner ring-4 ring-slate-100 peer-checked:ring-orange-100">
-                                </div>
-                                <span
-                                    class="ml-4 text-xs font-black text-slate-400 peer-checked:hidden uppercase tracking-widest transition-colors">TIDAK</span>
-                                <span
-                                    class="ml-4 hidden peer-checked:inline text-xs font-black text-[#FF7A21] uppercase tracking-widest transition-colors">YA,
-                                    IKUT!</span>
-                            </label>
-                        </div>
-                        <div class="mt-6 pt-6 border-t border-orange-100/50">
-                            <p
-                                class="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed italic">
-                                * Pilihan ini bersifat opsional. Jika dipilih, Anda akan terdaftar di kedua kategori tersebut. </p>
-                        </div>
-                    </div>
-                @endif
+
 
                 <!-- Disclaimer Section -->
                 <div class="mt-8">
@@ -272,12 +224,7 @@
                             <span class="text-[#003366] font-bold">Rp
                                 {{ number_format($ticket->price, 0, ',', '.') }}</span>
                         </div>
-                        @if ($pairTicket)
-                            <div id="row_second_ticket" class="{{ old('other_race_interest') ? '' : 'hidden' }} flex justify-between items-center text-sm">
-                                <span class="text-[#E8630A] font-bold italic">Tiket Tambahan: {{ $pairTicket->category->name }}</span>
-                                <span class="text-[#E8630A] font-bold">Rp {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
-                            </div>
-                        @endif
+
                     </div>
                     <div
                         class="p-5 border-t border-dashed border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -286,7 +233,7 @@
                                 class="text-[10px] text-slate-400 font-[800] uppercase tracking-wider block mb-1">Total
                                 Bayar</span>
                             <div id="lbl_total" class="text-[28px] font-[900] text-[#003366] leading-none font-['Plus_Jakarta_Sans']">
-                                Rp {{ number_format($ticket->price + (old('other_race_interest') ? $pairTicket->price : 0), 0, ',', '.') }}
+                                Rp {{ number_format($ticket->price, 0, ',', '.') }}
                             </div>
                         </div>
                         <x-button type="submit"
@@ -312,24 +259,7 @@
                 allowInput: true
             });
 
-            const cbSecond = document.getElementById('cb_second_ticket');
-            const rowSecond = document.getElementById('row_second_ticket');
-            const lblTotal = document.getElementById('lbl_total');
-            const basePrice = {{ $ticket->price }};
-            const pairPrice = {{ $pairTicket->price ?? 0 }};
 
-            if (cbSecond) {
-                cbSecond.addEventListener('change', function() {
-                    if (this.checked) {
-                        rowSecond?.classList.remove('hidden');
-                        const total = basePrice + pairPrice;
-                        lblTotal.innerText = 'Rp ' + total.toLocaleString('id-ID');
-                    } else {
-                        rowSecond?.classList.add('hidden');
-                        lblTotal.innerText = 'Rp ' + basePrice.toLocaleString('id-ID');
-                    }
-                });
-            }
         });
     </script>
 </x-layouts.app>

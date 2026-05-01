@@ -64,34 +64,7 @@ class SponsorshipController extends Controller
             return redirect('/sponsorship')->with('error', 'Maaf, periode pendaftaran untuk tiket ini tidak ditemukan.');
         }
 
-        // Find the pair ticket for bundling
-        $categoryName = strtoupper($ticket->category->name ?? '');
-        $pairTarget = '';
-        if (str_contains($categoryName, '5K') || str_contains($categoryName, '42K')) {
-            $pairTarget = '10K';
-        } elseif (str_contains($categoryName, '10K') || str_contains($categoryName, '21K')) {
-            $pairTarget = '5K';
-        }
-
-        $pairTicket = null;
-        $isPairSoldOut = false;
-        if ($pairTarget) {
-            $pairTicket = Ticket::where('period_id', $ticket->period_id)
-                ->where('type', $ticket->type)
-                ->whereHas('category', function ($q) use ($pairTarget) {
-                    $q->where('name', 'LIKE', "%$pairTarget%");
-                })
-                ->where('id', '!=', $ticket->id)
-                ->first();
-
-            if ($pairTicket) {
-                $usedQty = \App\Models\RaceEntry::where('ticket_id', $pairTicket->id)
-                    ->whereIn('status', ['pending', 'paid'])->count();
-                $isPairSoldOut = ($usedQty >= $pairTicket->qty);
-            }
-        }
-
-        return view('pages.enduser.sponsorship.checkout', compact('ticket', 'pairTicket', 'isPairSoldOut'));
+        return view('pages.enduser.sponsorship.checkout', compact('ticket'));
     }
 
     public function register(Request $request)
@@ -145,30 +118,13 @@ class SponsorshipController extends Controller
             $adminFee = 0;
             $ticketSubtotal = $ticket->price;
             
-            $second_ticket_id = null;
-            if ($request->other_race_interest) {
-                $categoryName = strtoupper($ticket->category->name ?? '');
-                $pairTarget = (str_contains($categoryName, '5K') || str_contains($categoryName, '42K')) ? '10K' : '5K';
-                
-                $pairTicket = Ticket::where('period_id', $ticket->period_id)
-                    ->where('type', $ticket->type)
-                    ->whereHas('category', function ($q) use ($pairTarget) {
-                        $q->where('name', 'LIKE', "%$pairTarget%");
-                    })
-                    ->where('id', '!=', $ticket->id)
-                    ->first();
-                
-                if ($pairTicket) {
-                    $second_ticket_id = $pairTicket->id;
-                    $ticketSubtotal += $pairTicket->price;
-                }
-            }
+
 
             $totalPrice = $ticketSubtotal + $adminFee;
 
             $participant = Participant::create(
                 array_merge(
-                    \Illuminate\Support\Arr::except($validated, ['email_confirmation', 'ticket_id', 'other_race_interest']),
+                    \Illuminate\Support\Arr::except($validated, ['email_confirmation', 'ticket_id']),
                     ['is_community' => false] 
                 )
             );
@@ -188,13 +144,7 @@ class SponsorshipController extends Controller
                 'status' => 'pending',
             ]);
 
-            if ($second_ticket_id) {
-                $participant->raceEntries()->create([
-                    'ticket_id' => $second_ticket_id,
-                    'order_id' => $order->id,
-                    'status' => 'pending',
-                ]);
-            }
+
 
             // Mark as success using the shared handler
             $this->handleSuccessPayment($order, $participant);
