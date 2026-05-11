@@ -213,6 +213,29 @@
                                 placeholder="Name, Email, NIK, Order...">
                         </div>
 
+                        {{-- Bundling Options --}}
+                        <div class="grid grid-cols-1 gap-6 w-full">
+                            <div class="w-full">
+                                <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Tipe Peserta</label>
+                                <select name="participant_type"
+                                    class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
+                                    <option value="all">Semua Peserta</option>
+                                    <option value="regular">Peserta Regular (1 Tiket)</option>
+                                    <option value="bundling">Peserta Bundling (>1 Tiket)</option>
+                                </select>
+                            </div>
+                            <div class="w-full">
+                                <label class="flex items-center gap-4 cursor-pointer group p-4 bg-amber-50/50 rounded-xl border border-amber-100/50 hover:bg-amber-50 transition-all">
+                                    <input type="checkbox" name="split_bundling" value="1"
+                                        class="w-5 h-5 rounded border-slate-200 text-amber-500 focus:ring-amber-500 transition-all">
+                                    <div>
+                                        <span class="text-[12px] font-black text-slate-700 uppercase tracking-tight block">Pisah Row Tiket Bundling</span>
+                                        <span class="text-[10px] font-bold text-slate-400 tracking-wide block mt-1">Peserta bundling akan dipecah menjadi 2 baris terpisah (1 row per tiket)</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="grid grid-cols-2 gap-6 w-full">
                             <div class="w-full">
                                 <label

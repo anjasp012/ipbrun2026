@@ -143,6 +143,8 @@ class AdminController extends Controller
         $periodId = $request->period_id;
         $search = $request->search;
         $selectedColumns = $request->columns ?? [];
+        $participantType = $request->participant_type ?? 'all'; // all, regular, bundling
+        $splitBundling = $request->has('split_bundling');
 
         $query = Participant::query();
 
@@ -218,9 +220,16 @@ class AdminController extends Controller
 
         $participants = $query->latest()->get();
 
+        // Filter by participant type (regular = 1 entry, bundling = >1 entries)
+        if ($participantType === 'regular') {
+            $participants = $participants->filter(fn($p) => $p->raceEntries->count() === 1);
+        } elseif ($participantType === 'bundling') {
+            $participants = $participants->filter(fn($p) => $p->raceEntries->count() > 1);
+        }
+
         $filename = "participants_export_" . date('Y-m-d_H-i-s') . ".xlsx";
 
-        return Excel::download(new ParticipantExport($participants, $status, $selectedColumns), $filename);
+        return Excel::download(new ParticipantExport($participants, $status, $selectedColumns, $splitBundling), $filename);
     }
 
     public function participantShow(Participant $participant)
