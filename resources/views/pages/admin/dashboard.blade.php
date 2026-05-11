@@ -174,10 +174,30 @@
                     </div>
                 </div>
                 {{-- Total Tiket Terjual --}}
-                <div class="bg-white p-8 rounded-xl border border-slate-100 shadow-sm bg-blue-50/10">
-                    <p class="text-[11px] font-black text-blue-600 uppercase tracking-widest mb-3">TOTAL TIKET TERJUAL</p>
-                    <h4 class="text-3xl font-black text-blue-700">
-                        {{ number_format($stats['total_tickets_sold'], 0, ',', '.') }}</h4>
+                <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-600"></div>
+                    <div class="flex items-center justify-between mb-6">
+                        <p class="text-[11px] font-black text-slate-400 uppercase tracking-[3px]">Total Tiket Terjual</p>
+                        <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4v-3a2 2 0 00-2-2H5z"></path></svg>
+                        </div>
+                    </div>
+
+                    <h4 class="text-3xl font-[900] text-slate-800 tracking-tighter mb-8 leading-none">
+                        {{ number_format($stats['total_tickets_sold'], 0, ',', '.') }}
+                        <span class="block text-[10px] font-bold text-blue-500 uppercase tracking-widest mt-2">Seluruh Kategori</span>
+                    </h4>
+
+                    <div class="space-y-4 pt-6 border-t border-slate-50">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Reguler (Presale+Normal)</span>
+                            <span class="text-xs font-black text-slate-700 font-mono">{{ number_format($stats['total_tickets_regular'], 0, ',', '.') }}</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sponsorship</span>
+                            <span class="text-xs font-black text-slate-700 font-mono">{{ number_format($stats['total_tickets_sponsor'], 0, ',', '.') }}</span>
+                        </div>
+                    </div>
                 </div>
                 {{-- Total Peserta --}}
                 <div class="bg-white p-8 rounded-xl border border-slate-100 shadow-sm">

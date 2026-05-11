@@ -19,10 +19,16 @@ class AdminController extends Controller
     public function dashboard()
     {
         // 1. Ringkasan Data
-        $totalTicketsSold = RaceEntry::where('status', 'paid')
+        $totalTicketsRegular = RaceEntry::where('status', 'paid')
             ->whereHas('ticket.period', function($q) {
                 $q->where('name', '!=', 'Invitation & Sponsorship');
             })->count();
+        $totalTicketsSponsor = RaceEntry::where('status', 'paid')
+            ->whereHas('ticket.period', function($q) {
+                $q->where('name', 'Invitation & Sponsorship');
+            })->count();
+
+        $totalTicketsSold = $totalTicketsRegular + $totalTicketsSponsor;
         $totalOrders = \App\Models\Order::where('status', 'paid')->count();
         $totalCapacity = \App\Models\Ticket::sum('qty');
 
@@ -33,6 +39,8 @@ class AdminController extends Controller
             'total_admin' => \App\Models\Order::where('status', 'paid')->sum('admin_fee'),
             'total_participant' => User::where('role', 'participant')->count(),
             'total_tickets_sold' => $totalTicketsSold,
+            'total_tickets_regular' => $totalTicketsRegular,
+            'total_tickets_sponsor' => $totalTicketsSponsor,
             'total_remaining_tickets' => $totalCapacity - $totalTicketsSold,
             'is_running' => Setting::getValue('is_running', '0') === '1'
         ];
@@ -341,5 +349,38 @@ class AdminController extends Controller
         }
 
         return back()->with('success', "Password untuk profil ({$participant->name}) telah berhasil diubah secara permanen.");
+    }
+
+    public function cancelParticipant(Participant $participant)
+    {
+        try {
+            DB::beginTransaction();
+
+            // 1. Update all related orders to failed
+            \App\Models\Order::where('participant_id', $participant->id)
+                ->update(['status' => 'failed']);
+
+            // 2. Update all race entries to failed
+            \App\Models\RaceEntry::where('participant_id', $participant->id)
+                ->update(['status' => 'failed']);
+
+            // 3. Delete associated user if exists
+            if ($participant->user_id) {
+                \App\Models\User::where('id', $participant->user_id)->delete();
+                $participant->update(['user_id' => null]);
+            } else {
+                // Fallback check by email if user_id is null
+                \App\Models\User::where('email', $participant->email)
+                    ->where('role', 'participant')
+                    ->delete();
+            }
+
+            DB::commit();
+
+            return back()->with('success', "Peserta ({$participant->name}) telah berhasil dinonaktifkan. Semua pesanan diset ke FAILED dan akun login telah dihapus.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menonaktifkan peserta: ' . $e->getMessage());
+        }
     }
 }

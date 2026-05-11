@@ -105,6 +105,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::get('/participants/{participant}', [AdminDashboard::class, 'participantShow']);
         Route::get('/participants/{participant}/resend-invoice', [AdminDashboard::class, 'resendInvoice'])->name('participants.resend-invoice');
         Route::put('/participants/{participant}', [AdminDashboard::class, 'participantUpdate'])->name('participants.update');
+        Route::delete('/participants/{participant}/cancel', [AdminDashboard::class, 'cancelParticipant'])->name('participants.cancel');
       
         
         Route::get('/vouchers', [\App\Http\Controllers\Admin\VoucherController::class, 'index'])->name('admin.vouchers.index');
