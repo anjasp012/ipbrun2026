@@ -145,42 +145,44 @@
                                         </span>
                                     </div>
                                 </td>
-                                <td class="px-10 py-8 text-right">
-                                    @if (auth()->user()->role !== 'pic')
-                                        <a href="{{ url('/admin/participants/' . $p->id) }}"
-                                            class="p-3 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all inline-block">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                                </path>
-                                            </svg>
-                                        </a>
-                                        @if (auth()->user()->role === 'superadmin')
-                                            <button @click="showPasswordModal = true; selectedParticipantId = '{{ $p->id }}'; selectedParticipantName = '{{ addslashes($p->name) }}'"
-                                                class="p-3 bg-red-50 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-md transition-all inline-block ml-2" title="Ganti Password">
-                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4v-3.586l8.172-8.172A6 6 0 1115 7z"></path>
+                                <td class="px-10 py-8">
+                                    <div class="flex items-center justify-end gap-2">
+                                        @if (auth()->user()->role !== 'pic')
+                                            <a href="{{ url('/admin/participants/' . $p->id) }}"
+                                                class="p-3 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all inline-block" title="View Detail">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                    </path>
                                                 </svg>
-                                            </button>
-
-                                            <form action="{{ route('participants.cancel', $p->id) }}" method="POST" class="inline-block ml-2" onsubmit="return confirm('Apakah Anda yakin ingin MENONAKTIFKAN peserta ini? Akun login akan dihapus dan semua pesanan akan menjadi FAILED.')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="p-3 bg-rose-100 text-rose-600 hover:text-white hover:bg-rose-600 rounded-md transition-all inline-block" title="Cancel/Nonaktifkan Peserta">
+                                            </a>
+                                            @if (auth()->user()->role === 'superadmin')
+                                                <button @click="showPasswordModal = true; selectedParticipantId = '{{ $p->id }}'; selectedParticipantName = '{{ addslashes($p->name) }}'"
+                                                    class="p-3 bg-red-50 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-md transition-all inline-block" title="Ganti Password">
                                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4v-3.586l8.172-8.172A6 6 0 1115 7z"></path>
                                                     </svg>
                                                 </button>
-                                            </form>
+
+                                                <form action="{{ route('participants.cancel', $p->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin MENONAKTIFKAN peserta ini? Akun login akan dihapus dan semua pesanan akan menjadi FAILED.')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="p-3 bg-rose-100 text-rose-600 hover:text-white hover:bg-rose-600 rounded-md transition-all inline-block" title="Cancel/Nonaktifkan Peserta">
+                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        @else
+                                            <span
+                                                class="text-[10px] font-bold text-slate-300 uppercase tracking-widest italic">No
+                                                Access</span>
                                         @endif
-                                    @else
-                                        <span
-                                            class="text-[10px] font-bold text-slate-300 uppercase tracking-widest italic">No
-                                            Access</span>
-                                    @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
