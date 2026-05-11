@@ -492,7 +492,7 @@
                     </div>
                 </form>
             </div>
-        @endforeach
+        </div>
 
         {{-- Bulk Action Bar --}}
         <form id="bulk-action-form" action="{{ route('participants.bulk-cancel') }}" method="POST" x-show="selectedIds.length > 0" 
