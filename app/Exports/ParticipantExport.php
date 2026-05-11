@@ -14,11 +14,13 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
     protected $participants;
     protected $status;
     protected $selectedColumns;
+    protected $splitBundling;
 
-    public function __construct($participants, $status = 'paid', $selectedColumns = [])
+    public function __construct($participants, $status = null, $selectedColumns = [], $splitBundling = false)
     {
         $this->participants = $participants;
-        $this->status = $status ?: 'paid';
+        $this->status = $status;
+        $this->splitBundling = $splitBundling;
         
         // If empty, assume all columns (fallback)
         if (empty($selectedColumns)) {
@@ -37,6 +39,28 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
 
     public function collection()
     {
+        if ($this->splitBundling) {
+            $flattened = collect();
+            foreach ($this->participants as $p) {
+                // Filter entries matching the criteria just like in map()
+                $entries = $p->raceEntries->filter(function($e) {
+                    return empty($this->status) || ($e->order->status ?? $e->status) === $this->status;
+                });
+
+                if ($entries->isEmpty()) {
+                    // If no entries match the status but we still want the participant (fallback)
+                    // Or if they have no entries at all
+                    $flattened->push($p);
+                } else {
+                    foreach ($entries as $entry) {
+                        $clone = clone $p;
+                        $clone->singleEntry = $entry;
+                        $flattened->push($clone);
+                    }
+                }
+            }
+            return $flattened;
+        }
         return $this->participants;
     }
 
@@ -62,9 +86,9 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
             'emergency_name' => 'Emergency Contact Name',
             'emergency_phone' => 'Emergency Contact Phone',
             'emergency_relationship' => 'Emergency Relationship',
-            'order_codes' => 'Order Codes',
-            'order_statuses' => 'Order Statuses',
-            'ticket_details' => 'Ticket Details',
+            'order_codes' => 'Order Code',
+            'order_statuses' => 'Order Status',
+            'ticket_details' => 'Ticket Detail',
             'paid_amount' => 'Paid Amount',
             'donation_scholarship' => 'Donation Scholarship',
             'donation_event' => 'Donation Event',
@@ -85,51 +109,97 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
 
     public function map($p): array
     {
-        // Pre-calculate common data
-        $targetOrders = $p->raceEntries->filter(function($e) {
-            return ($e->order->status ?? $e->status) === $this->status;
-        })->map(fn($e) => $e->order)->unique('id')->filter();
+        if (isset($p->singleEntry)) {
+            $entry = $p->singleEntry;
+            $order = $entry->order;
+            
+            $totalPaid = $order->total_price ?? 0;
+            $donationScholarship = $order->donation_scholarship ?? 0;
+            $donationEvent = $order->donation_event ?? 0;
+            $adminFee = $order->admin_fee ?? 0;
+            $paidAmount = $totalPaid - $donationScholarship - $donationEvent - $adminFee;
 
-        $totalPaid = $targetOrders->sum('total_price');
-        $donationScholarship = $targetOrders->sum('donation_scholarship');
-        $donationEvent = $targetOrders->sum('donation_event');
-        $adminFee = $targetOrders->sum('admin_fee');
-        $paidAmount = $totalPaid - $donationScholarship - $donationEvent - $adminFee;
+            $cat = $entry->ticket->category->name ?? '-';
+            $type = strtoupper($entry->ticket->type ?? '-');
+            $ticketDetail = "($type - $cat)";
 
-        $rowData = [
-            'name' => $p->name,
-            'email' => $p->email,
-            'phone' => $p->phone_number,
-            'nik' => $p->nik,
-            'birth_date' => $p->date_birth,
-            'sex' => strtoupper($p->sex),
-            'blood_type' => $p->blood_type,
-            'jersey_size' => $p->jersey_size,
-            'nim_nrp' => $p->nim_nrp ?: '-',
-            'nationality' => $p->nationality ?? 'WNI',
-            'address' => $p->address,
-            'running_community' => $p->running_community ?: '-',
-            'medical_condition' => $p->medical_condition ?: '-',
-            'shuttle_bus' => $p->shuttle_bus ?: 'No',
-            'best_time' => $p->best_time ?: '-',
-            'previous_events' => $p->previous_events ?: '-',
-            'emergency_name' => $p->emergency_contact_name,
-            'emergency_phone' => $p->emergency_contact_phone_number,
-            'emergency_relationship' => $p->emergency_contact_relationship,
-            'order_codes' => $p->raceEntries->map(fn($e) => $e->order->order_code ?? '-')->unique()->filter()->implode(' | '),
-            'order_statuses' => $p->raceEntries->map(fn($e) => strtoupper($e->order->status ?? ($e->status ?? 'unknown')))->unique()->implode(' | '),
-            'ticket_details' => $p->raceEntries->map(function($e) {
-                $cat = $e->ticket->category->name ?? '-';
-                $type = strtoupper($e->ticket->type ?? '-');
-                return "($type - $cat)";
-            })->unique()->implode(' | '),
-            'paid_amount' => $paidAmount,
-            'donation_scholarship' => $donationScholarship,
-            'donation_event' => $donationEvent,
-            'admin_fee' => $adminFee,
-            'total_paid' => $totalPaid,
-            'created_at' => $p->created_at->format('Y-m-d H:i')
-        ];
+            $rowData = [
+                'name' => $p->name,
+                'email' => $p->email,
+                'phone' => $p->phone_number,
+                'nik' => $p->nik,
+                'birth_date' => $p->date_birth,
+                'sex' => strtoupper($p->sex),
+                'blood_type' => $p->blood_type,
+                'jersey_size' => $p->jersey_size,
+                'nim_nrp' => $p->nim_nrp ?: '-',
+                'nationality' => $p->nationality ?? 'WNI',
+                'address' => $p->address,
+                'running_community' => $p->running_community ?: '-',
+                'medical_condition' => $p->medical_condition ?: '-',
+                'shuttle_bus' => $p->shuttle_bus ?: 'No',
+                'best_time' => $p->best_time ?: '-',
+                'previous_events' => $p->previous_events ?: '-',
+                'emergency_name' => $p->emergency_contact_name,
+                'emergency_phone' => $p->emergency_contact_phone_number,
+                'emergency_relationship' => $p->emergency_contact_relationship,
+                'order_codes' => $order->order_code ?? '-',
+                'order_statuses' => strtoupper($order->status ?? ($entry->status ?? 'unknown')),
+                'ticket_details' => $ticketDetail,
+                'paid_amount' => $paidAmount,
+                'donation_scholarship' => $donationScholarship,
+                'donation_event' => $donationEvent,
+                'admin_fee' => $adminFee,
+                'total_paid' => $totalPaid,
+                'created_at' => $p->created_at->format('Y-m-d H:i')
+            ];
+        } else {
+            // Pre-calculate common data for combined row
+            $targetOrders = $p->raceEntries->filter(function($e) {
+                return empty($this->status) || ($e->order->status ?? $e->status) === $this->status;
+            })->map(fn($e) => $e->order)->unique('id')->filter();
+
+            $totalPaid = $targetOrders->sum('total_price');
+            $donationScholarship = $targetOrders->sum('donation_scholarship');
+            $donationEvent = $targetOrders->sum('donation_event');
+            $adminFee = $targetOrders->sum('admin_fee');
+            $paidAmount = $totalPaid - $donationScholarship - $donationEvent - $adminFee;
+
+            $rowData = [
+                'name' => $p->name,
+                'email' => $p->email,
+                'phone' => $p->phone_number,
+                'nik' => $p->nik,
+                'birth_date' => $p->date_birth,
+                'sex' => strtoupper($p->sex),
+                'blood_type' => $p->blood_type,
+                'jersey_size' => $p->jersey_size,
+                'nim_nrp' => $p->nim_nrp ?: '-',
+                'nationality' => $p->nationality ?? 'WNI',
+                'address' => $p->address,
+                'running_community' => $p->running_community ?: '-',
+                'medical_condition' => $p->medical_condition ?: '-',
+                'shuttle_bus' => $p->shuttle_bus ?: 'No',
+                'best_time' => $p->best_time ?: '-',
+                'previous_events' => $p->previous_events ?: '-',
+                'emergency_name' => $p->emergency_contact_name,
+                'emergency_phone' => $p->emergency_contact_phone_number,
+                'emergency_relationship' => $p->emergency_contact_relationship,
+                'order_codes' => $p->raceEntries->map(fn($e) => $e->order->order_code ?? '-')->unique()->filter()->implode(' | '),
+                'order_statuses' => $p->raceEntries->map(fn($e) => strtoupper($e->order->status ?? ($e->status ?? 'unknown')))->unique()->implode(' | '),
+                'ticket_details' => $p->raceEntries->map(function($e) {
+                    $cat = $e->ticket->category->name ?? '-';
+                    $type = strtoupper($e->ticket->type ?? '-');
+                    return "($type - $cat)";
+                })->unique()->implode(' | '),
+                'paid_amount' => $paidAmount,
+                'donation_scholarship' => $donationScholarship,
+                'donation_event' => $donationEvent,
+                'admin_fee' => $adminFee,
+                'total_paid' => $totalPaid,
+                'created_at' => $p->created_at->format('Y-m-d H:i')
+            ];
+        }
 
         $row = [];
         foreach ($this->selectedColumns as $key) {

@@ -218,14 +218,14 @@ class AdminController extends Controller
             $query->whereDate('created_at', '<=', $request->end_date);
         }
 
-        $participants = $query->latest()->get();
-
         // Filter by participant type (regular = 1 entry, bundling = >1 entries)
         if ($participantType === 'regular') {
-            $participants = $participants->filter(fn($p) => $p->raceEntries->count() === 1);
+            $query->has('raceEntries', '=', 1);
         } elseif ($participantType === 'bundling') {
-            $participants = $participants->filter(fn($p) => $p->raceEntries->count() > 1);
+            $query->has('raceEntries', '>', 1);
         }
+
+        $participants = $query->latest()->get();
 
         $filename = "participants_export_" . date('Y-m-d_H-i-s') . ".xlsx";
 
