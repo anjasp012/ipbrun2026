@@ -96,14 +96,19 @@ class AdminController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%$search%")
-                    ->orWhere('email', 'like', "%$search%")
-                    ->orWhere('nik', 'like', "%$search%")
-                    ->orWhere('phone_number', 'like', "%$search%")
-                    ->orWhereHas('raceEntries.order', function ($rq) use ($search) {
-                        $rq->where('order_code', 'like', "%$search%");
+            $keywords = array_filter(array_map('trim', explode(',', $search)));
+            $query->where(function ($q) use ($keywords) {
+                foreach ($keywords as $keyword) {
+                    $q->orWhere(function ($sq) use ($keyword) {
+                        $sq->where('name', 'like', "%$keyword%")
+                            ->orWhere('email', 'like', "%$keyword%")
+                            ->orWhere('nik', 'like', "%$keyword%")
+                            ->orWhere('phone_number', 'like', "%$keyword%")
+                            ->orWhereHas('raceEntries.order', function ($rq) use ($keyword) {
+                                $rq->where('order_code', 'like', "%$keyword%");
+                            });
                     });
+                }
             });
         }
 
@@ -183,14 +188,19 @@ class AdminController extends Controller
 
         // Filter Participants (WhereHas ensures the participant has at least one matching entry)
         if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%$search%")
-                    ->orWhere('email', 'like', "%$search%")
-                    ->orWhere('nik', 'like', "%$search%")
-                    ->orWhere('phone_number', 'like', "%$search%")
-                    ->orWhereHas('raceEntries.order', function ($rq) use ($search) {
-                        $rq->where('order_code', 'like', "%$search%");
+            $keywords = array_filter(array_map('trim', explode(',', $search)));
+            $query->where(function ($q) use ($keywords) {
+                foreach ($keywords as $keyword) {
+                    $q->orWhere(function ($sq) use ($keyword) {
+                        $sq->where('name', 'like', "%$keyword%")
+                            ->orWhere('email', 'like', "%$keyword%")
+                            ->orWhere('nik', 'like', "%$keyword%")
+                            ->orWhere('phone_number', 'like', "%$keyword%")
+                            ->orWhereHas('raceEntries.order', function ($rq) use ($keyword) {
+                                $rq->where('order_code', 'like', "%$keyword%");
+                            });
                     });
+                }
             });
         }
 
@@ -381,6 +391,48 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal menonaktifkan peserta: ' . $e->getMessage());
+        }
+    }
+
+    public function bulkCancelParticipants(Request $request)
+    {
+        $ids = $request->ids;
+        if (empty($ids)) {
+            return back()->with('error', 'Pilih minimal satu peserta.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // 1. Update all related orders to failed
+            \App\Models\Order::whereIn('participant_id', $ids)
+                ->update(['status' => 'failed']);
+
+            // 2. Update all race entries to failed
+            \App\Models\RaceEntry::whereIn('participant_id', $ids)
+                ->update(['status' => 'failed']);
+
+            // 3. Delete associated users
+            $participants = Participant::whereIn('id', $ids)->get();
+            $emails = $participants->pluck('email');
+            $userIds = $participants->whereNotNull('user_id')->pluck('user_id');
+
+            if ($userIds->isNotEmpty()) {
+                \App\Models\User::whereIn('id', $userIds)->delete();
+            }
+            
+            \App\Models\User::whereIn('email', $emails)
+                ->where('role', 'participant')
+                ->delete();
+
+            Participant::whereIn('id', $ids)->update(['user_id' => null]);
+
+            DB::commit();
+
+            return back()->with('success', count($ids) . " peserta telah berhasil dinonaktifkan secara massal.");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Gagal menonaktifkan peserta secara massal: ' . $e->getMessage());
         }
     }
 }
