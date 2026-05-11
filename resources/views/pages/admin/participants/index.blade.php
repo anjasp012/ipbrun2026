@@ -495,33 +495,30 @@
         </div>
 
         {{-- Bulk Action Bar --}}
-        <form id="bulk-action-form" action="{{ route('participants.bulk-cancel') }}" method="POST" x-show="selectedIds.length > 0" 
-            class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0 translate-y-10"
-            x-transition:enter-end="opacity-100 translate-y-0"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100 translate-y-0"
-            x-transition:leave-end="opacity-0 translate-y-10">
-            @csrf
-            <template x-for="id in selectedIds" :key="id">
-                <input type="hidden" name="ids[]" :value="id">
-            </template>
-            <div class="bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-8 border border-slate-700/50 backdrop-blur-xl">
-                <div class="flex flex-col">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bulk Action</span>
-                    <span class="text-sm font-bold"><span x-text="selectedIds.length"></span> Peserta Terpilih</span>
+        <div x-show="selectedIds.length > 0" 
+            class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[1000] animate-slide-in"
+            style="display: none;">
+            <form id="bulk-action-form" action="{{ route('participants.bulk-cancel') }}" method="POST">
+                @csrf
+                <template x-for="id in selectedIds" :key="id">
+                    <input type="hidden" name="ids[]" :value="id">
+                </template>
+                <div class="bg-slate-900 text-white px-8 py-5 rounded-2xl shadow-2xl flex items-center gap-8 border border-slate-700/50 backdrop-blur-xl">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bulk Action</span>
+                        <span class="text-sm font-bold"><span x-text="selectedIds.length"></span> Peserta Terpilih</span>
+                    </div>
+                    <div class="h-8 w-[1px] bg-slate-700"></div>
+                    <button type="submit" onclick="return confirm('Apakah Anda yakin ingin MENONAKTIFKAN semua peserta yang dipilih secara massal? Akun login akan dihapus dan semua pesanan akan menjadi FAILED.')" 
+                        class="bg-rose-600 hover:bg-rose-700 text-white px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-3">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                        Nonaktifkan Massal
+                    </button>
+                    <button type="button" @click="selectedIds = []" class="text-slate-400 hover:text-white transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
                 </div>
-                <div class="h-8 w-[1px] bg-slate-700"></div>
-                <button type="submit" onclick="return confirm('Apakah Anda yakin ingin MENONAKTIFKAN semua peserta yang dipilih secara massal? Akun login akan dihapus dan semua pesanan akan menjadi FAILED.')" 
-                    class="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-3">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
-                    Nonaktifkan Massal
-                </button>
-                <button type="button" @click="selectedIds = []" class="text-slate-400 hover:text-white transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </x-layouts.admin>
