@@ -589,12 +589,27 @@
 
                                         <div class="grid grid-cols-1 gap-2 pl-4 border-l-2 border-white/10 mt-4">
                                             {{-- Voucher Info --}}
+                                            @php $runningDiscount = 0; @endphp
                                             @foreach ($o->voucherUsages as $usage)
+                                                @php
+                                                    $v = $usage->voucher;
+                                                    $ticketSubtotal = $o->raceEntries->sum(fn($e) => $e->ticket->price ?? 0);
+                                                    
+                                                    // Determine base price for this specific voucher
+                                                    $basePrice = $ticketSubtotal - $runningDiscount;
+                                                    if ($v->category_id) {
+                                                        $matchedEntry = $o->raceEntries->filter(fn($e) => ($e->ticket->category_id ?? null) === $v->category_id)->first();
+                                                        if ($matchedEntry) {
+                                                            $basePrice = $matchedEntry->ticket->price;
+                                                        }
+                                                    }
+                                                    
+                                                    $disc = $v->calculateDiscount($basePrice);
+                                                    $runningDiscount += $disc;
+                                                @endphp
                                                 <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest mb-1 last:mb-0">
-                                                    <span class="text-white/40 italic">Voucher: {{ $usage->voucher->code ?? '-' }}</span>
-                                                    @if($loop->first)
-                                                        <span class="text-emerald-400">- IDR {{ number_format($o->discount_amount, 0, ',', '.') }}</span>
-                                                    @endif
+                                                    <span class="text-white/40 italic">Voucher: {{ $v->code ?? '-' }}</span>
+                                                    <span class="text-emerald-400">- IDR {{ number_format($disc, 0, ',', '.') }}</span>
                                                 </div>
                                             @endforeach
 
