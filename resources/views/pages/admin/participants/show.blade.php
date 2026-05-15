@@ -588,6 +588,14 @@
                                         </div>
 
                                         <div class="grid grid-cols-1 gap-2 pl-4 border-l-2 border-white/10 mt-4">
+                                            {{-- Harga Asli (Tickets) --}}
+                                            @foreach($o->raceEntries as $entry)
+                                                <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest">
+                                                    <span class="text-white/40 italic">Harga Tiket ({{ $entry->ticket->category->name }})</span>
+                                                    <span class="text-white/80">IDR {{ number_format($entry->ticket->price, 0, ',', '.') }}</span>
+                                                </div>
+                                            @endforeach
+
                                             {{-- Voucher Info --}}
                                             @php $runningDiscount = 0; @endphp
                                             @foreach ($o->voucherUsages as $usage)
@@ -607,29 +615,31 @@
                                                     $disc = $v->calculateDiscount($basePrice);
                                                     $runningDiscount += $disc;
                                                 @endphp
-                                                <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest mb-1 last:mb-0">
-                                                    <span class="text-white/40 italic">Voucher: {{ $v->code ?? '-' }}</span>
+                                                <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest">
+                                                    <span class="text-emerald-400 italic">Voucher: {{ $v->code ?? '-' }}</span>
                                                     <span class="text-emerald-400">- IDR {{ number_format($disc, 0, ',', '.') }}</span>
                                                 </div>
                                             @endforeach
 
+                                            <div class="h-[1px] bg-white/5 my-1"></div>
+
                                             {{-- Donations --}}
                                             @if($o->donation_event > 0)
                                                 <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest">
-                                                    <span class="text-white/40">Donasi Event</span>
+                                                    <span class="text-white/40 italic">Donasi Event</span>
                                                     <span class="text-white/80">IDR {{ number_format($o->donation_event, 0, ',', '.') }}</span>
                                                 </div>
                                             @endif
                                             @if($o->donation_scholarship > 0)
                                                 <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest">
-                                                    <span class="text-white/40">Donasi Beasiswa</span>
+                                                    <span class="text-white/40 italic">Donasi Beasiswa</span>
                                                     <span class="text-white/80">IDR {{ number_format($o->donation_scholarship, 0, ',', '.') }}</span>
                                                 </div>
                                             @endif
 
                                             {{-- Admin Fee --}}
                                             <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest">
-                                                <span class="text-white/40">Admin Fee</span>
+                                                <span class="text-white/40 italic">Biaya Layanan (Admin)</span>
                                                 <span class="text-white/80">IDR {{ number_format($o->admin_fee, 0, ',', '.') }}</span>
                                             </div>
                                         </div>
