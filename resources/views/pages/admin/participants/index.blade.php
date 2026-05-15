@@ -109,9 +109,9 @@
                                 @foreach ($p->raceEntries->pluck('order')->unique('id') as $order)
                                     <div class="mb-2 last:mb-0">
                                         <span class="text-base font-black text-blue-600 tracking-tighter block">#{{ $order->order_code }}</span>
-                                        @if($order->voucher_code)
-                                            <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-tight block">Voucher: {{ $order->voucher_code }}</span>
-                                        @endif
+                                        @foreach ($order->voucherUsages as $usage)
+                                            <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-tight block">Voucher: {{ $usage->voucher->code ?? '-' }}</span>
+                                        @endforeach
                                     </div>
                                 @endforeach
                                     <p class="text-[11px] font-bold text-slate-400 mt-1 tracking-widest">

@@ -589,12 +589,14 @@
 
                                         <div class="grid grid-cols-1 gap-2 pl-4 border-l-2 border-white/10 mt-4">
                                             {{-- Voucher Info --}}
-                                            @if($o->voucher_code)
-                                                <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest">
-                                                    <span class="text-white/40 italic">Voucher: {{ $o->voucher_code }}</span>
-                                                    <span class="text-emerald-400">- IDR {{ number_format($o->discount_amount, 0, ',', '.') }}</span>
+                                            @foreach ($o->voucherUsages as $usage)
+                                                <div class="flex justify-between items-center text-[11px] font-bold uppercase tracking-widest mb-1 last:mb-0">
+                                                    <span class="text-white/40 italic">Voucher: {{ $usage->voucher->code ?? '-' }}</span>
+                                                    @if($loop->first)
+                                                        <span class="text-emerald-400">- IDR {{ number_format($o->discount_amount, 0, ',', '.') }}</span>
+                                                    @endif
                                                 </div>
-                                            @endif
+                                            @endforeach
 
                                             {{-- Donations --}}
                                             @if($o->donation_event > 0)
