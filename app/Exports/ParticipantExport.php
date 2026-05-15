@@ -88,6 +88,7 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
             'emergency_relationship' => 'Emergency Relationship',
             'order_codes' => 'Order Code',
             'order_statuses' => 'Order Status',
+            'voucher_codes' => 'Voucher Codes',
             'ticket_details' => 'Ticket Detail',
             'paid_amount' => 'Paid Amount',
             'donation_scholarship' => 'Donation Scholarship',
@@ -145,6 +146,7 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
                 'emergency_relationship' => $p->emergency_contact_relationship,
                 'order_codes' => $order->order_code ?? '-',
                 'order_statuses' => strtoupper($order->status ?? ($entry->status ?? 'unknown')),
+                'voucher_codes' => $order->voucher_code ?? '-',
                 'ticket_details' => $ticketDetail,
                 'paid_amount' => $paidAmount,
                 'donation_scholarship' => $donationScholarship,
@@ -187,6 +189,7 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
                 'emergency_relationship' => $p->emergency_contact_relationship,
                 'order_codes' => $p->raceEntries->map(fn($e) => $e->order->order_code ?? '-')->unique()->filter()->implode(' | '),
                 'order_statuses' => $p->raceEntries->map(fn($e) => strtoupper($e->order->status ?? ($e->status ?? 'unknown')))->unique()->implode(' | '),
+                'voucher_codes' => $p->raceEntries->map(fn($e) => $e->order->voucher_code ?? '-')->unique()->filter()->implode(' | '),
                 'ticket_details' => $p->raceEntries->map(function($e) {
                     $cat = $e->ticket->category->name ?? '-';
                     $type = strtoupper($e->ticket->type ?? '-');

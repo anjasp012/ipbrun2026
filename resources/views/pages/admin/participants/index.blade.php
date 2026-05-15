@@ -106,10 +106,14 @@
                                         class="participant-checkbox w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer">
                                 </td>
                                 <td class="px-10 py-8">
-                                    @foreach ($p->raceEntries->pluck('order.order_code')->unique() as $orderCode)
-                                        <span
-                                            class="text-base font-black text-blue-600 tracking-tighter block">#{{ $orderCode }}</span>
-                                    @endforeach
+                                @foreach ($p->raceEntries->pluck('order')->unique('id') as $order)
+                                    <div class="mb-2 last:mb-0">
+                                        <span class="text-base font-black text-blue-600 tracking-tighter block">#{{ $order->order_code }}</span>
+                                        @if($order->voucher_code)
+                                            <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-tight block">Voucher: {{ $order->voucher_code }}</span>
+                                        @endif
+                                    </div>
+                                @endforeach
                                     <p class="text-[11px] font-bold text-slate-400 mt-1 tracking-widest">
                                         {{ $p->created_at->format('d/m/Y') }}</p>
                                 </td>
@@ -426,6 +430,7 @@
                                             $orderFields = [
                                                 'order_codes' => 'Order Codes',
                                                 'order_statuses' => 'Order Statuses',
+                                                'voucher_codes' => 'Voucher Codes',
                                                 'ticket_details' => 'Ticket Details',
                                                 'paid_amount' => 'Paid Amount (Price)',
                                                 'donation_scholarship' => 'Donation Scholarship',

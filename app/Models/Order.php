@@ -18,9 +18,9 @@ class Order extends Model
         return $this->belongsTo(Participant::class);
     }
 
-    public function voucherUsage(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function voucherUsages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasOne(VoucherUsage::class);
+        return $this->hasMany(VoucherUsage::class);
     }
 
     public function raceEntries(): HasMany
@@ -30,10 +30,12 @@ class Order extends Model
 
     /**
      * Kode voucher yang dipakai, diambil dari relasi voucher_usages → vouchers.
+     * Jika ada lebih dari satu, digabung dengan tanda '+'.
      */
     public function getVoucherCodeAttribute(): ?string
     {
-        return $this->voucherUsage?->voucher?->code;
+        $codes = $this->voucherUsages->map(fn($u) => $u->voucher->code ?? '')->filter()->toArray();
+        return !empty($codes) ? implode(' + ', $codes) : null;
     }
 
     /**
