@@ -344,6 +344,7 @@ class TicketController extends Controller
 
             $ticketSubtotal = $ticket->price;
             $second_ticket_id = null;
+            $pairTicket = null;
 
             if ($request->other_race_interest) {
                 $categoryName = strtoupper($ticket->category->name ?? '');
@@ -388,7 +389,14 @@ class TicketController extends Controller
                 if ($v->ticket_type && strtolower($v->ticket_type) !== strtolower($ticket->type)) {
                     throw new \Exception('Voucher ' . $vCode . ' tidak berlaku untuk tipe tiket ini.');
                 }
-                if ($v->category_id && $v->category_id !== $ticket->category_id) {
+
+                // Check against both tickets if it's a bundle
+                $allowedCategoryIds = [$ticket->category_id];
+                if ($pairTicket) {
+                    $allowedCategoryIds[] = $pairTicket->category_id;
+                }
+
+                if ($v->category_id && !in_array($v->category_id, $allowedCategoryIds)) {
                     throw new \Exception('Voucher ' . $vCode . ' tidak berlaku untuk kategori tiket ini.');
                 }
 
@@ -404,7 +412,17 @@ class TicketController extends Controller
                     }
                 }
 
-                $disc = $v->calculateDiscount($ticketSubtotal - $discountAmount);
+                // Calculate discount based on the ticket it applies to
+                $basePriceForDiscount = $ticketSubtotal - $discountAmount;
+                if ($v->category_id) {
+                    if ($v->category_id === $ticket->category_id) {
+                        $basePriceForDiscount = $ticket->price;
+                    } elseif ($pairTicket && $v->category_id === $pairTicket->category_id) {
+                        $basePriceForDiscount = $pairTicket->price;
+                    }
+                }
+
+                $disc = $v->calculateDiscount($basePriceForDiscount);
                 $discountAmount += $disc;
                 $vouchersApplied[] = $v;
                 if (count($vouchersApplied) >= 2) break;
