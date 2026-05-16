@@ -12,11 +12,16 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use App\Jobs\SendQueuedEmail;
+use App\Mail\ParticipantPaidNotification;
 
-class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
+class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, WithColumnFormatting
 {
     protected $periodId;
     protected $ticketType;
@@ -29,47 +34,64 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
         $this->orderEmail = $orderEmail;
     }
 
+    /**
+     * Force NIK column (C = column 3) to be read as text to prevent scientific notation.
+     * Adjust column letter if your template column order changes.
+     */
+    public function columnFormats(): array
+    {
+        return [
+            'B' => NumberFormat::FORMAT_TEXT, // NIK column
+        ];
+    }
+
+    /**
+     * Safely parse NIK regardless of how Excel reads it.
+     * Handles scientific notation (e.g. 3.20132E+15) → '3201320000000000'
+     */
+    private function parseNik(mixed $value): string
+    {
+        if (is_null($value) || $value === '') return '';
+        if (is_float($value) || is_int($value)) {
+            return rtrim(rtrim(number_format($value, 0, '.', ''), '0'), '.') !== ''
+                ? number_format($value, 0, '.', '')
+                : (string)(int)$value;
+        }
+        return trim((string)$value);
+    }
+
     public function collection(Collection $rows)
     {
         if ($rows->isEmpty()) {
             throw new \Exception("File Excel kosong atau tidak memiliki data di bawah header.");
         }
 
-        // 1. Create or Update the Shared User Account
-        $user = User::where('email', $this->orderEmail)->first();
-        if (!$user) {
-            $randomPassword = Str::random(8);
-            $user = User::create([
-                'name' => 'Imported Group (' . $this->orderEmail . ')',
-                'email' => $this->orderEmail,
-                'username' => $this->orderEmail,
-                'password' => Hash::make($randomPassword),
-                'role' => 'participant',
-            ]);
+        // Check for duplicate names within the Excel file itself
+        $namesInExcel = $rows->pluck('name')->filter()->map(fn($n) => trim($n))->toArray();
+        if (count($namesInExcel) !== count(array_unique($namesInExcel))) {
+            $duplicates = array_unique(array_diff_assoc($namesInExcel, array_unique($namesInExcel)));
+            throw new \Exception("Ditemukan nama duplikat di dalam file Excel: " . implode(', ', $duplicates));
         }
 
         foreach ($rows as $index => $row) {
-            $lineNum = $index + 2; 
+            $lineNum = $index + 2;
 
-            // Debugging helper: if NIK is empty, maybe header mapping failed
             $name = $row['name'] ?? null;
-            $nik = $row['nik'] ?? null;
+            $nik  = $row['nik']  ?? null;
 
             if (empty($name) || empty($nik)) {
-                // If the first row fails, it's likely a header mismatch
                 $availableHeaders = implode(', ', array_keys($row->toArray()));
                 throw new \Exception("Kolom 'Name' atau 'NIK' tidak ditemukan atau kosong pada baris $lineNum. Kolom yang terdeteksi: [$availableHeaders]. Pastikan header sesuai dengan template.");
             }
 
-            DB::transaction(function () use ($row, $user, $lineNum) {
-                // 2. Find Ticket
+            DB::transaction(function () use ($row, $lineNum) {
+                // 1. Find Ticket
                 $raceCategory = trim($row['race_category'] ?? ($row['category'] ?? ''));
                 if (!$raceCategory) {
                     throw new \Exception("Kolom 'Race Category' kosong pada baris $lineNum.");
                 }
 
                 $category = Category::where('name', 'like', "%$raceCategory%")->first();
-                
                 if (!$category) {
                     throw new \Exception("Kategori '$raceCategory' tidak ditemukan di sistem pada baris $lineNum. Pilihan: 5K, 10K, HM, dsb.");
                 }
@@ -84,49 +106,81 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                     throw new \Exception("Tiket untuk kategori '$raceCategory' dengan tipe '$typeName' tidak tersedia pada periode ini (Baris $lineNum).");
                 }
 
-                // 3. Create or Update Participant
+                // 2. Create or Update Participant (Name as unique key)
                 $participant = Participant::updateOrCreate(
-                    ['nik' => trim($row['nik'])],
+                    ['name' => trim($row['name'])],
                     [
-                        'name' => $row['name'],
-                        'email' => $this->orderEmail,
-                        'phone_number' => $row['phone_number'] ?? ($row['phone'] ?? '-'),
-                        'jersey_size' => $row['jersey_size'] ?? ($row['ukuran_jersey'] ?? '-'),
-                        'date_birth' => '-',
-                        'sex' => 'male',
-                        'blood_type' => '-',
-                        'nationality' => 'WNI',
-                        'address' => '-',
-                        'emergency_contact_name' => '-',
-                        'emergency_contact_phone_number' => '-',
-                        'emergency_contact_relationship' => '-',
-                        'user_id' => $user->id,
+                        'email'                            => $this->orderEmail,
+                        'nik'                              => $this->parseNik($row['nik'] ?? ''),
+                        'phone_number'                     => $row['phone_number'] ?? ($row['phone'] ?? '-'),
+                        'jersey_size'                      => $row['jersey_size'] ?? ($row['ukuran_jersey'] ?? '-'),
+                        'date_birth'                       => '-',
+                        'sex'                              => 'male',
+                        'blood_type'                       => '-',
+                        'nationality'                      => 'WNI',
+                        'address'                          => '-',
+                        'emergency_contact_name'           => '-',
+                        'emergency_contact_phone_number'   => '-',
+                        'emergency_contact_relationship'   => '-',
                     ]
                 );
 
-                // 4. Check for existing entry to avoid duplicates
+                // 3. Create individual User Account per participant (NIK as username & password)
+                $user = User::where('username', $participant->nik)->first();
+                if (!$user) {
+                    $user = User::create([
+                        'name'     => $participant->name,
+                        'email'    => $participant->email,
+                        'username' => $participant->nik,
+                        'password' => Hash::make($participant->nik),
+                        'role'     => 'participant',
+                    ]);
+                } else {
+                    $user->update([
+                        'name'     => $participant->name,
+                        'email'    => $participant->email,
+                        'password' => Hash::make($participant->nik),
+                    ]);
+                }
+
+                // 4. Link Participant → User
+                $participant->update(['user_id' => $user->id]);
+
+                // 5. Check for existing entry to avoid duplicates
                 $existingEntry = RaceEntry::where('participant_id', $participant->id)
                     ->where('ticket_id', $ticket->id)
                     ->whereIn('status', ['paid', 'pending'])
                     ->first();
 
                 if (!$existingEntry) {
-                    // 5. Create Order
-                    $orderCode = 'IMP-' . strtoupper(Str::random(8));
+                    // 6. Create Order
+                    $orderCode = 'IPBR26-SP-' . strtoupper(Str::random(6));
                     $order = Order::create([
                         'participant_id' => $participant->id,
-                        'order_code' => $orderCode,
-                        'total_price' => 0, 
-                        'status' => 'paid',
+                        'order_code'     => $orderCode,
+                        'total_price'    => 0,
+                        'status'         => 'paid',
                     ]);
 
-                    // 6. Create Race Entry
+                    // 7. Create Race Entry
                     RaceEntry::create([
                         'participant_id' => $participant->id,
-                        'ticket_id' => $ticket->id,
-                        'order_id' => $order->id,
-                        'status' => 'paid',
+                        'ticket_id'      => $ticket->id,
+                        'order_id'       => $order->id,
+                        'status'         => 'paid',
                     ]);
+
+                    // 8. Send email notification (same as Sponsorship flow)
+                    try {
+                        // Reload order with relations needed by the mailable
+                        $order->load(['raceEntries.ticket.category', 'participant']);
+                        SendQueuedEmail::dispatch(
+                            $participant->email,
+                            new ParticipantPaidNotification($participant, $participant->nik, $order, false)
+                        );
+                    } catch (\Exception $e) {
+                        Log::error("Import email failed for {$participant->name}: " . $e->getMessage());
+                    }
                 }
             });
         }
