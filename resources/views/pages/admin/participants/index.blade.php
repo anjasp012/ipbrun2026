@@ -1,6 +1,7 @@
 <x-layouts.admin title="Participant Master List">
     <div class="space-y-6" x-data="{ 
         showExportModal: false, 
+        showImportModal: false, 
         showPasswordModal: false, 
         selectedParticipantId: null, 
         selectedParticipantName: '',
@@ -66,6 +67,12 @@
                     <div class="flex gap-4 w-full lg:w-auto">
                         <button type="submit"
                             class="h-14 px-10 bg-[#003366] w-full lg:w-auto text-white rounded-lg text-sm font-black uppercase tracking-widest hover:bg-[#002244] transition-all">Filter</button>
+                        <button type="button" @click="showImportModal = true"
+                            class="h-14 px-10 bg-blue-50 w-full lg:w-auto text-blue-600 rounded-lg text-sm font-black uppercase tracking-widest border border-blue-100 flex items-center justify-center gap-3 hover:bg-blue-100 transition-all whitespace-nowrap">
+                            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                            </svg> Import Data
+                        </button>
                         <button type="button" @click="showExportModal = true"
                             class="h-14 px-10 bg-emerald-50 w-full lg:w-auto text-emerald-600 rounded-lg text-sm font-black uppercase tracking-widest border border-emerald-100 flex items-center justify-center gap-3 hover:bg-emerald-100 transition-all whitespace-nowrap">
                             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -494,6 +501,78 @@
                             class="px-8 py-4 text-sm font-black text-slate-400 uppercase tracking-widest hover:text-slate-600">Batal</button>
                         <button type="submit"
                             class="px-10 py-4 bg-red-500 text-white rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-red-900/20 hover:bg-red-600 transition-all">Ubah Password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Import Modal -->
+        <div x-show="showImportModal"
+            class="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm"
+            style="display: none;"
+            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+
+            <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
+                @click.away="showImportModal = false">
+                <div class="p-10 border-b border-slate-50 bg-slate-50/50">
+                    <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Import Participant Data</h3>
+                    <p class="text-sm text-slate-400 font-bold uppercase tracking-wider mt-2">Upload Excel file to add multiple participants</p>
+                </div>
+
+                <form action="{{ route('participants.import') }}" method="POST" enctype="multipart/form-data" @submit="showImportModal = false">
+                    @csrf
+                    <div class="p-10 space-y-6">
+                        <div>
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Periode Tiket</label>
+                            <select name="period_id" required
+                                class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
+                                <option value="">Pilih Periode...</option>
+                                @foreach($periods as $period)
+                                    <option value="{{ $period->id }}">{{ $period->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Tipe Tiket</label>
+                            <select name="ticket_type" required
+                                class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
+                                <option value="umum">Public (Umum)</option>
+                                <option value="ipb">IPB Family</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Email Penanggung Jawab (Opsional)</label>
+                            <input type="email" name="order_email"
+                                class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all"
+                                placeholder="Email untuk notifikasi order...">
+                        </div>
+
+                        <div>
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">File Excel (.xlsx / .csv)</label>
+                            <input type="file" name="file" required accept=".xlsx, .csv"
+                                class="w-full p-4 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
+                        </div>
+
+                        <div class="pt-4">
+                            <a href="{{ route('participants.import-template') }}" 
+                                class="flex items-center gap-3 text-blue-600 hover:text-blue-700 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span class="text-xs font-black uppercase tracking-widest">Download Template Excel</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="p-8 bg-slate-50 flex items-center justify-end gap-4">
+                        <button type="button" @click="showImportModal = false"
+                            class="px-8 py-4 text-sm font-black text-slate-400 uppercase tracking-widest hover:text-slate-600">Batal</button>
+                        <button type="submit"
+                            class="px-10 py-4 bg-[#003366] text-white rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 hover:bg-[#002244] transition-all">Upload & Import</button>
                     </div>
                 </form>
             </div>

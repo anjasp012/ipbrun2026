@@ -102,6 +102,8 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     // Superadmin & Admin Only (PIC Restricted)
     Route::middleware(['role:superadmin,admin'])->group(function () {
         Route::get('/participants/export', [AdminDashboard::class, 'exportParticipants'])->name('participants.export');
+        Route::get('/participants/import/template', [AdminDashboard::class, 'importTemplate'])->name('participants.import-template');
+        Route::post('/participants/import', [AdminDashboard::class, 'importParticipants'])->name('participants.import');
         Route::get('/participants/{participant}', [AdminDashboard::class, 'participantShow']);
         Route::get('/participants/{participant}/resend-invoice', [AdminDashboard::class, 'resendInvoice'])->name('participants.resend-invoice');
         Route::put('/participants/{participant}', [AdminDashboard::class, 'participantUpdate'])->name('participants.update');

@@ -13,6 +13,7 @@ use App\Models\Period;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ParticipantExport;
+use App\Imports\ParticipantImport;
 
 class AdminController extends Controller
 {
@@ -433,6 +434,47 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal menonaktifkan peserta secara massal: ' . $e->getMessage());
+        }
+    }
+
+    public function importTemplate()
+    {
+        $headers = [
+            'Name', 'Email', 'NIK', 'Phone Number', 'Jersey Size', 'Race Category'
+        ];
+
+        $callback = function() use ($headers) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $headers);
+            // Example Row
+            fputcsv($file, [
+                'John Doe', 'john@example.com', '1234567890123456', '08123456789', 'L', '10K'
+            ]);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=participant_import_template.csv",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ]);
+    }
+
+    public function importParticipants(Request $request)
+    {
+        $request->validate([
+            'period_id' => 'required|exists:periods,id',
+            'ticket_type' => 'required|in:umum,ipb',
+            'file' => 'required',
+        ]);
+
+        try {
+            Excel::import(new ParticipantImport($request->period_id, $request->ticket_type, $request->order_email), $request->file('file'));
+            return back()->with('success', 'Data peserta berhasil diimport.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal import data: ' . $e->getMessage());
         }
     }
 }
