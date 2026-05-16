@@ -440,7 +440,7 @@ class AdminController extends Controller
     public function importTemplate()
     {
         $headers = [
-            'Name', 'Email', 'NIK', 'Phone Number', 'Jersey Size', 'Race Category'
+            'Name', 'NIK', 'Phone Number', 'Jersey Size', 'Race Category'
         ];
 
         $callback = function() use ($headers) {
@@ -448,7 +448,7 @@ class AdminController extends Controller
             fputcsv($file, $headers);
             // Example Row
             fputcsv($file, [
-                'John Doe', 'john@example.com', '1234567890123456', '08123456789', 'L', '10K'
+                'John Doe', '1234567890123456', '08123456789', 'L', '10K'
             ]);
             fclose($file);
         };

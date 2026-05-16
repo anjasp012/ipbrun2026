@@ -21,22 +21,35 @@ class ParticipantImport implements ToCollection, WithHeadingRow
     protected $ticketType;
     protected $orderEmail;
 
-    public function __construct($periodId, $ticketType, $orderEmail = null)
+    public function __construct($periodId, $ticketType, $orderEmail)
     {
         $this->periodId = $periodId;
         $this->ticketType = $ticketType;
-        $this->orderEmail = $orderEmail;
+        $this->orderEmail = $orderEmail; // This is now the email for all participants and the user login
     }
 
     public function collection(Collection $rows)
     {
+        // 1. Create or Update the Shared User Account
+        $user = User::where('email', $this->orderEmail)->first();
+        if (!$user) {
+            $randomPassword = Str::random(8);
+            $user = User::create([
+                'name' => 'Imported Group (' . $this->orderEmail . ')',
+                'email' => $this->orderEmail,
+                'username' => $this->orderEmail,
+                'password' => Hash::make($randomPassword),
+                'role' => 'participant',
+            ]);
+        }
+
         foreach ($rows as $row) {
-            if (empty($row['name']) || empty($row['email'])) {
+            if (empty($row['name']) || empty($row['nik'])) {
                 continue;
             }
 
-            DB::transaction(function () use ($row) {
-                // 1. Find Ticket
+            DB::transaction(function () use ($row, $user) {
+                // 2. Find Ticket
                 $raceCategory = $row['race_category'] ?? ($row['category'] ?? '');
                 $category = Category::where('name', 'like', "%$raceCategory%")->first();
                 
@@ -53,13 +66,13 @@ class ParticipantImport implements ToCollection, WithHeadingRow
                     return; // Skip if ticket not found for this period and category
                 }
 
-                // 2. Create or Update Participant
+                // 3. Create or Update Participant (Using NIK as identifier since Email is shared)
                 $participant = Participant::updateOrCreate(
-                    ['email' => strtolower(trim($row['email']))],
+                    ['nik' => trim($row['nik'])],
                     [
                         'name' => $row['name'],
+                        'email' => $this->orderEmail,
                         'phone_number' => $row['phone_number'] ?? '-',
-                        'nik' => $row['nik'] ?? '-',
                         'jersey_size' => $row['jersey_size'] ?? '-',
                         'date_birth' => '-',
                         'sex' => 'male',
@@ -69,25 +82,9 @@ class ParticipantImport implements ToCollection, WithHeadingRow
                         'emergency_contact_name' => '-',
                         'emergency_contact_phone_number' => '-',
                         'emergency_contact_relationship' => '-',
+                        'user_id' => $user->id,
                     ]
                 );
-
-                // 3. Create or Update User Account
-                $user = User::where('email', $participant->email)->first();
-                if (!$user) {
-                    $randomPassword = Str::random(8);
-                    $user = User::create([
-                        'name' => $participant->name,
-                        'email' => $participant->email,
-                        'username' => $participant->email,
-                        'password' => Hash::make($randomPassword),
-                        'role' => 'participant',
-                    ]);
-                }
-
-                if (!$participant->user_id) {
-                    $participant->update(['user_id' => $user->id]);
-                }
 
                 // 4. Check for existing entry to avoid duplicates
                 $existingEntry = RaceEntry::where('participant_id', $participant->id)
@@ -101,7 +98,7 @@ class ParticipantImport implements ToCollection, WithHeadingRow
                     $order = Order::create([
                         'participant_id' => $participant->id,
                         'order_code' => $orderCode,
-                        'email' => $this->orderEmail ?: $participant->email,
+                        'email' => $this->orderEmail,
                         'total_price' => 0, 
                         'status' => 'paid',
                         'payment_method' => 'import',

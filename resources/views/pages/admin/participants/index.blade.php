@@ -545,10 +545,10 @@
                         </div>
 
                         <div>
-                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Email Penanggung Jawab (Opsional)</label>
-                            <input type="email" name="order_email"
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Email Penanggung Jawab / User Login</label>
+                            <input type="email" name="order_email" required
                                 class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-medium outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all"
-                                placeholder="Email untuk notifikasi order...">
+                                placeholder="Email untuk login & notifikasi order...">
                         </div>
 
                         <div>
