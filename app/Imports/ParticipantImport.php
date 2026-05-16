@@ -116,10 +116,8 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                     $order = Order::create([
                         'participant_id' => $participant->id,
                         'order_code' => $orderCode,
-                        'email' => $this->orderEmail,
                         'total_price' => 0, 
                         'status' => 'paid',
-                        'payment_method' => 'import',
                     ]);
 
                     // 6. Create Race Entry
