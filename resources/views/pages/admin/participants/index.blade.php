@@ -1,7 +1,7 @@
 <x-layouts.admin title="Participant Master List">
     <div class="space-y-6" x-data="{ 
         showExportModal: false, 
-        showImportModal: false, 
+        showImportModal: {{ $errors->any() ? 'true' : 'false' }}, 
         showPasswordModal: false, 
         selectedParticipantId: null, 
         selectedParticipantName: '',
@@ -523,6 +523,15 @@
 
                 <form action="{{ route('participants.import') }}" method="POST" enctype="multipart/form-data" @submit="showImportModal = false">
                     @csrf
+                    @if($errors->any())
+                        <div class="px-10 py-4 bg-red-50 border-b border-red-100">
+                            <ul class="list-disc list-inside text-xs font-bold text-red-600 uppercase tracking-wide space-y-1">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
                     <div class="p-10 space-y-6">
                         <div>
                             <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Periode Tiket</label>

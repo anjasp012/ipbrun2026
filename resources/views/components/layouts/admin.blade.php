@@ -158,6 +158,26 @@
         </div>
     </div>
     <script src="//unpkg.com/alpinejs" defer></script>
+    <script>
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                timer: 3000,
+                showConfirmButton: false
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: "{{ session('error') }}",
+                confirmButtonColor: '#003366'
+            });
+        @endif
+    </script>
     @stack('scripts')
 </body>
 

@@ -11,11 +11,12 @@ use App\Models\User;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class ParticipantImport implements ToCollection, WithHeadingRow
+class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
 {
     protected $periodId;
     protected $ticketType;
@@ -25,11 +26,15 @@ class ParticipantImport implements ToCollection, WithHeadingRow
     {
         $this->periodId = $periodId;
         $this->ticketType = $ticketType;
-        $this->orderEmail = $orderEmail; // This is now the email for all participants and the user login
+        $this->orderEmail = $orderEmail;
     }
 
     public function collection(Collection $rows)
     {
+        if ($rows->isEmpty()) {
+            throw new \Exception("File Excel kosong atau tidak memiliki data di bawah header.");
+        }
+
         // 1. Create or Update the Shared User Account
         $user = User::where('email', $this->orderEmail)->first();
         if (!$user) {
@@ -43,18 +48,30 @@ class ParticipantImport implements ToCollection, WithHeadingRow
             ]);
         }
 
-        foreach ($rows as $row) {
-            if (empty($row['name']) || empty($row['nik'])) {
-                continue;
+        foreach ($rows as $index => $row) {
+            $lineNum = $index + 2; 
+
+            // Debugging helper: if NIK is empty, maybe header mapping failed
+            $name = $row['name'] ?? null;
+            $nik = $row['nik'] ?? null;
+
+            if (empty($name) || empty($nik)) {
+                // If the first row fails, it's likely a header mismatch
+                $availableHeaders = implode(', ', array_keys($row->toArray()));
+                throw new \Exception("Kolom 'Name' atau 'NIK' tidak ditemukan atau kosong pada baris $lineNum. Kolom yang terdeteksi: [$availableHeaders]. Pastikan header sesuai dengan template.");
             }
 
-            DB::transaction(function () use ($row, $user) {
+            DB::transaction(function () use ($row, $user, $lineNum) {
                 // 2. Find Ticket
-                $raceCategory = $row['race_category'] ?? ($row['category'] ?? '');
+                $raceCategory = trim($row['race_category'] ?? ($row['category'] ?? ''));
+                if (!$raceCategory) {
+                    throw new \Exception("Kolom 'Race Category' kosong pada baris $lineNum.");
+                }
+
                 $category = Category::where('name', 'like', "%$raceCategory%")->first();
                 
                 if (!$category) {
-                    return; // Skip if category not found
+                    throw new \Exception("Kategori '$raceCategory' tidak ditemukan di sistem pada baris $lineNum. Pilihan: 5K, 10K, HM, dsb.");
                 }
 
                 $ticket = Ticket::where('period_id', $this->periodId)
@@ -63,17 +80,18 @@ class ParticipantImport implements ToCollection, WithHeadingRow
                     ->first();
 
                 if (!$ticket) {
-                    return; // Skip if ticket not found for this period and category
+                    $typeName = $this->ticketType === 'ipb' ? 'IPB Family' : 'Public (Umum)';
+                    throw new \Exception("Tiket untuk kategori '$raceCategory' dengan tipe '$typeName' tidak tersedia pada periode ini (Baris $lineNum).");
                 }
 
-                // 3. Create or Update Participant (Using NIK as identifier since Email is shared)
+                // 3. Create or Update Participant
                 $participant = Participant::updateOrCreate(
                     ['nik' => trim($row['nik'])],
                     [
                         'name' => $row['name'],
                         'email' => $this->orderEmail,
-                        'phone_number' => $row['phone_number'] ?? '-',
-                        'jersey_size' => $row['jersey_size'] ?? '-',
+                        'phone_number' => $row['phone_number'] ?? ($row['phone'] ?? '-'),
+                        'jersey_size' => $row['jersey_size'] ?? ($row['ukuran_jersey'] ?? '-'),
                         'date_birth' => '-',
                         'sex' => 'male',
                         'blood_type' => '-',
