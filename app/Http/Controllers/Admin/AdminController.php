@@ -13,6 +13,7 @@ use App\Models\Period;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ParticipantExport;
+use App\Exports\ParticipantImportTemplate;
 use App\Imports\ParticipantImport;
 
 class AdminController extends Controller
@@ -145,8 +146,9 @@ class AdminController extends Controller
         
         $categories = Category::orderBy('name')->get();
         $periods = Period::orderBy('name')->get();
+        $sponsorshipPeriods = Period::where('name', 'like', '%Sponsorship%')->orderBy('name')->get();
 
-        return view('pages.admin.participants.index', compact('participants', 'categories', 'periods'));
+        return view('pages.admin.participants.index', compact('participants', 'categories', 'periods', 'sponsorshipPeriods'));
     }
 
     public function exportParticipants(Request $request)
@@ -439,27 +441,7 @@ class AdminController extends Controller
 
     public function importTemplate()
     {
-        $headers = [
-            'Name', 'NIK', 'Phone Number', 'Jersey Size', 'Race Category'
-        ];
-
-        $callback = function() use ($headers) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $headers);
-            // Example Row
-            fputcsv($file, [
-                'John Doe', '1234567890123456', '08123456789', 'L', '10K'
-            ]);
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, [
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=participant_import_template.csv",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        ]);
+        return Excel::download(new ParticipantImportTemplate(), 'participant_import_template.xlsx');
     }
 
     public function importParticipants(Request $request)

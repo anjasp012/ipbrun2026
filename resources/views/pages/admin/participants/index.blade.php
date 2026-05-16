@@ -537,8 +537,8 @@
                             <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Periode Tiket</label>
                             <select name="period_id" required
                                 class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
-                                <option value="">Pilih Periode...</option>
-                                @foreach($periods as $period)
+                                <option value="">Pilih Periode Sponsorship...</option>
+                                @foreach($sponsorshipPeriods as $period)
                                     <option value="{{ $period->id }}">{{ $period->name }}</option>
                                 @endforeach
                             </select>
