@@ -55,17 +55,16 @@ class ParticipantImportTemplate implements FromArray, WithHeadings, WithStyles, 
                     ->getNumberFormat()
                     ->setFormatCode(NumberFormat::FORMAT_TEXT);
 
-                // 2. Write example row — NIK must be explicitly written as STRING
-                //    so Excel stores it as text, not a float.
+                // 2. Write example row — NIK written with ' prefix to force text in Excel
                 $sheet->setCellValueExplicit('A2', 'John Doe', DataType::TYPE_STRING);
-                $sheet->setCellValueExplicit('B2', '3201320012345678', DataType::TYPE_STRING);
+                $sheet->setCellValueExplicit('B2', "'3201320012345678", DataType::TYPE_STRING);
                 $sheet->setCellValueExplicit('C2', '08123456789', DataType::TYPE_STRING);
                 $sheet->setCellValueExplicit('D2', 'L', DataType::TYPE_STRING);
                 $sheet->setCellValueExplicit('E2', '10K', DataType::TYPE_STRING);
 
-                // 3. Add a note/comment on NIK cell
+                // 3. Add comment on B1 header
                 $comment = $sheet->getComment('B1');
-                $comment->getText()->createTextRun('NIK harus 16 digit. Kolom ini sudah diformat sebagai TEXT — paste langsung tanpa khawatir scientific notation.');
+                $comment->getText()->createTextRun("PENTING: Tambahkan tanda petik (') di depan NIK saat mengisi.\nContoh: '3201320012345678\nIni mencegah Excel mengubah NIK menjadi scientific notation.");
             },
         ];
     }

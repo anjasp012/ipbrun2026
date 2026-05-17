@@ -47,17 +47,20 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
 
     /**
      * Safely parse NIK regardless of how Excel reads it.
-     * Handles scientific notation (e.g. 3.20132E+15) → '3201320000000000'
+     * - Strips leading apostrophe (') that users add to force text in Excel.
+     * - Handles scientific notation (e.g. 3.20132E+15).
      */
     private function parseNik(mixed $value): string
     {
         if (is_null($value) || $value === '') return '';
+
+        // If it's still a float (scientific notation), convert to full integer string
         if (is_float($value) || is_int($value)) {
-            return rtrim(rtrim(number_format($value, 0, '.', ''), '0'), '.') !== ''
-                ? number_format($value, 0, '.', '')
-                : (string)(int)$value;
+            return number_format($value, 0, '.', '');
         }
-        return trim((string)$value);
+
+        // Strip leading apostrophe (Excel text prefix trick: '3201320012345678)
+        return ltrim(trim((string)$value), "'");
     }
 
     public function collection(Collection $rows)
