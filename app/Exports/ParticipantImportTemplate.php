@@ -17,7 +17,7 @@ class ParticipantImportTemplate implements FromArray, WithHeadings, WithStyles, 
 {
     public function headings(): array
     {
-        return ['Name', 'NIK', 'Phone Number', 'Jersey Size', 'Race Category'];
+        return ['Name', 'NIK', 'Phone Number', 'Jersey Size', 'Race Category', 'Blood Type'];
     }
 
     public function array(): array
@@ -49,18 +49,22 @@ class ParticipantImportTemplate implements FromArray, WithHeadings, WithStyles, 
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                // 1. Format ENTIRE column B (rows 2–1000) as Text (@)
-                //    This ensures paste will be treated as text, not number.
+                // 1. Format ENTIRE column B (NIK) and C (Phone) as Text
                 $sheet->getStyle('B2:B1000')
+                    ->getNumberFormat()
+                    ->setFormatCode(NumberFormat::FORMAT_TEXT);
+
+                $sheet->getStyle('C2:C1000')
                     ->getNumberFormat()
                     ->setFormatCode(NumberFormat::FORMAT_TEXT);
 
                 // 2. Write example row — NIK written with ' prefix to force text in Excel
                 $sheet->setCellValueExplicit('A2', 'John Doe', DataType::TYPE_STRING);
                 $sheet->setCellValueExplicit('B2', "'3201320012345678", DataType::TYPE_STRING);
-                $sheet->setCellValueExplicit('C2', '08123456789', DataType::TYPE_STRING);
+                $sheet->setCellValueExplicit('C2', "'08123456789", DataType::TYPE_STRING);
                 $sheet->setCellValueExplicit('D2', 'L', DataType::TYPE_STRING);
                 $sheet->setCellValueExplicit('E2', '10K', DataType::TYPE_STRING);
+                $sheet->setCellValueExplicit('F2', 'O', DataType::TYPE_STRING);
 
                 // 3. Add comment on B1 header
                 $comment = $sheet->getComment('B1');

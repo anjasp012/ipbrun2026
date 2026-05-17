@@ -63,6 +63,18 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
         return ltrim(trim((string)$value), "'");
     }
 
+    /**
+     * Safely parse phone number — strips leading apostrophe.
+     */
+    private function parsePhone(mixed $value): string
+    {
+        if (is_null($value) || $value === '') return '-';
+        if (is_float($value) || is_int($value)) {
+            return (string)(int)$value;
+        }
+        return ltrim(trim((string)$value), "'");
+    }
+
     public function collection(Collection $rows)
     {
         if ($rows->isEmpty()) {
@@ -115,11 +127,11 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
                     [
                         'email'                            => $this->orderEmail,
                         'nik'                              => $this->parseNik($row['nik'] ?? ''),
-                        'phone_number'                     => $row['phone_number'] ?? ($row['phone'] ?? '-'),
+                        'phone_number'                     => $this->parsePhone($row['phone_number'] ?? ($row['phone'] ?? null)),
                         'jersey_size'                      => $row['jersey_size'] ?? ($row['ukuran_jersey'] ?? '-'),
+                        'blood_type'                       => $row['blood_type'] ?? ($row['golongan_darah'] ?? '-'),
                         'date_birth'                       => '-',
                         'sex'                              => 'male',
-                        'blood_type'                       => '-',
                         'nationality'                      => 'WNI',
                         'address'                          => '-',
                         'emergency_contact_name'           => '-',
