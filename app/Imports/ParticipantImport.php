@@ -90,6 +90,7 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
         }
 
         $importErrors = [];
+        $successCount = 0;
 
         foreach ($rows as $index => $row) {
             $lineNum = $index + 2;
@@ -205,6 +206,7 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
                     }
                 }
             });
+                $successCount++;
             } catch (\Exception $e) {
                 $importErrors[] = $e->getMessage();
             }
@@ -218,9 +220,9 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
             }
 
             $errorCount = count($importErrors);
-            session()->flash('warning', "$errorCount data peserta gagal diimport (Duplikat/Tidak Valid). List detail error telah dikirim ke email PIC ({$this->orderEmail}). Data lainnya berhasil diproses.");
+            session()->flash('warning', "$successCount data berhasil diimport. $errorCount data gagal (Duplikat/Tidak Valid). List detail error telah dikirim ke email PIC ({$this->orderEmail}).");
         } else {
-            session()->flash('success', 'Semua data peserta berhasil diimport.');
+            session()->flash('success', "$successCount data peserta berhasil diimport tanpa ada error.");
         }
     }
 }
