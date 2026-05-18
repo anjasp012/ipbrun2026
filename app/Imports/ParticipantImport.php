@@ -218,7 +218,9 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
             }
 
             $errorCount = count($importErrors);
-            throw new \Exception("$errorCount data peserta gagal diimport (Duplikat/Tidak Valid). List detail error telah dikirim ke email PIC ({$this->orderEmail}).");
+            session()->flash('warning', "$errorCount data peserta gagal diimport (Duplikat/Tidak Valid). List detail error telah dikirim ke email PIC ({$this->orderEmail}). Data lainnya berhasil diproses.");
+        } else {
+            session()->flash('success', 'Semua data peserta berhasil diimport.');
         }
     }
 }

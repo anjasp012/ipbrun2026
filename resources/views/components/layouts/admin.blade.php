@@ -169,6 +169,15 @@
             });
         @endif
 
+        @if(session('warning'))
+            Swal.fire({
+                icon: 'warning',
+                title: 'Peringatan!',
+                text: "{{ session('warning') }}",
+                confirmButtonColor: '#003366'
+            });
+        @endif
+
         @if(session('error'))
             Swal.fire({
                 icon: 'error',

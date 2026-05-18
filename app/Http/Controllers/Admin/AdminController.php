@@ -454,7 +454,7 @@ class AdminController extends Controller
 
         try {
             Excel::import(new ParticipantImport($request->period_id, $request->ticket_type, $request->order_email), $request->file('file'));
-            return back()->with('success', 'Data peserta berhasil diimport.');
+            return back();
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal import data: ' . $e->getMessage());
         }
