@@ -20,7 +20,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\SendQueuedEmail;
 use App\Mail\ParticipantPaidNotification;
-
+use App\Mail\ImportErrorNotification;
+use Illuminate\Support\Facades\Mail;
 class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, WithColumnFormatting
 {
     protected $periodId;
@@ -88,6 +89,8 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
             throw new \Exception("Ditemukan nama duplikat di dalam file Excel: " . implode(', ', $duplicates));
         }
 
+        $importErrors = [];
+
         foreach ($rows as $index => $row) {
             $lineNum = $index + 2;
 
@@ -96,10 +99,12 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
 
             if (empty($name) || empty($nik)) {
                 $availableHeaders = implode(', ', array_keys($row->toArray()));
-                throw new \Exception("Kolom 'Name' atau 'NIK' tidak ditemukan atau kosong pada baris $lineNum. Kolom yang terdeteksi: [$availableHeaders]. Pastikan header sesuai dengan template.");
+                $importErrors[] = "Baris $lineNum: Kolom 'Name' atau 'NIK' tidak ditemukan atau kosong. Pastikan header sesuai template.";
+                continue;
             }
 
-            DB::transaction(function () use ($row, $lineNum) {
+            try {
+                DB::transaction(function () use ($row, $lineNum) {
                 // 1. Find Ticket
                 $raceCategory = trim($row['race_category'] ?? ($row['category'] ?? ''));
                 if (!$raceCategory) {
@@ -121,42 +126,44 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
                     throw new \Exception("Tiket untuk kategori '$raceCategory' dengan tipe '$typeName' tidak tersedia pada periode ini (Baris $lineNum).");
                 }
 
-                // 2. Create or Update Participant (Name as unique key)
-                $participant = Participant::updateOrCreate(
-                    ['name' => trim($row['name'])],
-                    [
-                        'email'                            => $this->orderEmail,
-                        'nik'                              => $this->parseNik($row['nik'] ?? ''),
-                        'phone_number'                     => $this->parsePhone($row['phone_number'] ?? ($row['phone'] ?? null)),
-                        'jersey_size'                      => $row['jersey_size'] ?? ($row['ukuran_jersey'] ?? '-'),
-                        'blood_type'                       => $row['blood_type'] ?? ($row['golongan_darah'] ?? '-'),
-                        'date_birth'                       => '-',
-                        'sex'                              => '-',
-                        'nationality'                      => '-',
-                        'address'                          => '-',
-                        'emergency_contact_name'           => '-',
-                        'emergency_contact_phone_number'   => '-',
-                        'emergency_contact_relationship'   => '-',
-                    ]
-                );
+                // 2. Check for existing Participant to prevent update
+                $parsedNik = $this->parseNik($row['nik'] ?? '');
+                $parsedName = trim($row['name']);
+                
+                $existingParticipant = Participant::where('nik', $parsedNik)->orWhere('name', $parsedName)->first();
+                if ($existingParticipant) {
+                    throw new \Exception("Peserta dengan Nama '$parsedName' atau NIK '$parsedNik' sudah terdaftar (Baris $lineNum). Import dibatalkan.");
+                }
+
+                $participant = Participant::create([
+                    'name'                             => $parsedName,
+                    'email'                            => $this->orderEmail,
+                    'nik'                              => $parsedNik,
+                    'phone_number'                     => $this->parsePhone($row['phone_number'] ?? ($row['phone'] ?? null)),
+                    'jersey_size'                      => $row['jersey_size'] ?? ($row['ukuran_jersey'] ?? '-'),
+                    'blood_type'                       => $row['blood_type'] ?? ($row['golongan_darah'] ?? '-'),
+                    'date_birth'                       => '-',
+                    'sex'                              => '-',
+                    'nationality'                      => '-',
+                    'address'                          => '-',
+                    'emergency_contact_name'           => '-',
+                    'emergency_contact_phone_number'   => '-',
+                    'emergency_contact_relationship'   => '-',
+                ]);
 
                 // 3. Create individual User Account per participant (NIK as username & password)
                 $user = User::where('username', $participant->nik)->first();
-                if (!$user) {
-                    $user = User::create([
-                        'name'     => $participant->name,
-                        'email'    => $participant->email,
-                        'username' => $participant->nik,
-                        'password' => Hash::make($participant->nik),
-                        'role'     => 'participant',
-                    ]);
-                } else {
-                    $user->update([
-                        'name'     => $participant->name,
-                        'email'    => $participant->email,
-                        'password' => Hash::make($participant->nik),
-                    ]);
+                if ($user) {
+                    throw new \Exception("Akun dengan username NIK '{$participant->nik}' sudah ada di database. Import dibatalkan.");
                 }
+                
+                $user = User::create([
+                    'name'     => $participant->name,
+                    'email'    => $participant->email,
+                    'username' => $participant->nik,
+                    'password' => Hash::make($participant->nik),
+                    'role'     => 'participant',
+                ]);
 
                 // 4. Link Participant → User
                 $participant->update(['user_id' => $user->id]);
@@ -198,6 +205,20 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
                     }
                 }
             });
+            } catch (\Exception $e) {
+                $importErrors[] = $e->getMessage();
+            }
+        }
+
+        if (!empty($importErrors)) {
+            try {
+                Mail::to($this->orderEmail)->send(new ImportErrorNotification($importErrors));
+            } catch (\Exception $e) {
+                Log::error("Gagal mengirim email laporan error import: " . $e->getMessage());
+            }
+
+            $errorCount = count($importErrors);
+            throw new \Exception("$errorCount data peserta gagal diimport (Duplikat/Tidak Valid). List detail error telah dikirim ke email PIC ({$this->orderEmail}).");
         }
     }
 }
