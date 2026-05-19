@@ -136,9 +136,15 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
                     throw new \Exception("Peserta dengan Nama '$parsedName' atau NIK '$parsedNik' sudah terdaftar (Baris $lineNum). Import dibatalkan.");
                 }
 
+                $rawEmail = trim((string)($row['email'] ?? ''));
+                $email = ($rawEmail === '' || $rawEmail === '-') ? $this->orderEmail : $rawEmail;
+
+                $rawHarga = trim((string)($row['harga'] ?? ''));
+                $harga = ($rawHarga === '' || $rawHarga === '-') ? 0 : (float)$rawHarga;
+
                 $participant = Participant::create([
                     'name'                             => $parsedName,
-                    'email'                            => $this->orderEmail,
+                    'email'                            => $email,
                     'nik'                              => $parsedNik,
                     'phone_number'                     => $this->parsePhone($row['phone_number'] ?? ($row['phone'] ?? null)),
                     'jersey_size'                      => $row['jersey_size'] ?? ($row['ukuran_jersey'] ?? '-'),
@@ -181,7 +187,7 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
                     $order = Order::create([
                         'participant_id' => $participant->id,
                         'order_code'     => $orderCode,
-                        'total_price'    => 0,
+                        'total_price'    => $harga,
                         'status'         => 'paid',
                     ]);
 

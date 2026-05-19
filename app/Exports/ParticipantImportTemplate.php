@@ -17,7 +17,7 @@ class ParticipantImportTemplate implements FromArray, WithHeadings, WithStyles, 
 {
     public function headings(): array
     {
-        return ['Name', 'NIK', 'Phone Number', 'Jersey Size', 'Race Category', 'Blood Type'];
+        return ['Name', 'NIK', 'Phone Number', 'Jersey Size', 'Race Category', 'Blood Type', 'Email', 'Harga'];
     }
 
     public function array(): array
@@ -49,12 +49,20 @@ class ParticipantImportTemplate implements FromArray, WithHeadings, WithStyles, 
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                // 1. Format ENTIRE column B (NIK) and C (Phone) as Text
+                // 1. Format ENTIRE column B (NIK), C (Phone), G (Email), and H (Harga) as Text
                 $sheet->getStyle('B2:B1000')
                     ->getNumberFormat()
                     ->setFormatCode(NumberFormat::FORMAT_TEXT);
 
                 $sheet->getStyle('C2:C1000')
+                    ->getNumberFormat()
+                    ->setFormatCode(NumberFormat::FORMAT_TEXT);
+
+                $sheet->getStyle('G2:G1000')
+                    ->getNumberFormat()
+                    ->setFormatCode(NumberFormat::FORMAT_TEXT);
+
+                $sheet->getStyle('H2:H1000')
                     ->getNumberFormat()
                     ->setFormatCode(NumberFormat::FORMAT_TEXT);
 
@@ -65,6 +73,8 @@ class ParticipantImportTemplate implements FromArray, WithHeadings, WithStyles, 
                 $sheet->setCellValueExplicit('D2', 'L', DataType::TYPE_STRING);
                 $sheet->setCellValueExplicit('E2', '10K', DataType::TYPE_STRING);
                 $sheet->setCellValueExplicit('F2', 'O', DataType::TYPE_STRING);
+                $sheet->setCellValueExplicit('G2', '-', DataType::TYPE_STRING);
+                $sheet->setCellValueExplicit('H2', '-', DataType::TYPE_STRING);
 
                 // 3. Add comment on B1 header
                 $comment = $sheet->getComment('B1');
