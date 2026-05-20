@@ -104,8 +104,8 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
             }
 
             if (empty($nik)) {
-                // Generate 16-digit NIK (3271 for Bogor + 12 random digits)
-                $nik = '327199' . str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT) . str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT);
+                // Generate 16-digit NIK (2026 + 67 + 10 random digits)
+                $nik = '202667' . str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT) . str_pad(rand(0, 99999), 5, '0', STR_PAD_LEFT);
                 $row['nik'] = $nik;
             }
 
