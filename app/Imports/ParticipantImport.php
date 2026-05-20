@@ -98,33 +98,44 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
             $name = $row['name'] ?? null;
             $nik  = $row['nik']  ?? null;
 
-            if (empty($name) || empty($nik)) {
-                $availableHeaders = implode(', ', array_keys($row->toArray()));
-                $importErrors[] = "Baris $lineNum: Kolom 'Name' atau 'NIK' tidak ditemukan atau kosong. Pastikan header sesuai template.";
+            if (empty($name)) {
+                $importErrors[] = "Baris $lineNum: Kolom 'Name' tidak ditemukan atau kosong. Pastikan header sesuai template.";
                 continue;
+            }
+
+            if (empty($nik)) {
+                $nik = 'GEN-' . time() . rand(1000, 9999);
+                $row['nik'] = $nik;
             }
 
             try {
                 DB::transaction(function () use ($row, $lineNum) {
-                // 1. Find Ticket
+                // 1. Find Tickets
                 $raceCategory = trim($row['race_category'] ?? ($row['category'] ?? ''));
                 if (!$raceCategory) {
                     throw new \Exception("Kolom 'Race Category' kosong pada baris $lineNum.");
                 }
 
-                $category = Category::where('name', 'like', "%$raceCategory%")->first();
-                if (!$category) {
-                    throw new \Exception("Kategori '$raceCategory' tidak ditemukan di sistem pada baris $lineNum. Pilihan: 5K, 10K, HM, dsb.");
-                }
+                $categoryNames = array_map('trim', explode('|', $raceCategory));
+                $tickets = [];
 
-                $ticket = Ticket::where('period_id', $this->periodId)
-                    ->where('type', $this->ticketType)
-                    ->where('category_id', $category->id)
-                    ->first();
+                foreach ($categoryNames as $catName) {
+                    $category = Category::where('name', 'like', "%$catName%")->first();
+                    if (!$category) {
+                        throw new \Exception("Kategori '$catName' tidak ditemukan di sistem pada baris $lineNum. Pilihan: 5K, 10K, HM, dsb.");
+                    }
 
-                if (!$ticket) {
-                    $typeName = $this->ticketType === 'ipb' ? 'IPB Family' : 'Public (Umum)';
-                    throw new \Exception("Tiket untuk kategori '$raceCategory' dengan tipe '$typeName' tidak tersedia pada periode ini (Baris $lineNum).");
+                    $ticket = Ticket::where('period_id', $this->periodId)
+                        ->where('type', $this->ticketType)
+                        ->where('category_id', $category->id)
+                        ->first();
+
+                    if (!$ticket) {
+                        $typeName = $this->ticketType === 'ipb' ? 'IPB Family' : 'Public (Umum)';
+                        throw new \Exception("Tiket untuk kategori '$catName' dengan tipe '$typeName' tidak tersedia pada periode ini (Baris $lineNum).");
+                    }
+                    
+                    $tickets[] = $ticket;
                 }
 
                 // 2. Check for existing Participant to prevent update
@@ -175,13 +186,19 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
                 // 4. Link Participant → User
                 $participant->update(['user_id' => $user->id]);
 
-                // 5. Check for existing entry to avoid duplicates
-                $existingEntry = RaceEntry::where('participant_id', $participant->id)
-                    ->where('ticket_id', $ticket->id)
-                    ->whereIn('status', ['paid', 'pending'])
-                    ->first();
+                // 5. Check for existing entries to avoid duplicates
+                $ticketsToCreate = [];
+                foreach ($tickets as $ticket) {
+                    $existingEntry = RaceEntry::where('participant_id', $participant->id)
+                        ->where('ticket_id', $ticket->id)
+                        ->whereIn('status', ['paid', 'pending'])
+                        ->first();
+                    if (!$existingEntry) {
+                        $ticketsToCreate[] = $ticket;
+                    }
+                }
 
-                if (!$existingEntry) {
+                if (!empty($ticketsToCreate)) {
                     // 6. Create Order
                     $orderCode = 'IPBR26-SP-' . strtoupper(Str::random(6));
                     $order = Order::create([
@@ -191,13 +208,15 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
                         'status'         => 'paid',
                     ]);
 
-                    // 7. Create Race Entry
-                    RaceEntry::create([
-                        'participant_id' => $participant->id,
-                        'ticket_id'      => $ticket->id,
-                        'order_id'       => $order->id,
-                        'status'         => 'paid',
-                    ]);
+                    // 7. Create Race Entries
+                    foreach ($ticketsToCreate as $ticketToCreate) {
+                        RaceEntry::create([
+                            'participant_id' => $participant->id,
+                            'ticket_id'      => $ticketToCreate->id,
+                            'order_id'       => $order->id,
+                            'status'         => 'paid',
+                        ]);
+                    }
 
                     // 8. Send email notification (same as Sponsorship flow)
                     try {
