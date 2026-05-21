@@ -142,7 +142,7 @@ class AdminController extends Controller
             });
         }
 
-        $participants = $query->latest()->paginate(1000);
+        $participants = $query->latest()->paginate(25);
         
         $categories = Category::orderBy('name')->get();
         $periods = Period::orderBy('name')->get();
@@ -255,7 +255,11 @@ class AdminController extends Controller
 
     public function participantShow(Participant $participant)
     {
-        return view('pages.admin.participants.show', compact('participant'));
+        $tickets = \App\Models\Ticket::whereHas('period', function ($q) {
+            $q->where('is_active', true);
+        })->with('category', 'period')->get();
+        
+        return view('pages.admin.participants.show', compact('participant', 'tickets'));
     }
 
     public function participantUpdate(Request $request, Participant $participant)
@@ -324,6 +328,87 @@ class AdminController extends Controller
         }
 
         return back()->with('success', 'Data peserta berhasil diperbarui.');
+    }
+
+    public function addTicket(Request $request, Participant $participant)
+    {
+        $request->validate([
+            'ticket_id' => 'required|exists:tickets,id',
+            'price' => 'required|numeric|min:0'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $ticket = \App\Models\Ticket::findOrFail($request->ticket_id);
+            $price = $request->price;
+
+            // Duplicate check
+            $exists = RaceEntry::where('participant_id', $participant->id)
+                ->where('ticket_id', $ticket->id)
+                ->whereIn('status', ['pending', 'paid'])
+                ->exists();
+
+            if ($exists) {
+                return back()->with('error', 'Peserta sudah terdaftar di kategori tiket ini.');
+            }
+
+            // Create Order
+            $orderCode = 'IPBR26-ADD' . strtoupper(\Illuminate\Support\Str::random(5));
+            $order = \App\Models\Order::create([
+                'participant_id' => $participant->id,
+                'order_code' => $orderCode,
+                'status' => 'paid',
+                'admin_fee' => 0,
+                'donation_event' => 0,
+                'donation_scholarship' => 0,
+                'total_price' => $price,
+            ]);
+
+            // Create Race Entry
+            $participant->raceEntries()->create([
+                'ticket_id' => $ticket->id,
+                'order_id' => $order->id,
+                'status' => 'paid',
+            ]);
+
+            // Jika participant belum punya user (e.g. dulunya belum bayar atau ada masalah)
+            // kita create user-nya & generate password
+            $userExists = true;
+            $password = null;
+            if (!$participant->user_id) {
+                $userExists = false;
+                $user = \App\Models\User::where('email', $participant->email)->first();
+                if (!$user) {
+                    $password = \Illuminate\Support\Str::random(8);
+                    $user = \App\Models\User::create([
+                        'name' => $participant->name,
+                        'email' => $participant->email,
+                        'username' => $participant->email,
+                        'password' => \Illuminate\Support\Facades\Hash::make($password),
+                        'role' => 'participant'
+                    ]);
+                }
+                $participant->update(['user_id' => $user->id]);
+            }
+
+            DB::commit();
+
+            // Send Email Notification
+            try {
+                \Illuminate\Support\Facades\Mail::to($participant->email)
+                    ->send(new \App\Mail\ParticipantPaidNotification($participant, $password, $order, $userExists));
+                $emailStatus = "Email notifikasi berhasil dikirim.";
+            } catch (\Exception $e) {
+                $emailStatus = "Namun gagal mengirim email: " . $e->getMessage();
+            }
+
+            return back()->with('success', "Tiket baru berhasil ditambahkan! {$emailStatus}");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     public function resendInvoice(Participant $participant)

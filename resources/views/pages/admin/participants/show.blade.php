@@ -1,6 +1,7 @@
 <x-layouts.admin title="Participant Profile & Logistics">
     <div x-data="{ 
         editing: false,
+        showAddTicketModal: false,
         initialEmail: '{{ $participant->email }}',
         formatBestTime(e) {
             let value = e.target.value.replace(/\D/g, '');
@@ -470,9 +471,17 @@
                     <div
                         class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col items-center p-10">
                         <!-- Logistics Sections (Dynamic for HasMany) -->
-                        <h3
-                            class="text-sm font-black text-slate-400 uppercase tracking-[5px] mb-10 w-full border-b pb-6">
-                            Race Logistics</h3>
+                        <div class="flex justify-between items-center w-full border-b pb-6 mb-10">
+                            <h3 class="text-sm font-black text-slate-400 uppercase tracking-[5px]">
+                                Race Logistics</h3>
+                            <button type="button" @click="showAddTicketModal = true"
+                                class="px-5 py-2.5 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase tracking-widest border border-blue-100 hover:bg-blue-100 transition-all flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                Add Ticket
+                            </button>
+                        </div>
                         @foreach ($participant->raceEntries->groupBy('order_id') as $orderId => $entries)
                             @php $order = $entries->first()->order; @endphp
                             <div
@@ -670,5 +679,53 @@
                 </div>
             </div>
         </form>
+
+        <!-- Add Ticket Modal -->
+        <div x-show="showAddTicketModal"
+            class="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-sm"
+            style="display: none;"
+            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+
+            <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
+                @click.away="showAddTicketModal = false">
+                <div class="p-10 border-b border-slate-50 bg-slate-50/50">
+                    <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Tambah Tiket Kategori Baru</h3>
+                    <p class="text-sm text-slate-400 font-bold uppercase tracking-wider mt-2">Untuk: {{ $participant->name }}</p>
+                </div>
+
+                <form action="{{ route('participants.add-ticket', $participant) }}" method="POST" @submit="showAddTicketModal = false">
+                    @csrf
+                    <div class="p-10 space-y-6">
+                        <div>
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Pilih Kategori Tiket</label>
+                            <select name="ticket_id" required
+                                class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
+                                <option value="">-- Pilih Tiket --</option>
+                                @foreach($tickets as $t)
+                                    <option value="{{ $t->id }}">{{ $t->category->name }} ({{ strtoupper($t->type) }}) - {{ $t->period->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">Harga Spesial (IDR)</label>
+                            <input type="number" name="price" value="0" min="0" required
+                                class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all"
+                                placeholder="Masukkan nominal (contoh: 0)">
+                            <p class="text-[10px] font-bold text-slate-400 mt-2">Harga 0 berarti tiket diberikan secara gratis/complimentary.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-8 bg-slate-50 flex items-center justify-end gap-4">
+                        <button type="button" @click="showAddTicketModal = false"
+                            class="px-8 py-4 text-sm font-black text-slate-400 uppercase tracking-widest hover:text-slate-600">Batal</button>
+                        <button type="submit"
+                            class="px-10 py-4 bg-[#00875a] text-white rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-emerald-900/20 hover:bg-emerald-700 transition-all">Tambahkan Tiket</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
 </x-layouts.admin>
