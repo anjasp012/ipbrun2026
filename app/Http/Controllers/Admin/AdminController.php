@@ -354,7 +354,7 @@ class AdminController extends Controller
             }
 
             // Create Order
-            $orderCode = 'IPBR26-ADD' . strtoupper(\Illuminate\Support\Str::random(5));
+            $orderCode = 'IPBR26-SP-' . strtoupper(\Illuminate\Support\Str::random(6));
             $order = \App\Models\Order::create([
                 'participant_id' => $participant->id,
                 'order_code' => $orderCode,
