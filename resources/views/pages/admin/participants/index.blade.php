@@ -588,30 +588,58 @@
         </div>
 
         {{-- Bulk Action Bar --}}
-        <div x-show="selectedIds.length > 0" 
+        <div x-show="selectedIds.length > 0"
             class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[1000] animate-slide-in"
             style="display: none;">
-            <form id="bulk-action-form" action="{{ route('participants.bulk-cancel') }}" method="POST">
-                @csrf
-                <template x-for="id in selectedIds" :key="id">
-                    <input type="hidden" name="ids[]" :value="id">
-                </template>
-                <div class="bg-slate-900 text-white px-8 py-5 rounded-2xl shadow-2xl flex items-center gap-8 border border-slate-700/50 backdrop-blur-xl">
-                    <div class="flex flex-col">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bulk Action</span>
-                        <span class="text-sm font-bold"><span x-text="selectedIds.length"></span> Peserta Terpilih</span>
-                    </div>
-                    <div class="h-8 w-[1px] bg-slate-700"></div>
-                    <button type="submit" onclick="return confirm('Apakah Anda yakin ingin MENONAKTIFKAN semua peserta yang dipilih secara massal? Akun login akan dihapus dan semua pesanan akan menjadi FAILED.')" 
+            <div class="bg-slate-900 text-white px-8 py-5 rounded-2xl shadow-2xl flex items-center gap-6 border border-slate-700/50 backdrop-blur-xl">
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bulk Action</span>
+                    <span class="text-sm font-bold"><span x-text="selectedIds.length"></span> Peserta Terpilih</span>
+                </div>
+                <div class="h-8 w-[1px] bg-slate-700"></div>
+
+                {{-- Bulk Resend Email --}}
+                <form id="bulk-resend-form" action="{{ route('participants.bulk-resend') }}" method="POST">
+                    @csrf
+                    <template x-for="id in selectedIds" :key="'resend-' + id">
+                        <input type="hidden" name="ids[]" :value="id">
+                    </template>
+                    <button type="submit"
+                        onclick="return confirm('Kirim ulang E-Invoice ke semua peserta yang dipilih? Hanya peserta dengan order Paid yang akan mendapat email.')"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-3">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Resend Email
+                    </button>
+                </form>
+
+                <div class="h-8 w-[1px] bg-slate-700"></div>
+
+                {{-- Bulk Cancel --}}
+                <form id="bulk-action-form" action="{{ route('participants.bulk-cancel') }}" method="POST">
+                    @csrf
+                    <template x-for="id in selectedIds" :key="'cancel-' + id">
+                        <input type="hidden" name="ids[]" :value="id">
+                    </template>
+                    <button type="submit"
+                        onclick="return confirm('Apakah Anda yakin ingin MENONAKTIFKAN semua peserta yang dipilih secara massal? Akun login akan dihapus dan semua pesanan akan menjadi FAILED.')"
                         class="bg-rose-600 hover:bg-rose-700 text-white px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-3">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
                         Nonaktifkan Massal
                     </button>
-                    <button type="button" @click="selectedIds = []" class="text-slate-400 hover:text-white transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-            </form>
+                </form>
+
+                <button type="button" @click="selectedIds = []" class="text-slate-400 hover:text-white transition-colors ml-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
         </div>
     </div>
 </x-layouts.admin>
