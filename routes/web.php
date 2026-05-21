@@ -109,6 +109,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::put('/participants/{participant}', [AdminDashboard::class, 'participantUpdate'])->name('participants.update');
         Route::delete('/participants/{participant}/cancel', [AdminDashboard::class, 'cancelParticipant'])->name('participants.cancel');
         Route::post('/participants/bulk-cancel', [AdminDashboard::class, 'bulkCancelParticipants'])->name('participants.bulk-cancel');
+        Route::post('/participants/bulk-resend', [AdminDashboard::class, 'bulkResendInvoice'])->name('participants.bulk-resend');
       
         
         Route::get('/vouchers', [\App\Http\Controllers\Admin\VoucherController::class, 'index'])->name('admin.vouchers.index');

@@ -432,11 +432,52 @@ class AdminController extends Controller
 
             DB::commit();
 
-            return back()->with('success', count($ids) . " peserta telah berhasil dinonaktifkan secara massal.");
+        return back()->with('success', count($ids) . " peserta telah berhasil dinonaktifkan secara massal.");
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal menonaktifkan peserta secara massal: ' . $e->getMessage());
         }
+    }
+
+    public function bulkResendInvoice(Request $request)
+    {
+        $ids = $request->ids;
+        if (empty($ids)) {
+            return back()->with('error', 'Pilih minimal satu peserta.');
+        }
+
+        $successCount = 0;
+        $failCount = 0;
+        $skippedCount = 0;
+
+        $participants = Participant::whereIn('id', $ids)->get();
+
+        foreach ($participants as $participant) {
+            $orders = \App\Models\Order::where('participant_id', $participant->id)
+                ->where('status', 'paid')
+                ->latest()
+                ->get();
+
+            if ($orders->isEmpty()) {
+                $skippedCount++;
+                continue;
+            }
+
+            try {
+                \Illuminate\Support\Facades\Mail::to($participant->email)
+                    ->send(new \App\Mail\ParticipantInvoiceResend($participant, $orders));
+                $successCount++;
+            } catch (\Exception $e) {
+                $failCount++;
+            }
+        }
+
+        $message = "Bulk Resend selesai: {$successCount} email berhasil dikirim";
+        if ($skippedCount > 0) $message .= ", {$skippedCount} dilewati (belum paid)";
+        if ($failCount > 0) $message .= ", {$failCount} gagal dikirim";
+        $message .= ".";
+
+        return back()->with('success', $message);
     }
 
     public function importTemplate()
