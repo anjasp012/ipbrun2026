@@ -125,7 +125,7 @@
                                         Jenis Kelamin</td>
                                     <td
                                         style="padding:10px 0;font-size:14px;color:#1a2b4b;font-weight:600;text-align:right;border-bottom:1px solid #edf0f5;">
-                                        {{ $participant->sex === 'male' ? 'Laki-laki' : 'Perempuan' }}</td>
+                                        {{ $participant->sex === 'male' ? 'Laki-laki' : ($participant->sex === 'female' ? 'Perempuan' : '-') }}</td>
                                 </tr>
                                 <tr>
                                     <td
