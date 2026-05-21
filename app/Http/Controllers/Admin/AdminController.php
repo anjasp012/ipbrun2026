@@ -142,7 +142,7 @@ class AdminController extends Controller
             });
         }
 
-        $participants = $query->latest()->paginate(25);
+        $participants = $query->latest()->paginate(1000);
         
         $categories = Category::orderBy('name')->get();
         $periods = Period::orderBy('name')->get();
