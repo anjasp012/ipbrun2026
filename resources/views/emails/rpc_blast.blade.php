@@ -36,7 +36,7 @@
                     <div style="background-color:#f9fbff;border-radius:12px;padding:25px;border:1px solid #eef2f7;">
                         <p style="margin:0 0 15px;font-size:14px;line-height:1.6;color:#556677;">
                             📍 <strong>Tempat:</strong> IPB International Convention Center (IICC)<br>
-                            📅 <strong>Tanggal:</strong> 3 Juni 2026 - Selesai<br>
+                            📅 <strong>Tanggal:</strong> 3 - 4 Juni 2026<br>
                             🕘 <strong>Waktu:</strong> 09.00 – 20.00 WIB
                         </p>
                         <p style="margin:0 0 15px;font-size:14px;line-height:1.6;color:#556677;">
