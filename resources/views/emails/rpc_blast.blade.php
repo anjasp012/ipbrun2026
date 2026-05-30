@@ -24,7 +24,7 @@
                 <td style="padding:40px 40px 20px;">
                     <p style="margin:0;font-size:16px;line-height:1.6;color:#556677;">
                         Hai Runner</strong>! 👋<br><br>
-                        Waktunya semakin dekat menuju IPB RUN 2026 – Inspiring Run for The Earth!<br><br>
+                        Waktunya semakin dekat menuju IPB RUN 2026 – Lestari Untuk Bumi<br><br>
                         Sebelum berlari, pastikan kamu sudah mengambil Racepack milikmu ya.
                     </p>
                 </td>
