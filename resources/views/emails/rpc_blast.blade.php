@@ -22,7 +22,6 @@
             <!-- Main Greeting -->
             <tr>
                 <td style="padding:40px 40px 20px;">
-                    <h1 style="margin:0 0 15px;font-size:24px;color:#1a2b4b;letter-spacing:-0.5px;">Persiapan Pengambilan Race Pack 📦🏃‍♂️</h1>
                     <p style="margin:0;font-size:16px;line-height:1.6;color:#556677;">
                         Hai Runner</strong>! 👋<br><br>
                         Waktunya semakin dekat menuju IPB RUN 2026 – Inspiring Run for The Earth!<br><br>
@@ -60,22 +59,7 @@
                     </div>
                 </td>
             </tr> 
-            
-            <!-- Dashboard Access Account Box -->
-            <tr>
-                <td style="padding:0 40px 40px;">
-                    <div style="background:linear-gradient(135deg, #e8630a 0%, #d85300 100%);border-radius:12px;padding:30px;color:#ffffff;text-align:center;">
-                        <h3 style="margin:0 0 10px;font-size:18px;font-weight:bold;">Akses QR Code Anda</h3>
-                        <p style="margin:0 0 20px;font-size:14px;opacity:0.9;">
-                            Silakan login ke portal peserta untuk melihat QR Code RPC Anda. Tanda Pengambilan juga telah dilampirkan pada email ini dalam format PDF.
-                        </p>
-                        <a href="{{ url('/login') }}"
-                            style="display:inline-block;background-color:#ffffff;color:#e8630a;text-decoration:none;padding:14px 35px;border-radius:8px;font-weight:bold;font-size:14px;box-shadow:0 4px 15px rgba(0,0,0,0.1);">
-                            KE DASHBOARD PESERTA
-                        </a>
-                    </div>
-                </td>
-            </tr>
+
             
             <!-- Footer -->
             <tr>

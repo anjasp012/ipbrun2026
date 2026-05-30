@@ -30,7 +30,7 @@ class RpcBlastEmail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Informasi Pengambilan Race Pack (RPC) IPB RUN 2026',
+            subject: 'IPB RUN RACEPACK DAY 2026',
         );
     }
 
