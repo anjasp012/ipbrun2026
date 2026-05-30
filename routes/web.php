@@ -45,12 +45,12 @@ Route::get('/sponsorship/checkout/{ticket}', [SponsorshipController::class, 'che
 Route::post('/sponsorship/register', [SponsorshipController::class, 'register'])->name('sponsorship.register');
 
 // Komunitas Flow
-Route::prefix('komunitas')->group(function () {
-    Route::get('/', [\App\Http\Controllers\Enduser\CommunityTicketController::class, 'home'])->name('komunitas.home');
-    Route::get('/checkout/{ticket}', [\App\Http\Controllers\Enduser\CommunityTicketController::class, 'checkout'])->name('komunitas.checkout');
-    Route::post('/check-voucher', [\App\Http\Controllers\Enduser\CommunityTicketController::class, 'checkVoucher'])->name('komunitas.check-voucher');
-    Route::post('/register', [\App\Http\Controllers\Enduser\CommunityTicketController::class, 'register'])->name('komunitas.register');
-});
+// Route::prefix('komunitas')->group(function () {
+//     Route::get('/', [\App\Http\Controllers\Enduser\CommunityTicketController::class, 'home'])->name('komunitas.home');
+//     Route::get('/checkout/{ticket}', [\App\Http\Controllers\Enduser\CommunityTicketController::class, 'checkout'])->name('komunitas.checkout');
+//     Route::post('/check-voucher', [\App\Http\Controllers\Enduser\CommunityTicketController::class, 'checkVoucher'])->name('komunitas.check-voucher');
+//     Route::post('/register', [\App\Http\Controllers\Enduser\CommunityTicketController::class, 'register'])->name('komunitas.register');
+// });
 
 Route::get('/payment/{participant}', function (\App\Models\Participant $participant) {
     return view('pages.enduser.payment', compact('participant'));
