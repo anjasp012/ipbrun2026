@@ -6,6 +6,7 @@ use App\Http\Controllers\Enduser\TicketController as EnduserTicket;
 use App\Http\Controllers\Admin\TicketController as AdminTicket;
 use App\Http\Controllers\Admin\CategoryController as AdminCategory;
 use App\Http\Controllers\Admin\AdminController as AdminDashboard;
+use App\Http\Controllers\Admin\ScanController;
 use App\Http\Controllers\Enduser\PaymentController;
 use App\Http\Controllers\Enduser\TestController;
 use App\Http\Controllers\Auth\AuthController;
@@ -72,12 +73,17 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::middleware(['role:superadmin,admin,pic'])->group(function () {
         Route::get('/dashboard', [AdminDashboard::class, 'dashboard']);
         Route::get('/participants', [AdminDashboard::class, 'participants']);
+
+        // QR Scan Race Pack
+        Route::get('/scan-rpc', [ScanController::class, 'index'])->name('admin.scan-rpc');
+        Route::post('/scan-rpc/process', [ScanController::class, 'process'])->name('admin.scan-rpc.process');
     });
 
     // Superadmin Only Routes
     Route::middleware(['role:superadmin'])->group(function () {
         Route::post('/toggle-running', [AdminDashboard::class, 'toggleRunning']);
         Route::put('/participants/{participant}/change-password', [AdminDashboard::class, 'changePassword'])->name('participants.change-password');
+        Route::post('/scan-rpc/{raceEntry}/reset', [ScanController::class, 'reset'])->name('admin.scan-rpc.reset');
 
         Route::get('/tickets', [AdminTicket::class, 'index']);
         Route::post('/tickets', [AdminTicket::class, 'store'])->name('tickets.store');

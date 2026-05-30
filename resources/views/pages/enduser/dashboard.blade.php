@@ -1,7 +1,7 @@
 <x-layouts.app title="Dashboard Peserta - IPB RUN 2026">
     <div class="fixed inset-0 bg-[#f4f6f9] z-[-2]"></div>
     <div class="max-w-[1000px] mx-auto py-12 px-6">
-        <!-- Welcome Message Section -->
+        {{-- Welcome Message Section --}}
         <div class="mb-12 border-b border-slate-200 pb-10">
             <h2 class="text-3xl md:text-4xl font-[900] text-[#003366] tracking-tight uppercase mb-3 leading-none">
                 Selamat Datang, {{ explode(' ', $participant->name)[0] }}
@@ -11,7 +11,7 @@
             </p>
         </div>
 
-        <!-- Section: Verified Registrations (Owned Tickets) -->
+        {{-- Section: Verified Registrations (Owned Tickets) --}}
         <div class="space-y-10 mb-20">
             <div class="flex items-center gap-6">
                 <h3 class="text-[12px] font-black text-slate-400 uppercase tracking-[4px] whitespace-nowrap">Status Pendaftaran</h3>
@@ -67,9 +67,47 @@
 
                             <div class="lg:w-72 shrink-0">
                                 @if($entry->status === 'paid')
-                                    <div class="p-8 bg-slate-50 border border-slate-100 rounded-[2rem] text-center lg:text-right group-hover:bg-blue-50/50 transition-colors">
-                                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3 leading-none opacity-70">Nomor Dada (BIB)</p>
-                                        <div class="text-5xl font-black text-[#003366] font-mono tracking-widest leading-none">{{ $entry->bib_number ?: 'TBA' }}</div>
+                                    <div class="flex flex-col gap-4">
+                                        {{-- BIB Number --}}
+                                        <div class="p-6 bg-slate-50 border border-slate-100 rounded-[2rem] text-center group-hover:bg-blue-50/50 transition-colors">
+                                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none opacity-70">Nomor Dada (BIB)</p>
+                                            <div class="text-4xl font-black text-[#003366] font-mono tracking-widest leading-none">{{ $entry->bib_number ?: 'TBA' }}</div>
+                                        </div>
+
+                                        {{-- QR Code for Race Pack Pickup --}}
+                                        <div class="p-6 border-2 rounded-[2rem] text-center transition-all
+                                            {{ $entry->scanned_at 
+                                                ? 'bg-emerald-50 border-emerald-200' 
+                                                : 'bg-white border-slate-100 hover:border-blue-100' }}">
+                                            <p class="text-[9px] font-black uppercase tracking-widest mb-3 leading-none
+                                                {{ $entry->scanned_at ? 'text-emerald-500' : 'text-slate-400 opacity-70' }}">
+                                                QR Code Pengambilan RPC
+                                            </p>
+                                            
+                                            @if($entry->scanned_at)
+                                                {{-- Already picked up - show confirmation --}}
+                                                <div class="flex flex-col items-center gap-3">
+                                                    <div class="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                                        <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-sm font-black text-emerald-600 uppercase tracking-tight">SUDAH DIAMBIL</p>
+                                                        <p class="text-[10px] font-bold text-emerald-500/70 mt-1">
+                                                            {{ \Carbon\Carbon::parse($entry->scanned_at)->setTimezone('Asia/Jakarta')->format('d M Y, H:i') }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            @else
+                                                {{-- Show QR Code --}}
+                                                <div class="flex justify-center mb-3">
+                                                    <div id="qr-{{ $entry->id }}" class="w-32 h-32"></div>
+                                                </div>
+                                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Tunjukkan ke panitia saat pengambilan Race Pack</p>
+                                                <p class="text-[8px] font-black text-slate-300 font-mono mt-2 break-all">{{ Str::limit($entry->id, 20, '...') }}</p>
+                                            @endif
+                                        </div>
                                     </div>
                                 @elseif($entry->status === 'failed')
                                     <div class="flex flex-col gap-4 text-center lg:text-right">
@@ -98,7 +136,7 @@
             </div>
         </div>
 
-        <!-- Section: Additional Category Recommendation (Formal Upsell) -->
+        {{-- Section: Additional Category Recommendation (Formal Upsell) --}}
         @if($pairRecommendation && $participant->raceEntries->where('status', 'paid')->count() < 2)
             <div class="bg-[#003366] rounded-[3rem] p-10 md:p-14 text-white relative overflow-hidden group shadow-2xl shadow-blue-950/20 mb-20 border border-white/5">
                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
@@ -132,7 +170,7 @@
             </div>
         @endif
 
-        <!-- Section: Athlete Profile Detail (Grid Modules) -->
+        {{-- Section: Athlete Profile Detail (Grid Modules) --}}
         <div class="space-y-8 mb-20">
             <div class="flex items-center gap-6">
                 <h3 class="text-[12px] font-black text-slate-400 uppercase tracking-[4px] whitespace-nowrap">Detail Profil Peserta</h3>
@@ -247,8 +285,31 @@
         </div>
 
         <div class="text-center">
-            <p class="text-[10px] font-black text-slate-300 uppercase tracking-[5px] italic">Athlete Portal IPB RUN 2026 • Versi 2.1.0</p>
+            <p class="text-[10px] font-black text-slate-300 uppercase tracking-[5px] italic">Athlete Portal IPB RUN 2026 • Versi 2.2.0</p>
         </div>
     </div>
-</x-layouts.app>
 
+    {{-- QR Code Generation Script --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            @foreach($participant->raceEntries as $entry)
+                @if($entry->status === 'paid' && !$entry->scanned_at)
+                    (function() {
+                        var el = document.getElementById('qr-{{ $entry->id }}');
+                        if (el) {
+                            new QRCode(el, {
+                                text: '{{ $entry->id }}',
+                                width: 128,
+                                height: 128,
+                                colorDark: '#003366',
+                                colorLight: '#ffffff',
+                                correctLevel: QRCode.CorrectLevel.M
+                            });
+                        }
+                    })();
+                @endif
+            @endforeach
+        });
+    </script>
+</x-layouts.app>
