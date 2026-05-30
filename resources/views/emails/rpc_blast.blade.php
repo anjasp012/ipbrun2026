@@ -24,7 +24,7 @@
                 <td style="padding:40px 40px 20px;">
                     <h1 style="margin:0 0 15px;font-size:24px;color:#1a2b4b;letter-spacing:-0.5px;">Persiapan Pengambilan Race Pack 📦🏃‍♂️</h1>
                     <p style="margin:0;font-size:16px;line-height:1.6;color:#556677;">
-                        Hai <strong style="color:#1a2b4b;">{{ $participant->name }} (Runner)</strong>! 👋<br><br>
+                        Hai Runner</strong>! 👋<br><br>
                         Waktunya semakin dekat menuju IPB RUN 2026 – Inspiring Run for The Earth!<br><br>
                         Sebelum berlari, pastikan kamu sudah mengambil Racepack milikmu ya.
                     </p>
