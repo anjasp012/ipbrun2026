@@ -77,6 +77,10 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         // QR Scan Race Pack
         Route::get('/scan-rpc', [ScanController::class, 'index'])->name('admin.scan-rpc');
         Route::post('/scan-rpc/process', [ScanController::class, 'process'])->name('admin.scan-rpc.process');
+        
+        // Blast Email RPC
+        Route::get('/scan-rpc/blast', [ScanController::class, 'blastForm'])->name('admin.scan-rpc.blast');
+        Route::post('/scan-rpc/blast', [ScanController::class, 'sendBlast'])->name('admin.scan-rpc.blast.send');
     });
 
     // Superadmin Only Routes

@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\RaceEntry;
+use App\Models\Participant;
+use App\Mail\RpcBlastEmail;
+use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
 class ScanController extends Controller
@@ -93,9 +96,6 @@ class ScanController extends Controller
         ], 200);
     }
 
-    /**
-     * Reset status scan (superadmin only, untuk koreksi)
-     */
     public function reset(RaceEntry $raceEntry)
     {
         if (!$raceEntry->scanned_at) {
@@ -108,5 +108,57 @@ class ScanController extends Controller
         ]);
 
         return back()->with('success', "Status pengambilan Race Pack untuk {$raceEntry->participant->name} ({$raceEntry->ticket->category->name}) berhasil direset.");
+    }
+
+    /**
+     * Tampilkan form untuk Blast Email RPC
+     */
+    public function blastForm()
+    {
+        return view('pages.admin.scan.blast');
+    }
+
+    /**
+     * Proses kirim blast email RPC
+     */
+    public function sendBlast(Request $request)
+    {
+        $request->validate([
+            'emails' => 'required|string',
+        ]);
+
+        $rawEmails = $request->input('emails');
+        
+        // Pisahkan berdasarkan koma, titik koma, spasi, atau baris baru
+        $emailArray = preg_split('/[\s,;]+/', $rawEmails);
+        $emailArray = array_filter(array_map('trim', $emailArray));
+        $emailArray = array_unique($emailArray);
+
+        if (empty($emailArray)) {
+            return back()->with('error', 'Tidak ada alamat email yang valid untuk diproses.');
+        }
+
+        $sentCount = 0;
+        $notFoundEmails = [];
+
+        foreach ($emailArray as $email) {
+            $participant = Participant::where('email', $email)->first();
+            
+            if ($participant) {
+                // Send email to participant using Queue
+                Mail::to($participant->email)->queue(new RpcBlastEmail($participant));
+                $sentCount++;
+            } else {
+                $notFoundEmails[] = $email;
+            }
+        }
+
+        $msg = "Berhasil mengirim antrean email ke {$sentCount} peserta.";
+        if (count($notFoundEmails) > 0) {
+            $msg .= " Namun, ada " . count($notFoundEmails) . " email yang tidak ditemukan di sistem: " . implode(', ', $notFoundEmails);
+            return back()->with('success', $msg)->with('notFound', $notFoundEmails);
+        }
+
+        return back()->with('success', $msg);
     }
 }

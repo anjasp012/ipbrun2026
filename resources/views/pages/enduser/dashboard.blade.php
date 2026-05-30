@@ -54,7 +54,7 @@
                                         <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 leading-none">Jadwal Lomba</p>
                                         @php 
                                             $catName = strtoupper($entry->ticket->category->name);
-                                            $day = (str_contains($catName, '5K') || str_contains($catName, '42K')) ? 'Sabtu, 6 Juni 2026' : 'Minggu, 7 Juni 2026';
+                                            $day = str_contains($catName, '5K') ? 'Sabtu, 6 Juni 2026' : 'Minggu, 7 Juni 2026';
                                         @endphp
                                         <p class="text-sm font-black text-[#003366] uppercase group-hover:text-blue-600 transition-colors">{{ $day }}</p>
                                     </div>
@@ -137,34 +137,39 @@
         </div>
 
         {{-- Section: Additional Category Recommendation (Formal Upsell) --}}
-        @if($pairRecommendation && $participant->raceEntries->where('status', 'paid')->count() < 2)
+        @if(isset($pairRecommendations) && $pairRecommendations->count() > 0 && $participant->raceEntries->where('status', 'paid')->count() < 2)
             <div class="bg-[#003366] rounded-[3rem] p-10 md:p-14 text-white relative overflow-hidden group shadow-2xl shadow-blue-950/20 mb-20 border border-white/5">
                 <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
                 <div class="absolute -right-20 -top-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
                 
-                <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-12">
-                    <div class="flex-grow text-center lg:text-left">
-                        <h4 class="text-2xl md:text-3xl font-black uppercase tracking-tight mb-6 leading-tight">Pendaftaran Tiket Tambahan</h4>
-                        <p class="text-[12px] md:text-[13px] text-white/70 font-bold uppercase tracking-widest leading-loose italic opacity-80">
-                            @php
-                                $recCatName = strtoupper($pairRecommendation->category->name);
-                                $recDay = (str_contains($recCatName, '5K') || str_contains($recCatName, '42K')) ? 'HARI SABTU' : 'HARI MINGGU';
-                            @endphp
-                            Anda memenuhi kualifikasi untuk mengikuti kategori {{ $recCatName }} ({{ $recDay }}). Gunakan tombol di samping untuk mendaftar secara instan
+                <div class="relative z-10 flex flex-col items-center text-center gap-10">
+                    <div class="w-full">
+                        <h4 class="text-2xl md:text-3xl font-black uppercase tracking-tight mb-4 leading-tight">Pendaftaran Tiket Tambahan</h4>
+                        <p class="text-[12px] md:text-[13px] text-white/70 font-bold uppercase tracking-widest leading-loose italic opacity-80 max-w-2xl mx-auto">
+                            Anda memenuhi kualifikasi untuk mengikuti kategori tambahan di hari yang berbeda. Pilih salah satu dari tiket di bawah ini untuk mendaftar secara instan.
                         </p>
                     </div>
 
-                    <div class="w-full lg:w-auto text-center border-t lg:border-t-0 lg:border-l border-white/10 pt-10 lg:pt-0 lg:pl-16 flex flex-col items-center lg:items-end">
-                        <p class="text-[9px] font-black text-white/40 uppercase tracking-[5px] mb-4 leading-none">Biaya Pendaftaran</p>
-                        
-                        <div class="mb-10 text-center lg:text-right">
-                            <div class="text-4xl md:text-5xl font-[900] text-white leading-none tracking-tighter italic">Rp {{ number_format($pairRecommendation->price, 0, ',', '.') }}</div>
-                        </div>
-
-                        <a href="{{ route('participant.buy-more', $pairRecommendation->id) }}" 
-                           class="w-full lg:w-auto inline-flex items-center justify-center px-12 h-16 bg-[#E8630A] text-white rounded-2xl font-black text-[11px] uppercase tracking-[4px] hover:bg-orange-700 transition-all shadow-2xl shadow-orange-950/20 transform hover:scale-[1.05] active:scale-95">
-                           Daftar Sekarang
-                        </a>
+                    <div class="w-full grid grid-cols-1 md:grid-cols-{{ min($pairRecommendations->count(), 3) }} gap-6 mt-2">
+                        @foreach($pairRecommendations as $rec)
+                            @php
+                                $recCatName = strtoupper($rec->category->name);
+                                $recDay = str_contains($recCatName, '5K') ? 'HARI SABTU' : 'HARI MINGGU';
+                            @endphp
+                            <div class="bg-white/10 rounded-3xl p-8 flex flex-col items-center justify-between gap-6 hover:bg-white/20 transition-all border border-white/10">
+                                <div>
+                                    <h5 class="text-3xl font-black text-white uppercase tracking-tight mb-2">{{ $recCatName }}</h5>
+                                    <span class="px-3 py-1 bg-orange-500/20 text-orange-400 rounded-full text-[9px] font-black uppercase tracking-[3px]">{{ $recDay }}</span>
+                                </div>
+                                <div class="text-2xl md:text-3xl font-[900] text-white italic tracking-tighter">
+                                    Rp {{ number_format($rec->price, 0, ',', '.') }}
+                                </div>
+                                <a href="{{ route('participant.buy-more', $rec->id) }}" 
+                                   class="w-full inline-flex items-center justify-center h-14 bg-[#E8630A] text-white rounded-xl font-black text-[11px] uppercase tracking-[3px] hover:bg-orange-600 transition-all shadow-xl shadow-orange-900/20 transform hover:scale-[1.02] active:scale-95">
+                                   Daftar Sekarang
+                                </a>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

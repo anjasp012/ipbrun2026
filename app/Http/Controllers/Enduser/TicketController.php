@@ -99,31 +99,45 @@ class TicketController extends Controller
             $isSponsorship = $firstEntry->ticket->period && $firstEntry->ticket->period->name === 'Invitation & Sponsorship';
             if (!$isSponsorship) {
                 $firstCatName = strtoupper($firstEntry->ticket->category->name);
-                if (str_contains($firstCatName, '5K') || str_contains($firstCatName, '42K')) {
-                    $pairTarget = '10K';
-                } elseif (str_contains($firstCatName, '10K') || str_contains($firstCatName, '21K')) {
-                    $pairTarget = '5K';
+                if (str_contains($firstCatName, '5K')) {
+                    $pairTargets = ['10K', '21K', '42K'];
+                } elseif (str_contains($firstCatName, '10K') || str_contains($firstCatName, '21K') || str_contains($firstCatName, '42K')) {
+                    $pairTargets = ['5K'];
                 }
             }
         }
 
-        if (in_array($pairTarget, $ownedCategoryNames)) {
-            $pairTarget = '';
+        // We check if the user already owns ANY of the potential pair targets
+        // If they already have a 5K and a 10K, they can't buy another Sunday ticket since they already have 2 tickets.
+        $hasPairedTicket = false;
+        foreach ($ownedCategoryNames as $owned) {
+            if (!empty($pairTargets) && in_array($owned, $pairTargets)) {
+                $hasPairedTicket = true;
+                break;
+            }
         }
 
-        $pairRecommendation = null;
-        if ($pairTarget && $firstEntry) {
-            $recommendationCandidate = Ticket::whereHas('period', fn($q) => $q->where('is_active', true))
-                ->whereHas('category', fn($q) => $q->where('name', 'LIKE', "%$pairTarget%"))
+        $pairRecommendations = collect();
+        if (!$hasPairedTicket && !empty($pairTargets) && $firstEntry) {
+            // Find all available tickets that match the pair targets
+            $recommendationCandidates = Ticket::whereHas('period', fn($q) => $q->where('is_active', true))
+                ->whereHas('category', function ($q) use ($pairTargets) {
+                    $q->where(function($subQ) use ($pairTargets) {
+                        foreach($pairTargets as $pt) {
+                            $subQ->orWhere('name', 'LIKE', "%$pt%");
+                        }
+                    });
+                })
                 ->where('type', $firstEntry->ticket->type)
                 ->with(['category', 'period'])
-                ->first();
+                ->get();
 
-            if ($recommendationCandidate) {
-                $usedQty = RaceEntry::where('ticket_id', $recommendationCandidate->id)
+            // Pick all that have stock
+            foreach ($recommendationCandidates as $cand) {
+                $usedQty = RaceEntry::where('ticket_id', $cand->id)
                     ->whereIn('status', ['pending', 'paid'])->count();
-                if ($usedQty < $recommendationCandidate->qty) {
-                    $pairRecommendation = $recommendationCandidate;
+                if ($usedQty < $cand->qty) {
+                    $pairRecommendations->push($cand);
                 }
             }
         }
@@ -131,7 +145,7 @@ class TicketController extends Controller
         $potentialVoucher = null;
         $potentialDiscount = 0;
 
-        return view('pages.enduser.dashboard', compact('participant', 'orders', 'pairRecommendation', 'potentialVoucher', 'potentialDiscount'));
+        return view('pages.enduser.dashboard', compact('participant', 'orders', 'pairRecommendations', 'potentialVoucher', 'potentialDiscount'));
     }
 
     public function checkout(Ticket $ticket)
@@ -157,34 +171,39 @@ class TicketController extends Controller
             return redirect('/')->with('error', 'Maaf, tiket untuk kategori ini baru saja habis terjual.');
         }
 
-        // Find the pair ticket
+        // Find the pair ticket(s)
         $categoryName = strtoupper($ticket->category->name ?? '');
-        $pairTarget = '';
-        if (str_contains($categoryName, '5K') || str_contains($categoryName, '42K')) {
-            $pairTarget = '10K';
-        } elseif (str_contains($categoryName, '10K') || str_contains($categoryName, '21K')) {
-            $pairTarget = '5K';
+        $pairTargets = [];
+        if (str_contains($categoryName, '5K')) {
+            $pairTargets = ['10K', '21K', '42K'];
+        } elseif (str_contains($categoryName, '10K') || str_contains($categoryName, '21K') || str_contains($categoryName, '42K')) {
+            $pairTargets = ['5K'];
         }
 
-        $pairTicket = null;
-        $isPairSoldOut = false;
-        if ($pairTarget) {
-            $pairTicket = Ticket::where('period_id', $ticket->period_id)
+        $pairTickets = collect();
+        if (!empty($pairTargets)) {
+            $pairTicketsQuery = Ticket::where('period_id', $ticket->period_id)
                 ->where('type', $ticket->type)
-                ->whereHas('category', function ($q) use ($pairTarget) {
-                    $q->where('name', 'LIKE', "%$pairTarget%");
+                ->whereHas('category', function ($q) use ($pairTargets) {
+                    $q->where(function($subQ) use ($pairTargets) {
+                        foreach($pairTargets as $pt) {
+                            $subQ->orWhere('name', 'LIKE', "%$pt%");
+                        }
+                    });
                 })
                 ->where('id', '!=', $ticket->id)
-                ->first();
-
-            if ($pairTicket) {
-                $usedQty = \App\Models\RaceEntry::where('ticket_id', $pairTicket->id)
+                ->get();
+            
+            // Evaluasi stock untuk masing-masing opsi
+            foreach ($pairTicketsQuery as $pt) {
+                $usedQty = \App\Models\RaceEntry::where('ticket_id', $pt->id)
                     ->whereIn('status', ['pending', 'paid'])->count();
-                $isPairSoldOut = ($usedQty >= $pairTicket->qty);
+                $pt->isSoldOut = ($usedQty >= $pt->qty);
+                $pairTickets->push($pt);
             }
         }
 
-        return view('pages.enduser.checkout', compact('ticket', 'pairTicket', 'isPairSoldOut'));
+        return view('pages.enduser.checkout', compact('ticket', 'pairTickets'));
     }
 
     public function register(Request $request)
@@ -347,26 +366,17 @@ class TicketController extends Controller
             $pairTicket = null;
 
             if ($request->other_race_interest) {
-                $categoryName = strtoupper($ticket->category->name ?? '');
-                $pairTarget = '';
-                if (str_contains($categoryName, '5K') || str_contains($categoryName, '42K')) {
-                    $pairTarget = '10K';
-                } elseif (str_contains($categoryName, '10K') || str_contains($categoryName, '21K')) {
-                    $pairTarget = '5K';
-                }
-
-                if ($pairTarget) {
-                    $pairTicket = Ticket::where('period_id', $ticket->period_id)
-                        ->where('type', $ticket->type)
-                        ->whereHas('category', function ($q) use ($pairTarget) {
-                            $q->where('name', 'LIKE', "%$pairTarget%");
-                        })
-                        ->where('id', '!=', $ticket->id)
-                        ->first();
-
-                    if ($pairTicket) {
-                        $second_ticket_id = $pairTicket->id;
-                        $ticketSubtotal += $pairTicket->price;
+                // other_race_interest mengembalikan ticket_id dari radio button
+                $pairTicketCandidate = Ticket::find($request->other_race_interest);
+                
+                if ($pairTicketCandidate && $pairTicketCandidate->period_id === $ticket->period_id && $pairTicketCandidate->type === $ticket->type) {
+                    $usedQtyCand = RaceEntry::where('ticket_id', $pairTicketCandidate->id)
+                        ->whereIn('status', ['pending', 'paid'])->count();
+                        
+                    if ($usedQtyCand < $pairTicketCandidate->qty) {
+                        $second_ticket_id = $pairTicketCandidate->id;
+                        $ticketSubtotal += $pairTicketCandidate->price;
+                        $pairTicket = $pairTicketCandidate;
                     }
                 }
             }

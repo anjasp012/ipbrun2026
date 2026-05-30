@@ -276,51 +276,43 @@
                                 {{ $message }}</p>
                         @enderror
                     </div>
-                </div> <!-- Other Race Interest Section --> @php
-                    $categoryName = strtoupper($ticket->category->name ?? '');
-                    $pairCategory = '';
-                    if (str_contains($categoryName, '5K') || str_contains($categoryName, '42K')) {
-                        $pairCategory = '10K (Minggu)';
-                    } elseif (str_contains($categoryName, '10K') || str_contains($categoryName, '21K')) {
-                        $pairCategory = '5K (Sabtu)';
-                    }
-                @endphp @if ($pairTicket)
-                    <div
-                        class="mt-12 bg-orange-50/50 border border-orange-100 p-8 rounded-2xl {{ $isPairSoldOut ? 'opacity-60' : '' }}">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                            <div class="space-y-1">
-                                <p
-                                    class="text-[11px] font-bold text-[#E8630A]/80 uppercase tracking-widest leading-loose">
-                                    APAKAH ANDA INGIN MENGIKUTI KATEGORI <span
-                                        class="text-[#E8630A] underline underline-offset-4 decoration-2">{{ $pairCategory }}</span>
-                                    JUGA?
-                                    @if ($isPairSoldOut)
-                                        <span
-                                            class="ml-2 px-2 py-0.5 bg-rose-500 text-white text-[9px] rounded font-black italic">KUOTA
-                                            HABIS</span>
-                                    @endif
-                                </p>
-                            </div> <label
-                                class="relative inline-flex items-center {{ $isPairSoldOut ? 'cursor-not-allowed' : 'cursor-pointer' }} group">
-                                <input type="checkbox" name="other_race_interest" id="cb_second_ticket"
-                                    value="{{ $pairCategory }}" class="sr-only peer"
-                                    {{ old('other_race_interest') ? 'checked' : '' }}
-                                    {{ $isPairSoldOut ? 'disabled' : '' }}>
-                                <div
-                                    class="w-20 h-10 {{ $isPairSoldOut ? 'bg-slate-300' : 'bg-slate-200' }} peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-10 after:content-[''] after:absolute after:top-1 after:left-1 after:bg-white after:rounded-full after:h-8 after:w-8 after:transition-all peer-checked:bg-[#FF7A21] shadow-inner ring-4 ring-slate-100 peer-checked:ring-orange-100">
-                                </div>
-                                <span
-                                    class="ml-4 text-xs font-black text-slate-400 peer-checked:hidden uppercase tracking-widest transition-colors">TIDAK</span>
-                                <span
-                                    class="ml-4 hidden peer-checked:inline text-xs font-black text-[#FF7A21] uppercase tracking-widest transition-colors">YA,
-                                    IKUT!</span>
-                            </label>
+                <!-- Other Race Interest Section -->
+                @if (isset($pairTickets) && $pairTickets->count() > 0)
+                    <div class="mt-12 bg-orange-50/50 border border-orange-100 p-8 rounded-2xl">
+                        <div class="space-y-4">
+                            <p class="text-[11px] font-bold text-[#E8630A]/80 uppercase tracking-widest leading-loose">
+                                APAKAH ANDA INGIN MENGIKUTI KATEGORI TAMBAHAN?
+                            </p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <label class="relative flex items-center p-4 border border-slate-200 bg-white rounded-xl cursor-pointer hover:border-orange-200 hover:bg-orange-50/30 transition-all">
+                                    <input type="radio" name="other_race_interest" value="" class="w-4 h-4 text-[#FF7A21] border-slate-300 focus:ring-[#FF7A21]" {{ !old('other_race_interest') ? 'checked' : '' }} onchange="updateSecondTicket(null)">
+                                    <span class="ml-3 text-xs font-black text-slate-600 uppercase tracking-widest">TIDAK, TERIMA KASIH</span>
+                                </label>
+                                @foreach($pairTickets as $pt)
+                                    @php
+                                        $ptName = strtoupper($pt->category->name);
+                                        $ptDay = str_contains($ptName, '5K') ? 'SABTU' : 'MINGGU';
+                                    @endphp
+                                    <label class="relative flex items-center justify-between p-4 border border-slate-200 bg-white rounded-xl {{ $pt->isSoldOut ? 'opacity-60 cursor-not-allowed bg-slate-50' : 'cursor-pointer hover:border-orange-200 hover:bg-orange-50/30' }} transition-all">
+                                        <div class="flex items-center">
+                                            <input type="radio" name="other_race_interest" value="{{ $pt->id }}" class="w-4 h-4 text-[#FF7A21] border-slate-300 focus:ring-[#FF7A21]" {{ old('other_race_interest') == $pt->id ? 'checked' : '' }} {{ $pt->isSoldOut ? 'disabled' : '' }} onchange="updateSecondTicket({ id: '{{ $pt->id }}', name: '{{ $ptName }}', price: {{ $pt->price }} })">
+                                            <div class="ml-3">
+                                                <span class="block text-xs font-black text-[#FF7A21] uppercase tracking-widest">{{ $ptName }} ({{ $ptDay }})</span>
+                                                <span class="block text-[10px] font-bold text-slate-400 mt-0.5">+ Rp {{ number_format($pt->price, 0, ',', '.') }}</span>
+                                            </div>
+                                        </div>
+                                        @if($pt->isSoldOut)
+                                            <span class="px-2 py-0.5 bg-rose-500 text-white text-[9px] rounded font-black italic">HABIS</span>
+                                        @endif
+                                    </label>
+                                @endforeach
+                            </div>
                         </div>
                         <div class="mt-6 pt-6 border-t border-orange-100/50">
-                            <p
-                                class="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed italic">
-                                * Pilihan ini bersifat opsional. Jika dipilih, data Anda akan tercatat sebagai peminat
-                                kategori {{ $pairCategory }}. </p>
+                            <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed italic">
+                                * Pilihan ini bersifat opsional. Jika dipilih, data Anda akan tercatat mengikuti dua kategori tersebut.
+                            </p>
                         </div>
                     </div>
                 @endif <!-- Donation Section -->
@@ -432,18 +424,16 @@
                                         class="hidden text-emerald-600 font-black block"></span>
                                 </div>
                             </div>
-                            @if ($pairTicket)
+                            @if (isset($pairTickets) && $pairTickets->count() > 0)
                                 <div id="row_second_ticket"
                                     class="hidden flex justify-between items-start text-sm ring-2 ring-orange-100 bg-orange-50/30 p-2 rounded-lg gap-3">
                                     <div class="flex-1 min-w-0">
                                         <span class="text-[#E8630A] font-bold italic block">Tiket Tambahan:
-                                            {{ $pairTicket->category->name }}
-                                            ({{ $pairTicket->name ?: strtoupper($pairTicket->type) }})</span>
+                                            <span id="lbl_second_ticket_name">-</span></span>
                                         <div id="ticket2_voucher_tags" class="mt-1.5 flex flex-wrap gap-1"></div>
                                     </div>
                                     <div class="text-right flex-shrink-0">
-                                        <span id="ticket2_price_original" class="text-[#E8630A] font-bold block">Rp
-                                            {{ number_format($pairTicket->price, 0, ',', '.') }}</span>
+                                        <span id="ticket2_price_original" class="text-[#E8630A] font-bold block">Rp 0</span>
                                         <span id="ticket2_price_final"
                                             class="hidden text-emerald-600 font-black block"></span>
                                     </div>
@@ -670,8 +660,11 @@
             const ticketPrice = {{ $ticket->price }};
             const adminFee = 4500;
             const isIPB = "{{ $ticket->type }}" === "ipb";
-            const pairTicketPrice = {{ $pairTicket->price ?? 0 }};
-            const pairTicketId = "{{ $pairTicket->id ?? '' }}";
+            
+            let isSecondTicketChecked = false;
+            let pairTicketPrice = 0;
+            let pairTicketId = null;
+            let pairTicketName = '';
             const nimInput = document.getElementById('nim_nrp');
             const nikInputForVoucher = document.getElementById('nik');
 
@@ -692,8 +685,7 @@
                 const dot1 = document.getElementById('slot_dot_1');
                 const dot2 = document.getElementById('slot_dot_2');
                 const limitLabel = document.getElementById('voucher_limit_label');
-                const isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
-                const limit = isSecondChecked ? 2 : 1;
+                const limit = isSecondTicketChecked ? 2 : 1;
 
                 if (limitLabel) limitLabel.innerText = `(maks. ${limit} voucher)`;
 
@@ -716,8 +708,7 @@
                 const inputEl = document.getElementById('voucher_input');
                 const btn = document.getElementById('btn_apply_voucher');
                 const messageEl = document.getElementById('voucher_message');
-                const isSecondChecked = document.getElementById('cb_second_ticket')?.checked || false;
-                const limit = isSecondChecked ? 2 : 1;
+                const limit = isSecondTicketChecked ? 2 : 1;
                 const count = appliedVouchers.length;
 
                 if (count >= limit) {
@@ -785,7 +776,6 @@
             function updateTotal() {
                 let donEvent = parseInt(document.getElementById('donation_event')?.value || 0);
                 let donScholar = parseInt(document.getElementById('donation_scholarship')?.value || 0);
-                let isSecondTicketChecked = document.getElementById('cb_second_ticket')?.checked || false;
 
                 const summaryEvent = document.getElementById('row_donation_event');
                 const lblEvent = document.getElementById('lbl_donation_event');
@@ -831,8 +821,14 @@
 
             document.getElementById('donation_event')?.addEventListener('change', updateTotal);
             document.getElementById('donation_scholarship')?.addEventListener('change', updateTotal);
-            document.getElementById('cb_second_ticket')?.addEventListener('change', function() {
-                if (!this.checked) {
+
+            function updateSecondTicket(ticketData) {
+                if (!ticketData) {
+                    isSecondTicketChecked = false;
+                    pairTicketId = null;
+                    pairTicketPrice = 0;
+                    pairTicketName = '';
+                    
                     appliedVouchers = appliedVouchers.filter(v => v.targetTicket !== 2);
 
                     document.getElementById('applied_voucher_code_1').value = appliedVouchers.length > 0 ?
@@ -841,13 +837,25 @@
                         appliedVouchers[1].code : '';
 
                     const messageEl = document.getElementById('voucher_message');
-                    if (appliedVouchers.length < (this.checked ? 2 : 1)) {
+                    if (appliedVouchers.length < 1) {
                         messageEl.innerHTML = '';
                     }
+                } else {
+                    isSecondTicketChecked = true;
+                    pairTicketId = ticketData.id;
+                    pairTicketPrice = ticketData.price;
+                    pairTicketName = ticketData.name;
+                    
+                    const lblName = document.getElementById('lbl_second_ticket_name');
+                    if(lblName) lblName.innerText = pairTicketName;
+                    
+                    const origEl = document.getElementById('ticket2_price_original');
+                    if(origEl) origEl.innerText = 'Rp ' + pairTicketPrice.toLocaleString('id-ID');
                 }
+                
                 syncVoucherInputState();
                 updateTotal();
-            });
+            }
 
             function commitVoucher(voucherData, targetTicket) {
                 appliedVouchers.push({
