@@ -35,10 +35,11 @@
                 <td style="padding:0 40px 30px;">
                     <div style="background-color:#f9fbff;border-radius:12px;padding:25px;border:1px solid #eef2f7;">
                         <h3 style="margin:0 0 15px;font-size:14px;color:#00875a;text-transform:uppercase;letter-spacing:1.5px;">
-                            Instruksi Pengambilan RPC
+                            Jadwal & Instruksi Pengambilan
                         </h3>
                         <p style="margin:0 0 15px;font-size:14px;line-height:1.6;color:#556677;">
-                            Untuk memperlancar proses pengambilan Race Pack, Anda wajib menunjukkan <strong>QR Code RPC</strong> kepada panitia. 
+                            Pengambilan Race Pack (RPC) akan dilaksanakan pada tanggal <strong>3 & 4 Juni 2026</strong>. 
+                            Untuk memperlancar proses pengambilan, Anda wajib menunjukkan <strong>QR Code RPC</strong> kepada panitia. 
                             Tanda Pengambilan berserta QR Code Anda telah kami <strong>lampirkan dalam bentuk file PDF</strong> di email ini.
                         </p>
                         
