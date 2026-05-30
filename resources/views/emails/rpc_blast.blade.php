@@ -50,7 +50,7 @@
                         <ul style="margin:0;padding-left:20px;font-size:14px;line-height:1.6;color:#556677;">
                             <li style="margin-bottom:8px;">Pengambilan dilakukan oleh peserta secara langsung.</li>
                             <li style="margin-bottom:8px;">Jika diwakilkan, wajib melampirkan surat kuasa dan kartu identitas yang diwakilkan dalam bentuk print.</li>
-                            <li style="margin-bottom:8px;">Formulir surat kuasa dapat diunduh di: <br><a href="{{ url('/surat-kuasa') }}" style="color:#00875a;">{{ url('/suratkuasa') }}</a></li>
+                            <li style="margin-bottom:8px;">Formulir surat kuasa dapat diunduh di: <br><a href="{{ url('/surat-kuasa') }}" style="color:#00875a;">{{ url('/surat-kuasa') }}</a></li>
                             <li style="margin-bottom:8px;">Baca juga rules & regulations di: <br><a href="{{ url('/rules') }}" style="color:#00875a;">{{ url('/rules') }}</a></li>
                         </ul>
                         <p style="margin:15px 0 0;font-size:14px;line-height:1.6;color:#556677;">
