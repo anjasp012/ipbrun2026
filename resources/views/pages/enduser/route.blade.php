@@ -7,24 +7,20 @@
             document.addEventListener('alpine:init', () => {
                 Alpine.data('gpxViewer', () => ({
                     modalOpen: false,
-                    activeTab: 'map',
                     loading: false,
                     currentCategory: '',
                     currentDistance: '',
                     currentGpxUrl: '',
-                    gpxRawData: '',
                     map: null,
                     polyline: null,
                     startMarker: null,
                     endMarker: null,
-                    copied: false,
 
                     openDetail(gpxUrl, categoryName, distance, themeColor) {
                         this.loading = true;
                         this.currentCategory = categoryName;
                         this.currentDistance = distance;
                         this.currentGpxUrl = gpxUrl;
-                        this.activeTab = 'map';
                         this.modalOpen = true;
 
                         // Fetch GPX file
@@ -34,7 +30,6 @@
                                 return res.text();
                             })
                             .then(text => {
-                                this.gpxRawData = text;
                                 this.loading = false;
 
                                 // Wait for modal to render and map container to be visible
@@ -122,17 +117,6 @@
                         } catch (e) {
                             Swal.fire('Parsing Error', 'Gagal memproses file GPX: ' + e.message, 'error');
                         }
-                    },
-
-                    copyGpxData() {
-                        navigator.clipboard.writeText(this.gpxRawData)
-                            .then(() => {
-                                this.copied = true;
-                                setTimeout(() => { this.copied = false; }, 2000);
-                            })
-                            .catch(err => {
-                                Swal.fire('Error', 'Gagal menyalin teks', 'error');
-                            });
                     }
                 }));
             });
@@ -300,26 +284,9 @@
                     </button>
                 </div>
 
-                <!-- Tabs Menu -->
-                <div class="flex border-b border-slate-100 bg-slate-50/50">
-                    <button type="button"
-                            @click="activeTab = 'map'; $nextTick(() => { if (map) map.invalidateSize(); })"
-                            :class="activeTab === 'map' ? 'border-b-4 border-[#E8630A] text-[#003366] font-black' : 'text-slate-400 font-bold'"
-                            class="px-8 py-4.5 text-xs uppercase tracking-widest hover:text-[#003366] transition-colors focus:outline-none">
-                        Peta Rute Interaktif
-                    </button>
-                    <button type="button"
-                            @click="activeTab = 'xml'"
-                            :class="activeTab === 'xml' ? 'border-b-4 border-[#E8630A] text-[#003366] font-black' : 'text-slate-400 font-bold'"
-                            class="px-8 py-4.5 text-xs uppercase tracking-widest hover:text-[#003366] transition-colors focus:outline-none">
-                        Isi File GPX (XML)
-                    </button>
-                </div>
-
                 <!-- Modal Body -->
                 <div class="p-8 md:p-10 flex-1">
-                    <!-- Tab: Map -->
-                    <div x-show="activeTab === 'map'" class="space-y-4">
+                    <div class="space-y-4">
                         <div id="gpx-map" class="w-full h-[400px] rounded-3xl border border-slate-100 shadow-inner bg-slate-100 overflow-hidden relative z-0"></div>
                         <div class="flex items-center gap-6 text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-wider pl-1 pt-1">
                             <div class="flex items-center gap-2">
@@ -334,22 +301,6 @@
                                 <div class="w-6 h-1 bg-[#E8630A] rounded-full"></div>
                                 <span>Garis Rute Perlombaan</span>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Tab: XML -->
-                    <div x-show="activeTab === 'xml'" class="space-y-4">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Metadata XML Source</span>
-                            <button type="button"
-                                    @click="copyGpxData"
-                                    class="h-9 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-black rounded-lg uppercase tracking-wider transition-colors flex items-center gap-2">
-                                <span x-text="copied ? 'Disalin!' : 'Salin Data'"></span>
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                            </button>
-                        </div>
-                        <div class="w-full h-[360px] bg-slate-900 rounded-3xl p-6 overflow-auto border border-slate-900 shadow-inner">
-                            <pre class="text-emerald-400 font-mono text-xs leading-relaxed" x-text="gpxRawData"></pre>
                         </div>
                     </div>
                 </div>
