@@ -11,6 +11,7 @@
                     currentCategory: '',
                     currentDistance: '',
                     currentGpxUrl: '',
+                    currentThemeColor: '',
                     map: null,
                     polyline: null,
                     startMarker: null,
@@ -21,6 +22,7 @@
                         this.currentCategory = categoryName;
                         this.currentDistance = distance;
                         this.currentGpxUrl = gpxUrl;
+                        this.currentThemeColor = themeColor;
                         this.modalOpen = true;
 
                         // Fetch GPX file
@@ -190,7 +192,7 @@
 
             @foreach ($categories as $cat)
                 <!-- Category Card -->
-                <div class="group bg-white/95 backdrop-blur-md rounded-[2.5rem] border border-white/20 shadow-2xl p-8 hover:scale-[1.03] transition-all duration-300 flex flex-col justify-between">
+                <div class="group bg-white/95 backdrop-blur-md rounded-[1.5rem] border border-white/20 shadow-2xl p-8 hover:scale-[1.03] transition-all duration-300 flex flex-col justify-between">
                     <div>
                         <!-- Icon & Distance Badge -->
                         <div class="flex items-center justify-between mb-8">
@@ -298,7 +300,7 @@
                                 <span>Titik Finish</span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <div class="w-6 h-1 bg-[#E8630A] rounded-full"></div>
+                                <div class="w-6 h-1 rounded-full" :style="{ backgroundColor: currentThemeColor }"></div>
                                 <span>Garis Rute Perlombaan</span>
                             </div>
                         </div>
