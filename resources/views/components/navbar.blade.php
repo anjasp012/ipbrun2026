@@ -52,8 +52,8 @@
                         x-transition:leave-end="opacity-0 translate-y-2"
                         class="absolute top-full left-0 w-52 py-2 mt-1 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden"
                         @click.away="desktopDropdownOpen = false">
-                        <a href="#"
-                            class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest">Route</a>
+                        <a href="{{ route('route') }}"
+                            class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest {{ request()->routeIs('route') ? 'text-[#003366] bg-slate-50' : '' }}">Route</a>
                         <a href="{{ route('faq') }}"
                             class="block px-6 py-3 text-[12px] font-bold text-slate-500 hover:text-[#003366] hover:bg-slate-50 transition-colors uppercase tracking-widest {{ request()->routeIs('faq') ? 'text-[#003366] bg-slate-50' : '' }}">FAQ</a>
                         <a href="{{ route('rules') }}"
@@ -236,8 +236,8 @@
                             </button>
                             <div x-show="open" x-cloak style="display: none"
                                 class="pl-11 mt-2 space-y-2 mb-4 animate-fade-down duration-300">
-                                <a href="#"
-                                    class="block py-2 text-[11px] font-bold text-slate-500 uppercase tracking-widest hover:text-[#003366]">Route
+                                <a href="{{ route('route') }}"
+                                    class="block py-2 text-[11px] font-bold uppercase tracking-widest hover:text-[#003366] {{ request()->routeIs('route') ? 'text-[#003366]' : 'text-slate-500' }}">Route
                                     Maps</a>
                                 <a href="{{ route('faq') }}"
                                     class="block py-2 text-[11px] font-bold uppercase tracking-widest hover:text-[#003366] {{ request()->routeIs('faq') ? 'text-[#003366]' : 'text-slate-500' }}">F.A.Q</a>

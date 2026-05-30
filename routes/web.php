@@ -36,6 +36,9 @@ Route::get('/surat-kuasa', function () {
 Route::get('/rules', function () {
     return view('pages.enduser.rules');
 })->name('rules');
+Route::get('/route', function () {
+    return view('pages.enduser.route');
+})->name('route');
 Route::get('/dashboard', [EnduserTicket::class, 'dashboard'])->name('participant.dashboard')->middleware('auth');
 Route::get('/payment/finish', [PaymentController::class, 'finish'])->name('payment.finish');
 
