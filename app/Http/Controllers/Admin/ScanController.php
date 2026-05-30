@@ -35,6 +35,60 @@ class ScanController extends Controller
     }
 
     /**
+     * Cek data QR code tanpa mencatat pengambilan (untuk konfirmasi modal)
+     */
+    public function check(Request $request)
+    {
+        $request->validate([
+            'race_entry_id' => 'required|string',
+        ]);
+
+        $raceEntryId = trim($request->race_entry_id);
+
+        $entry = RaceEntry::with(['participant', 'ticket.category', 'ticket.period', 'scanner'])
+            ->find($raceEntryId);
+
+        if (!$entry) {
+            return response()->json([
+                'status' => 'not_found',
+                'message' => 'QR Code tidak valid atau tidak ditemukan di sistem.',
+            ], 404);
+        }
+
+        if ($entry->status !== 'paid') {
+            return response()->json([
+                'status' => 'invalid',
+                'message' => 'Peserta ini belum melakukan pembayaran atau statusnya tidak valid.',
+                'participant_name' => $entry->participant->name ?? '-',
+                'category' => $entry->ticket->category->name ?? '-',
+                'entry_status' => $entry->status,
+            ], 422);
+        }
+
+        if ($entry->scanned_at) {
+            return response()->json([
+                'status' => 'already_scanned',
+                'message' => 'Race Pack untuk peserta ini sudah pernah diambil sebelumnya.',
+                'participant_name' => $entry->participant->name ?? '-',
+                'category' => $entry->ticket->category->name ?? '-',
+                'scanned_at' => Carbon::parse($entry->scanned_at)->setTimezone('Asia/Jakarta')->format('d M Y, H:i:s'),
+                'scanned_by' => $entry->scanner->name ?? 'Unknown',
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Data peserta ditemukan, siap diambil.',
+            'participant_name' => $entry->participant->name ?? '-',
+            'participant_nik' => $entry->participant->nik ?? '-',
+            'category' => $entry->ticket->category->name ?? '-',
+            'ticket_name' => $entry->ticket->name ?? '-',
+            'bib_number' => $entry->bib_number ?? 'Belum ditetapkan',
+            'jersey_size' => $entry->participant->jersey_size ?? '-',
+        ], 200);
+    }
+
+    /**
      * Proses scan QR code (API endpoint, return JSON)
      */
     public function process(Request $request)

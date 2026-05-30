@@ -231,6 +231,7 @@
         let cooldownTimer = null;
 
         const CSRF_TOKEN = '{{ csrf_token() }}';
+        const CHECK_URL = '{{ route('admin.scan-rpc.check') }}';
         const PROCESS_URL = '{{ route('admin.scan-rpc.process') }}';
 
         function setIndicator(state) {
@@ -322,6 +323,61 @@
             lastScannedId = raceEntryId;
             setIndicator('scanning');
 
+            fetch(CHECK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ race_entry_id: raceEntryId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire({
+                        title: 'Konfirmasi Pengambilan',
+                        html: `
+                            <div class="text-left space-y-2 mt-4 text-sm text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                <p><strong class="text-slate-900">Nama:</strong> ${data.participant_name}</p>
+                                <p><strong class="text-slate-900">Kategori:</strong> ${data.category}</p>
+                                <p><strong class="text-slate-900">Jersey:</strong> ${data.jersey_size}</p>
+                                <p><strong class="text-slate-900">BIB:</strong> ${data.bib_number}</p>
+                            </div>
+                            <p class="mt-4 text-sm font-bold text-emerald-600">Lanjutkan untuk mencatat pengambilan?</p>
+                        `,
+                        icon: 'info',
+                        showCancelButton: true,
+                        confirmButtonColor: '#003366',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Ya, Konfirmasi!',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            confirmScan(raceEntryId);
+                        } else {
+                            resetProcessingState();
+                        }
+                    });
+                } else {
+                    showResult(data);
+                    if (data.status === 'already_scanned') {
+                        setIndicator('warning');
+                    } else {
+                        setIndicator('error');
+                    }
+                    resetProcessingState();
+                }
+            })
+            .catch(err => {
+                showResult({ status: 'error', message: 'Koneksi gagal. Periksa jaringan.' });
+                setIndicator('error');
+                resetProcessingState();
+            });
+        }
+
+        function confirmScan(raceEntryId) {
+            setIndicator('scanning');
             fetch(PROCESS_URL, {
                 method: 'POST',
                 headers: {
@@ -348,14 +404,17 @@
                 setIndicator('error');
             })
             .finally(() => {
-                // Cooldown 2.5 seconds before next scan
-                clearTimeout(cooldownTimer);
-                cooldownTimer = setTimeout(() => {
-                    isProcessing = false;
-                    lastScannedId = null;
-                    setIndicator(html5QrCode ? 'scanning' : 'idle');
-                }, 2500);
+                resetProcessingState();
             });
+        }
+
+        function resetProcessingState() {
+            clearTimeout(cooldownTimer);
+            cooldownTimer = setTimeout(() => {
+                isProcessing = false;
+                lastScannedId = null;
+                setIndicator(html5QrCode ? 'scanning' : 'idle');
+            }, 2500);
         }
 
         function showResult(data) {
