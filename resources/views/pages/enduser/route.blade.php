@@ -151,7 +151,7 @@
                 $categories = [
                     [
                         'name' => '5K Fun Run',
-                        'distance' => '5.2 KM',
+                        'distance' => '5 KM',
                         'desc' => 'Rute santai melintasi ikon-ikon keindahan dan kerimbunan Kampus Dramaga. Sangat cocok bagi pemula dan keluarga.',
                         'gpx' => asset('assets/gpx/5K.gpx'),
                         'theme' => 'emerald',
@@ -160,7 +160,7 @@
                     ],
                     [
                         'name' => '10K Challenger',
-                        'distance' => '10.0 KM',
+                        'distance' => '10 KM',
                         'desc' => 'Tantangan tingkat menengah untuk menguji kecepatan Anda. Melalui tanjakan-tanjakan taktis kampus yang asri.',
                         'gpx' => asset('assets/gpx/10K.gpx'),
                         'theme' => 'sky',
@@ -169,7 +169,7 @@
                     ],
                     [
                         'name' => '21K Half Marathon',
-                        'distance' => '21.1 KM',
+                        'distance' => '21 KM',
                         'desc' => 'Setengah marathon menantang ketahanan fisik penuh dengan rute komplit berkeliling seluruh penjuru Kampus IPB.',
                         'gpx' => asset('assets/gpx/21K.gpx'),
                         'theme' => 'indigo',
@@ -178,7 +178,7 @@
                     ],
                     [
                         'name' => '42K Full Marathon',
-                        'distance' => '42.2 KM',
+                        'distance' => '42 KM',
                         'desc' => 'Ujian ketahanan tertinggi bagi pelari tangguh! Melibatkan putaran prestisius dan penuh memori di IPB RUN 2026.',
                         'gpx' => asset('assets/gpx/42K.gpx'),
                         'theme' => 'rose',
