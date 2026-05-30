@@ -54,7 +54,7 @@
                             <li style="margin-bottom:8px;">Baca juga rules & regulations di: <br><a href="{{ url('/rules') }}" style="color:#00875a;">{{ url('/rules') }}</a></li>
                         </ul>
                         <p style="margin:15px 0 0;font-size:14px;line-height:1.6;color:#556677;">
-                            Pastikan kamu datang sesuai jadwal, karena panitia tidak melayani pengambilan RPC diluar jadwal & waktu yang telah ditentukan. Jangan lupa bawa semangat terbaikmu untuk <strong>#InspiringRunForTheEarth</strong>
+                            Pastikan kamu datang sesuai jadwal, karena panitia tidak melayani pengambilan RPC diluar jadwal & waktu yang telah ditentukan. Jangan lupa bawa semangat terbaikmu untuk <strong>#LestariUntukBumi</strong>
                         </p>
                     </div>
                 </td>
