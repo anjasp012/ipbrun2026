@@ -3,6 +3,140 @@
     @push('scripts')
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        <script>
+            document.addEventListener('alpine:init', () => {
+                Alpine.data('gpxViewer', () => ({
+                    modalOpen: false,
+                    activeTab: 'map',
+                    loading: false,
+                    currentCategory: '',
+                    currentDistance: '',
+                    currentGpxUrl: '',
+                    gpxRawData: '',
+                    map: null,
+                    polyline: null,
+                    startMarker: null,
+                    endMarker: null,
+                    copied: false,
+
+                    openDetail(gpxUrl, categoryName, distance, themeColor) {
+                        this.loading = true;
+                        this.currentCategory = categoryName;
+                        this.currentDistance = distance;
+                        this.currentGpxUrl = gpxUrl;
+                        this.activeTab = 'map';
+                        this.modalOpen = true;
+
+                        // Fetch GPX file
+                        fetch(gpxUrl)
+                            .then(res => {
+                                if (!res.ok) throw new Error('Gagal memuat file GPX');
+                                return res.text();
+                            })
+                            .then(text => {
+                                this.gpxRawData = text;
+                                this.loading = false;
+
+                                // Wait for modal to render and map container to be visible
+                                this.$nextTick(() => {
+                                    setTimeout(() => {
+                                        this.initMap(text, themeColor);
+                                    }, 150);
+                                });
+                            })
+                            .catch(err => {
+                                this.loading = false;
+                                Swal.fire('Error', err.message, 'error');
+                                this.modalOpen = false;
+                            });
+                    },
+
+                    initMap(gpxText, colorHex) {
+                        // Initialize map if not yet done
+                        if (!this.map) {
+                            this.map = L.map('gpx-map', {
+                                scrollWheelZoom: true
+                            }).setView([-6.56084, 106.72611], 14);
+
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '&copy; OpenStreetMap contributors'
+                            }).addTo(this.map);
+                        }
+
+                        // Force Leaflet to recalculate container size
+                        this.map.invalidateSize();
+
+                        // Remove existing layers if any
+                        if (this.polyline) this.map.removeLayer(this.polyline);
+                        if (this.startMarker) this.map.removeLayer(this.startMarker);
+                        if (this.endMarker) this.map.removeLayer(this.endMarker);
+
+                        try {
+                            // Parse XML
+                            let parser = new DOMParser();
+                            let xmlDoc = parser.parseFromString(gpxText, 'text/xml');
+                            let trkpts = xmlDoc.getElementsByTagName('trkpt');
+
+                            if (trkpts.length === 0) {
+                                throw new Error('Tidak ditemukan titik rute di dalam file GPX');
+                            }
+
+                            let latlngs = [];
+                            for (let i = 0; i < trkpts.length; i++) {
+                                let lat = parseFloat(trkpts[i].getAttribute('lat'));
+                                let lon = parseFloat(trkpts[i].getAttribute('lon'));
+                                latlngs.push([lat, lon]);
+                            }
+
+                            // Draw Route Polyline
+                            this.polyline = L.polyline(latlngs, {
+                                color: colorHex || '#E8630A',
+                                weight: 5,
+                                opacity: 0.9,
+                                lineJoin: 'round'
+                            }).addTo(this.map);
+
+                            // Zoom map to fit polyline
+                            this.map.fitBounds(this.polyline.getBounds(), { padding: [30, 30] });
+
+                            // Add START marker
+                            this.startMarker = L.marker(latlngs[0], {
+                                icon: L.divIcon({
+                                    html: '<div class="w-8 h-8 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center font-black text-xs text-white shadow-xl animate-bounce">S</div>',
+                                    className: '',
+                                    iconSize: [32, 32],
+                                    iconAnchor: [16, 16]
+                                })
+                            }).addTo(this.map).bindPopup('<b>STARTING POINT</b><br>' + this.currentCategory);
+
+                            // Add FINISH marker
+                            this.endMarker = L.marker(latlngs[latlngs.length - 1], {
+                                icon: L.divIcon({
+                                    html: '<div class="w-8 h-8 rounded-full bg-rose-500 border-2 border-white flex items-center justify-center font-black text-xs text-white shadow-xl">F</div>',
+                                    className: '',
+                                    iconSize: [32, 32],
+                                    iconAnchor: [16, 16]
+                                })
+                            }).addTo(this.map).bindPopup('<b>FINISH LINE</b><br>' + this.currentCategory);
+
+                        } catch (e) {
+                            Swal.fire('Parsing Error', 'Gagal memproses file GPX: ' + e.message, 'error');
+                        }
+                    },
+
+                    copyGpxData() {
+                        navigator.clipboard.writeText(this.gpxRawData)
+                            .then(() => {
+                                this.copied = true;
+                                setTimeout(() => { this.copied = false; }, 2000);
+                            })
+                            .catch(err => {
+                                Swal.fire('Error', 'Gagal menyalin teks', 'error');
+                            });
+                    }
+                }));
+            });
+        </script>
     @endpush
 
     <div class="fixed inset-0 bg-[#f1f5f9] z-[-2]"></div>
@@ -11,136 +145,7 @@
     <div class="fixed inset-0 bg-blue-950/25 z-[-1]"></div>
 
     <div class="min-h-screen py-16 px-4 sm:px-6 lg:px-8 flex flex-col items-center"
-         x-data="{
-             modalOpen: false,
-             activeTab: 'map',
-             loading: false,
-             currentCategory: '',
-             currentDistance: '',
-             currentGpxUrl: '',
-             gpxRawData: '',
-             map: null,
-             polyline: null,
-             startMarker: null,
-             endMarker: null,
-             copied: false,
-
-             openDetail(gpxUrl, categoryName, distance, themeColor) {
-                 this.loading = true;
-                 this.currentCategory = categoryName;
-                 this.currentDistance = distance;
-                 this.currentGpxUrl = gpxUrl;
-                 this.activeTab = 'map';
-                 this.modalOpen = true;
-
-                 // Fetch GPX file
-                 fetch(gpxUrl)
-                     .then(res => {
-                         if (!res.ok) throw new Error('Gagal memuat file GPX');
-                         return res.text();
-                     })
-                     .then(text => {
-                         this.gpxRawData = text;
-                         this.loading = false;
-
-                         // Wait for modal to render and map container to be visible
-                         this.$nextTick(() => {
-                             setTimeout(() => {
-                                 this.initMap(text, themeColor);
-                             }, 150);
-                         });
-                     })
-                     .catch(err => {
-                         this.loading = false;
-                         Swal.fire('Error', err.message, 'error');
-                         this.modalOpen = false;
-                     });
-             },
-
-             initMap(gpxText, colorHex) {
-                 // Initialize map if not yet done
-                 if (!this.map) {
-                     this.map = L.map('gpx-map', {
-                         scrollWheelZoom: true
-                     }).setView([-6.56084, 106.72611], 14);
-
-                     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                         attribution: '&copy; OpenStreetMap contributors'
-                     }).addTo(this.map);
-                 }
-
-                 // Force Leaflet to recalculate container size
-                 this.map.invalidateSize();
-
-                 // Remove existing layers if any
-                 if (this.polyline) this.map.removeLayer(this.polyline);
-                 if (this.startMarker) this.map.removeLayer(this.startMarker);
-                 if (this.endMarker) this.map.removeLayer(this.endMarker);
-
-                 try {
-                     // Parse XML
-                     let parser = new DOMParser();
-                     let xmlDoc = parser.parseFromString(gpxText, 'text/xml');
-                     let trkpts = xmlDoc.getElementsByTagName('trkpt');
-
-                     if (trkpts.length === 0) {
-                         throw new Error('Tidak ditemukan titik rute di dalam file GPX');
-                     }
-
-                     let latlngs = [];
-                     for (let i = 0; i < trkpts.length; i++) {
-                         let lat = parseFloat(trkpts[i].getAttribute('lat'));
-                         let lon = parseFloat(trkpts[i].getAttribute('lon'));
-                         latlngs.push([lat, lon]);
-                     }
-
-                     // Draw Route Polyline
-                     this.polyline = L.polyline(latlngs, {
-                         color: colorHex || '#E8630A',
-                         weight: 5,
-                         opacity: 0.9,
-                         lineJoin: 'round'
-                     }).addTo(this.map);
-
-                     // Zoom map to fit polyline
-                     this.map.fitBounds(this.polyline.getBounds(), { padding: [30, 30] });
-
-                     // Add START marker
-                     this.startMarker = L.marker(latlngs[0], {
-                         icon: L.divIcon({
-                             html: '<div class=\"w-8 h-8 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center font-black text-xs text-white shadow-xl animate-bounce\">S</div>',
-                             className: '',
-                             iconSize: [32, 32],
-                             iconAnchor: [16, 16]
-                         })
-                     }).addTo(this.map).bindPopup('<b>STARTING POINT</b><br>' + this.currentCategory);
-
-                     // Add FINISH marker
-                     this.endMarker = L.marker(latlngs[latlngs.length - 1], {
-                         icon: L.divIcon({
-                             html: '<div class=\"w-8 h-8 rounded-full bg-rose-500 border-2 border-white flex items-center justify-center font-black text-xs text-white shadow-xl\">F</div>',
-                             className: '',
-                             iconSize: [32, 32],
-                             iconAnchor: [16, 16]
-                         })
-                     }).addTo(this.map).bindPopup('<b>FINISH LINE</b><br>' + this.currentCategory);
-
-                 } catch (e) {
-                     Swal.fire('Parsing Error', 'Gagal memproses file GPX: ' + e.message, 'error');
-                 }
-             },
-
-             copyGpxData() {
-                 navigator.clipboard.writeText(this.gpxRawData)
-                     .then(() => {
-                         this.copied = true;
-                         setTimeout(() => { this.copied = false; }, 2000);
-                     })
-                     .catch(err => {
-                         Swal.fire('Error', 'Gagal menyalin teks', 'error');
-                     });
-             }
-         }">
+         x-data="gpxViewer">
 
         <!-- Header Section -->
         <div class="max-w-4xl w-full text-center mb-16">
