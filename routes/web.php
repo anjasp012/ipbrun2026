@@ -72,8 +72,8 @@ Route::post('/test-email', [TestController::class, 'sendEmail']);
 // Admin Routes
 Route::redirect('admin', 'admin/dashboard');
 Route::prefix('admin')->middleware(['auth'])->group(function () {
-    // Shared Routes (Superadmin, Admin, PIC)
-    Route::middleware(['role:superadmin,admin,pic'])->group(function () {
+    // Shared Routes (Superadmin, Admin, PIC, Scanner, Tester, Photographer)
+    Route::middleware(['role:superadmin,admin,pic,scanner,tester,fotographer'])->group(function () {
         Route::get('/dashboard', [AdminDashboard::class, 'dashboard']);
         Route::get('/participants', [AdminDashboard::class, 'participants']);
 

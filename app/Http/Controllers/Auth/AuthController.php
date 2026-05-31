@@ -54,8 +54,8 @@ class AuthController extends Controller
         if (Auth::attempt([$loginField => $request->username, 'password' => $request->password], $request->remember)) {
             $request->session()->regenerate();
 
-            // Redirect to admin dashboard if staff
-            if (in_array(Auth::user()->role, ['superadmin', 'admin', 'pic'])) {
+            // Redirect to admin dashboard if staff (any role except participant)
+            if (Auth::user()->role !== 'participant') {
                 return redirect()->intended('/admin/dashboard');
             }
 

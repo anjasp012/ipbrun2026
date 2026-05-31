@@ -59,7 +59,7 @@
                     $role = auth()->user()->role;
                     $isSuper = $role === 'superadmin';
                     $isAdmin = in_array($role, ['superadmin', 'admin']);
-                    $isStaff = in_array($role, ['superadmin', 'admin', 'pic']);
+                    $isStaff = !in_array($role, ['participant']);
                 @endphp
 
                 @if($isStaff)
@@ -145,7 +145,7 @@
                         <p class="text-base font-bold text-slate-800">{{ auth()->user()->name ?? 'Admin Master' }}
                         </p>
                         <p class="text-[12px] font-black text-[#E8630A] uppercase tracking-wider">
-                            {{ auth()->user()->role === 'superadmin' ? 'Super Administrator' : (auth()->user()->role === 'admin' ? 'Administrator' : 'PIC Area') }}
+                            {{ auth()->user()->role === 'superadmin' ? 'Super Administrator' : (auth()->user()->role === 'admin' ? 'Administrator' : (auth()->user()->role === 'pic' ? 'PIC Area' : ucfirst(auth()->user()->role))) }}
                         </p>
                     </div>
                     <div
