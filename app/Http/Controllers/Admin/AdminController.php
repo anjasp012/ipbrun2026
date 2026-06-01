@@ -143,7 +143,23 @@ class AdminController extends Controller
             });
         }
 
-        $participants = $query->latest()->paginate(25);
+        if ($request->filled('rpc_status')) {
+            if ($request->rpc_status === 'taken') {
+                // Peserta yang memiliki minimal 1 race entry (paid) yang sudah di-scan
+                $query->whereHas('raceEntries', function ($rq) {
+                    $rq->where('status', 'paid')->whereNotNull('scanned_at');
+                });
+            } elseif ($request->rpc_status === 'not_taken') {
+                // Peserta paid yang BELUM ada satu pun race entry yang di-scan
+                $query->whereHas('raceEntries', function ($rq) {
+                    $rq->where('status', 'paid');
+                })->whereDoesntHave('raceEntries', function ($rq) {
+                    $rq->where('status', 'paid')->whereNotNull('scanned_at');
+                });
+            }
+        }
+
+        $participants = $query->with(['raceEntries.ticket.category', 'raceEntries.ticket.period', 'raceEntries.scanner'])->latest()->paginate(25);
         
         $categories = Category::orderBy('name')->get();
         $periods = Period::orderBy('name')->get();

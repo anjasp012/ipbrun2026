@@ -63,6 +63,12 @@
                                 <option value="{{ $period->id }}" {{ request('period_id') == $period->id ? 'selected' : '' }}>{{ $period->name }}</option>
                             @endforeach
                         </select>
+                        <select name="rpc_status"
+                            class="h-14 px-8 bg-slate-50 border border-slate-100 rounded-lg text-sm font-black uppercase tracking-widest outline-none focus:ring-2 focus:ring-blue-100 transition-all flex-1 min-w-[160px]">
+                            <option value="">All RPC Status</option>
+                            <option value="taken" {{ request('rpc_status') == 'taken' ? 'selected' : '' }}>✅ Sudah Diambil</option>
+                            <option value="not_taken" {{ request('rpc_status') == 'not_taken' ? 'selected' : '' }}>⬜ Belum Diambil</option>
+                        </select>
                     </div>
                     <div class="flex gap-4 w-full lg:w-auto">
                         <button type="submit"
@@ -102,6 +108,7 @@
                             <th class="px-8 py-8">Ticket Details</th>
                             <th class="px-8 py-8">Payment</th>
                             <th class="px-8 py-8">Status</th>
+                            <th class="px-8 py-8">RPC Status</th>
                             <th class="px-10 py-8 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -164,6 +171,35 @@
                                     <div class="text-[11px] font-bold text-slate-400 mt-3 uppercase italic opacity-60">
                                         Jersey: {{ $p->jersey_size }}</div>
                                 </td>
+                                {{-- RPC Status Column --}}
+                                <td class="px-8 py-8">
+                                    <div class="space-y-2">
+                                        @foreach ($p->raceEntries->where('status', 'paid') as $entry)
+                                            <div class="flex flex-col gap-1">
+                                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                    {{ $entry->ticket->category->name }}
+                                                </span>
+                                                @if ($entry->scanned_at)
+                                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wide rounded-lg border border-emerald-100 whitespace-nowrap">
+                                                        <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                                        Diambil
+                                                    </span>
+                                                    <span class="text-[9px] font-bold text-slate-300 block">
+                                                        {{ \Carbon\Carbon::parse($entry->scanned_at)->timezone('Asia/Jakarta')->format('d/m H:i') }}
+                                                    </span>
+                                                @else
+                                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-slate-400 text-[10px] font-black uppercase tracking-wide rounded-lg border border-slate-100 whitespace-nowrap">
+                                                        <svg class="w-3 h-3 flex-shrink-0 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                        Belum
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        @endforeach
+                                        @if ($p->raceEntries->where('status', 'paid')->isEmpty())
+                                            <span class="text-[10px] font-bold text-slate-200 uppercase tracking-widest italic">—</span>
+                                        @endif
+                                    </div>
+                                </td>
                                 <td class="px-8 py-8 font-bold text-base text-slate-800">
                                     Rp
                                     {{ number_format($p->raceEntries->where('status', 'paid')->pluck('order')->unique('id')->sum('total_price'), 0, ',', '.') }}
@@ -181,7 +217,7 @@
                                     </div>
                                 </td>
                                 <td class="px-10 py-8">
-                                    <div class="flex items-center justify-end gap-2">
+                                    <div class="flex flex-col items-end gap-2">
                                         @if (auth()->user()->role !== 'pic')
                                             <a href="{{ url('/admin/participants/' . $p->id) }}"
                                                 class="p-3 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-all inline-block" title="View Detail">
@@ -194,23 +230,43 @@
                                                     </path>
                                                 </svg>
                                             </a>
-                                            @if (auth()->user()->role === 'superadmin')
-                                                <button @click="showPasswordModal = true; selectedParticipantId = '{{ $p->id }}'; selectedParticipantName = '{{ addslashes($p->name) }}'"
-                                                    class="p-3 bg-red-50 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-md transition-all inline-block" title="Ganti Password">
-                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4v-3.586l8.172-8.172A6 6 0 1115 7z"></path>
-                                                    </svg>
-                                                </button>
 
-                                                <form action="{{ route('participants.cancel', $p->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin MENONAKTIFKAN peserta ini? Akun login akan dihapus dan semua pesanan akan menjadi FAILED.')">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="p-3 bg-rose-100 text-rose-600 hover:text-white hover:bg-rose-600 rounded-md transition-all inline-block" title="Cancel/Nonaktifkan Peserta">
+                                            {{-- Reset RPC buttons (Admin & Superadmin) --}}
+                                            @if (in_array(auth()->user()->role, ['superadmin', 'admin']))
+                                                @foreach ($p->raceEntries->where('status', 'paid')->where('scanned_at', '!=', null) as $entry)
+                                                    <form action="{{ route('participants.reset-rpc', [$p->id, $entry->id]) }}" method="POST"
+                                                        onsubmit="return confirm('Reset status RPC {{ $entry->ticket->category->name }} untuk {{ addslashes($p->name) }}?')">
+                                                        @csrf
+                                                        <button type="submit"
+                                                            class="flex items-center gap-1.5 px-3 py-1.5 bg-orange-50 text-orange-500 hover:bg-orange-100 hover:text-orange-700 rounded-lg text-[10px] font-black uppercase tracking-wide border border-orange-100 transition-all whitespace-nowrap"
+                                                            title="Reset RPC {{ $entry->ticket->category->name }}">
+                                                            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                            </svg>
+                                                            Reset {{ $entry->ticket->category->name }}
+                                                        </button>
+                                                    </form>
+                                                @endforeach
+                                            @endif
+
+                                            @if (auth()->user()->role === 'superadmin')
+                                                <div class="flex items-center gap-2">
+                                                    <button @click="showPasswordModal = true; selectedParticipantId = '{{ $p->id }}'; selectedParticipantName = '{{ addslashes($p->name) }}'"
+                                                        class="p-3 bg-red-50 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-md transition-all inline-block" title="Ganti Password">
                                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4v-3.586l8.172-8.172A6 6 0 1115 7z"></path>
                                                         </svg>
                                                     </button>
-                                                </form>
+                                                    <form action="{{ route('participants.cancel', $p->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin MENONAKTIFKAN peserta ini? Akun login akan dihapus dan semua pesanan akan menjadi FAILED.')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="p-3 bg-rose-100 text-rose-600 hover:text-white hover:bg-rose-600 rounded-md transition-all inline-block" title="Cancel/Nonaktifkan Peserta">
+                                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             @endif
                                         @else
                                             <span

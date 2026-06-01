@@ -70,10 +70,32 @@
                         </div>
                     </div>
 
-                    {{-- Manual Input Section --}}
-                    <div class="px-6 pb-6">
+                    {{-- Manual Input & Live Search Section --}}
+                    <div class="px-6 pb-6 space-y-4">
+                        <div class="p-5 bg-slate-50 border border-slate-100 rounded-xl space-y-4">
+                            <div>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Cari Peserta (Alternatif QR Rusak / Tidak Terbaca)</p>
+                                <div class="relative">
+                                    <input type="text" id="search-input"
+                                        placeholder="Ketik minimal 3 karakter nama atau nomor BIB..."
+                                        class="w-full h-11 pl-11 pr-4 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#003366] focus:ring-2 focus:ring-[#003366]/10"
+                                        oninput="searchParticipants()">
+                                    <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {{-- Container Hasil Pencarian --}}
+                            <div id="search-results" class="hidden border border-slate-150 rounded-xl bg-white max-h-60 overflow-y-auto divide-y divide-slate-100 shadow-inner">
+                                {{-- Hasil pencarian akan di-render di sini --}}
+                            </div>
+                        </div>
+
                         <div class="p-5 bg-slate-50 border border-slate-100 rounded-xl">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Input Manual (Jika Kamera Tidak Tersedia)</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Input Manual ID (Jika Kamera Tidak Tersedia)</p>
                             <div class="flex gap-3">
                                 <input type="text" id="manual-input"
                                     placeholder="Masukkan Race Entry ID..."
@@ -233,6 +255,7 @@
         const CSRF_TOKEN = '{{ csrf_token() }}';
         const CHECK_URL = '{{ route('admin.scan-rpc.check') }}';
         const PROCESS_URL = '{{ route('admin.scan-rpc.process') }}';
+        const SEARCH_URL = '{{ route('admin.scan-rpc.search') }}';
 
         function setIndicator(state) {
             const dot = document.getElementById('indicator-dot');
@@ -540,6 +563,79 @@
                 oscillator.start(ctx.currentTime);
                 oscillator.stop(ctx.currentTime + 0.15);
             } catch(e) {}
+        }
+
+        let searchTimeout = null;
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        function searchParticipants() {
+            const query = document.getElementById('search-input').value.trim();
+            const resultsContainer = document.getElementById('search-results');
+
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+
+            if (query.length < 3) {
+                resultsContainer.classList.add('hidden');
+                resultsContainer.innerHTML = '';
+                return;
+            }
+
+            searchTimeout = setTimeout(() => {
+                fetch(`${SEARCH_URL}?q=${encodeURIComponent(query)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        resultsContainer.innerHTML = '';
+                        if (data.length === 0) {
+                            resultsContainer.innerHTML = `
+                                <div class="px-4 py-3 text-xs text-slate-400 font-bold uppercase tracking-wider text-center">
+                                    Tidak ada hasil ditemukan
+                                </div>
+                            `;
+                        } else {
+                            data.forEach(entry => {
+                                const statusBadge = entry.scanned_at
+                                    ? `<span class="px-2 py-1 bg-amber-50 text-amber-600 text-[10px] font-black rounded-lg border border-amber-100 whitespace-nowrap">Sudah Diambil</span>`
+                                    : `<span class="px-2 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-lg border border-emerald-100 whitespace-nowrap">Belum Diambil</span>`;
+
+                                const item = document.createElement('div');
+                                item.className = 'px-4 py-3 hover:bg-slate-50 cursor-pointer flex items-center justify-between transition-colors';
+                                item.onclick = () => {
+                                    resultsContainer.classList.add('hidden');
+                                    document.getElementById('search-input').value = '';
+                                    processScan(entry.id);
+                                };
+                                item.innerHTML = `
+                                    <div class="min-w-0 pr-4">
+                                        <p class="text-xs font-black text-slate-800 uppercase truncate">${escapeHTML(entry.participant_name)}</p>
+                                        <p class="text-[10px] font-bold text-[#003366] uppercase tracking-wide mt-0.5">${escapeHTML(entry.category)}</p>
+                                    </div>
+                                    <div class="flex items-center gap-2 flex-shrink-0">
+                                        <span class="px-2 py-1 bg-blue-50 text-[#003366] text-[10px] font-black rounded-lg border border-blue-100 font-mono">${escapeHTML(entry.bib_number)}</span>
+                                        ${statusBadge}
+                                    </div>
+                                `;
+                                resultsContainer.appendChild(item);
+                            });
+                        }
+                        resultsContainer.classList.remove('hidden');
+                    })
+                    .catch(err => {
+                        console.error('Search error:', err);
+                    });
+            }, 300);
         }
     </script>
     @endpush

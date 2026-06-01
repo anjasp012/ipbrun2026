@@ -165,6 +165,65 @@ class ScanController extends Controller
     }
 
     /**
+     * Reset status RPC dari halaman Participants (Admin & Superadmin only).
+     * Route: POST /admin/participants/{participant}/race-entries/{raceEntry}/reset-rpc
+     */
+    public function resetFromParticipant(Participant $participant, RaceEntry $raceEntry)
+    {
+        // Pastikan raceEntry memang milik participant ini
+        if ($raceEntry->participant_id !== $participant->id) {
+            abort(403, 'Race entry tidak ditemukan untuk peserta ini.');
+        }
+
+        if (!$raceEntry->scanned_at) {
+            return back()->with('error', 'Race Pack ini belum pernah di-scan, tidak perlu direset.');
+        }
+
+        $categoryName = $raceEntry->ticket->category->name ?? '-';
+
+        $raceEntry->update([
+            'scanned_at' => null,
+            'scanned_by' => null,
+        ]);
+
+        return back()->with('success', "Status RPC ({$categoryName}) untuk {$participant->name} berhasil direset oleh " . auth()->user()->name . ".");
+    }
+
+    /**
+     * Cari peserta berdasarkan nama atau BIB number (live search).
+     * Hanya mencari race entries dengan status 'paid'.
+     */
+    public function search(Request $request)
+    {
+        $q = trim($request->get('q'));
+        if (strlen($q) < 3) {
+            return response()->json([]);
+        }
+
+        $entries = RaceEntry::where('status', 'paid')
+            ->where(function($query) use ($q) {
+                $query->where('bib_number', 'like', "%{$q}%")
+                      ->orWhereHas('participant', function($qp) use ($q) {
+                          $qp->where('name', 'like', "%{$q}%");
+                      });
+            })
+            ->with(['participant', 'ticket.category'])
+            ->limit(10)
+            ->get()
+            ->map(function($entry) {
+                return [
+                    'id' => $entry->id,
+                    'bib_number' => $entry->bib_number ?? '-',
+                    'participant_name' => $entry->participant->name ?? '-',
+                    'category' => $entry->ticket->category->name ?? '-',
+                    'scanned_at' => $entry->scanned_at ? Carbon::parse($entry->scanned_at)->setTimezone('Asia/Jakarta')->format('d M Y, H:i') : null,
+                ];
+            });
+
+        return response()->json($entries);
+    }
+
+    /**
      * Tampilkan form untuk Blast Email RPC
      */
     public function blastForm()

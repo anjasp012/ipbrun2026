@@ -529,6 +529,12 @@
                                                     <h5
                                                         class="text-sm font-black text-emerald-600 uppercase leading-none italic">
                                                         SUDAH DIAMBIL</h5>
+                                                    <p class="text-[10px] font-bold text-slate-300 mt-1">
+                                                        {{ \Carbon\Carbon::parse($entry->scanned_at)->timezone('Asia/Jakarta')->format('d M Y, H:i') }}
+                                                        @if ($entry->scanner)
+                                                            &bull; {{ $entry->scanner->name }}
+                                                        @endif
+                                                    </p>
                                                 @else
                                                     <h5
                                                         class="text-sm font-black text-slate-300 uppercase leading-none italic">
@@ -555,6 +561,22 @@
                                                 @endif
                                             </div>
                                         </div>
+                                        {{-- Tombol Reset RPC: hanya admin & superadmin --}}
+                                        @if ($entry->scanned_at && in_array(auth()->user()->role, ['superadmin', 'admin']))
+                                            <div class="mt-4 pt-4 border-t border-slate-50">
+                                                <form action="{{ route('participants.reset-rpc', [$participant->id, $entry->id]) }}" method="POST"
+                                                    onsubmit="return confirm('Reset status pengambilan Race Pack ({{ $entry->ticket->category->name }}) untuk {{ addslashes($participant->name) }}?')">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-50 text-orange-500 hover:bg-orange-100 hover:text-orange-700 rounded-xl text-[11px] font-black uppercase tracking-wider border border-orange-100 transition-all">
+                                                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                        </svg>
+                                                        Reset Status RPC
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        @endif
                                     </div>
                                 @endforeach
                             </div>

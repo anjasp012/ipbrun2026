@@ -72,8 +72,9 @@ Route::post('/test-email', [TestController::class, 'sendEmail']);
 // Admin Routes
 Route::redirect('admin', 'admin/dashboard');
 Route::prefix('admin')->middleware(['auth'])->group(function () {
-    // Shared Routes (Superadmin, Admin, PIC, Scanner, Tester, Photographer, Frontliner)
-    Route::middleware(['role:superadmin,admin,pic,scanner,tester,fotographer,frontliner'])->group(function () {
+    // Shared Routes (Superadmin, PIC, Scanner, Tester, Photographer, Frontliner)
+    // Note: Admin TIDAK memiliki akses ke halaman Scan RPC
+    Route::middleware(['role:superadmin,pic,scanner,tester,fotographer,frontliner'])->group(function () {
         Route::get('/dashboard', [AdminDashboard::class, 'dashboard']);
         Route::get('/participants', [AdminDashboard::class, 'participants']);
 
@@ -81,10 +82,17 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::get('/scan-rpc', [ScanController::class, 'index'])->name('admin.scan-rpc');
         Route::post('/scan-rpc/check', [ScanController::class, 'check'])->name('admin.scan-rpc.check');
         Route::post('/scan-rpc/process', [ScanController::class, 'process'])->name('admin.scan-rpc.process');
+        Route::get('/scan-rpc/search', [ScanController::class, 'search'])->name('admin.scan-rpc.search');
         
         // Blast Email RPC
         Route::get('/scan-rpc/blast', [ScanController::class, 'blastForm'])->name('admin.scan-rpc.blast');
         Route::post('/scan-rpc/blast', [ScanController::class, 'sendBlast'])->name('admin.scan-rpc.blast.send');
+    });
+
+    // Admin Routes: Dashboard & Participants (tanpa akses Scan RPC)
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/dashboard', [AdminDashboard::class, 'dashboard']);
+        Route::get('/participants', [AdminDashboard::class, 'participants']);
     });
 
     // Superadmin Only Routes
@@ -126,6 +134,9 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::delete('/participants/{participant}/cancel', [AdminDashboard::class, 'cancelParticipant'])->name('participants.cancel');
         Route::post('/participants/bulk-cancel', [AdminDashboard::class, 'bulkCancelParticipants'])->name('participants.bulk-cancel');
         Route::post('/participants/bulk-resend', [AdminDashboard::class, 'bulkResendInvoice'])->name('participants.bulk-resend');
+
+        // Reset status RPC dari halaman Participants (Admin & Superadmin)
+        Route::post('/participants/{participant}/race-entries/{raceEntry}/reset-rpc', [ScanController::class, 'resetFromParticipant'])->name('participants.reset-rpc');
       
         
         Route::get('/vouchers', [\App\Http\Controllers\Admin\VoucherController::class, 'index'])->name('admin.vouchers.index');
