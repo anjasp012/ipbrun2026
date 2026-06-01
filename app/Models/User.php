@@ -24,6 +24,7 @@ class User extends Authenticatable
     const ROLE_ADMIN = 'admin';
     const ROLE_PIC = 'pic';
     const ROLE_PARTICIPANT = 'participant';
+    const ROLE_FRONTLINER = 'frontliner';
 
     /**
      * Get the attributes that should be cast.

@@ -55,6 +55,10 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             // Redirect to admin dashboard if staff (any role except participant)
+            if (Auth::user()->role === 'frontliner') {
+                return redirect()->intended('/admin/scan-rpc');
+            }
+
             if (Auth::user()->role !== 'participant') {
                 return redirect()->intended('/admin/dashboard');
             }

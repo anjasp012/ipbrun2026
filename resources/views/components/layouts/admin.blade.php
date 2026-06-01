@@ -60,9 +60,18 @@
                     $isSuper = $role === 'superadmin';
                     $isAdmin = in_array($role, ['superadmin', 'admin']);
                     $isStaff = !in_array($role, ['participant']);
+                    $isFrontliner = $role === 'frontliner';
                 @endphp
 
-                @if($isStaff)
+                @if($isFrontliner)
+                    {{-- Frontliner: hanya menu Tukar RPC --}}
+                    <a href="{{ route('admin.scan-rpc') }}" class="flex items-center gap-4 p-4 rounded-lg sidebar-item {{ request()->is('admin/scan-rpc') ? 'active' : '' }}">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm-12 0h.01"></path>
+                        </svg>
+                        <span class="font-bold text-base tracking-wide">Tukar Race Pack</span>
+                    </a>
+                @elseif($isStaff)
                     <a href="{{ url('/admin/dashboard') }}" class="flex items-center gap-4 p-4 rounded-lg sidebar-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                         <span class="font-bold text-base tracking-wide">Overview</span>
@@ -73,13 +82,15 @@
                     </a>
                     <a href="{{ route('admin.scan-rpc') }}" class="flex items-center gap-4 p-4 rounded-lg sidebar-item {{ request()->is('admin/scan-rpc') ? 'active' : '' }}">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm-12 0h.01"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zm-12 0h.01">
+                            </path>
                         </svg>
                         <span class="font-bold text-base tracking-wide">Scan Race Pack</span>
                     </a>
                     <a href="{{ route('admin.scan-rpc.blast') }}" class="flex items-center gap-4 p-4 rounded-lg sidebar-item {{ request()->is('admin/scan-rpc/blast*') ? 'active' : '' }}">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                            </path>
                         </svg>
                         <span class="font-bold text-base tracking-wide">Blast Email RPC</span>
                     </a>
@@ -145,7 +156,15 @@
                         <p class="text-base font-bold text-slate-800">{{ auth()->user()->name ?? 'Admin Master' }}
                         </p>
                         <p class="text-[12px] font-black text-[#E8630A] uppercase tracking-wider">
-                            {{ auth()->user()->role === 'superadmin' ? 'Super Administrator' : (auth()->user()->role === 'admin' ? 'Administrator' : (auth()->user()->role === 'pic' ? 'PIC Area' : ucfirst(auth()->user()->role))) }}
+                            @php
+                                $roleLabels = [
+                                    'superadmin' => 'Super Administrator',
+                                    'admin' => 'Administrator',
+                                    'pic' => 'PIC Area',
+                                    'frontliner' => 'Frontliner',
+                                ];
+                                echo $roleLabels[auth()->user()->role] ?? ucfirst(auth()->user()->role);
+                            @endphp
                         </p>
                     </div>
                     <div
