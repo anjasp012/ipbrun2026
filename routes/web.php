@@ -72,13 +72,14 @@ Route::post('/test-email', [TestController::class, 'sendEmail']);
 // Admin Routes
 Route::redirect('admin', 'admin/dashboard');
 Route::prefix('admin')->middleware(['auth'])->group(function () {
-    // Shared Routes (Superadmin, PIC, Scanner, Tester, Photographer, Frontliner)
-    // Note: Admin TIDAK memiliki akses ke halaman Scan RPC
-    Route::middleware(['role:superadmin,pic,scanner,tester,fotographer,frontliner'])->group(function () {
+    // Shared Routes (Superadmin, Admin, PIC, Scanner, Tester, Photographer, Frontliner)
+    Route::middleware(['role:superadmin,admin,pic,scanner,tester,fotographer,frontliner'])->group(function () {
         Route::get('/dashboard', [AdminDashboard::class, 'dashboard']);
         Route::get('/participants', [AdminDashboard::class, 'participants']);
+    });
 
-        // QR Scan Race Pack
+    // QR Scan RPC Routes (Note: Admin TIDAK memiliki akses ke halaman Scan RPC)
+    Route::middleware(['role:superadmin,pic,scanner,tester,fotographer,frontliner'])->group(function () {
         Route::get('/scan-rpc', [ScanController::class, 'index'])->name('admin.scan-rpc');
         Route::post('/scan-rpc/check', [ScanController::class, 'check'])->name('admin.scan-rpc.check');
         Route::post('/scan-rpc/process', [ScanController::class, 'process'])->name('admin.scan-rpc.process');
@@ -87,12 +88,6 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         // Blast Email RPC
         Route::get('/scan-rpc/blast', [ScanController::class, 'blastForm'])->name('admin.scan-rpc.blast');
         Route::post('/scan-rpc/blast', [ScanController::class, 'sendBlast'])->name('admin.scan-rpc.blast.send');
-    });
-
-    // Admin Routes: Dashboard & Participants (tanpa akses Scan RPC)
-    Route::middleware(['role:admin'])->group(function () {
-        Route::get('/dashboard', [AdminDashboard::class, 'dashboard']);
-        Route::get('/participants', [AdminDashboard::class, 'participants']);
     });
 
     // Superadmin Only Routes
