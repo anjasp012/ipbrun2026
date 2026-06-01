@@ -70,8 +70,8 @@
                         </div>
                     </div>
 
-                    {{-- Manual Input & Live Search Section --}}
-                    <div class="px-6 pb-6 space-y-4">
+                    {{-- Search Section (Alternatif QR Rusak) --}}
+                    <div class="px-6 pb-6">
                         <div class="p-5 bg-slate-50 border border-slate-100 rounded-xl space-y-4">
                             <div>
                                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Cari Peserta (Alternatif QR Rusak / Tidak Terbaca)</p>
@@ -91,20 +91,6 @@
                             {{-- Container Hasil Pencarian --}}
                             <div id="search-results" class="hidden border border-slate-150 rounded-xl bg-white max-h-60 overflow-y-auto divide-y divide-slate-100 shadow-inner">
                                 {{-- Hasil pencarian akan di-render di sini --}}
-                            </div>
-                        </div>
-
-                        <div class="p-5 bg-slate-50 border border-slate-100 rounded-xl">
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Input Manual ID (Jika Kamera Tidak Tersedia)</p>
-                            <div class="flex gap-3">
-                                <input type="text" id="manual-input"
-                                    placeholder="Masukkan Race Entry ID..."
-                                    class="flex-1 h-11 px-4 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#003366] focus:ring-2 focus:ring-[#003366]/10 font-mono"
-                                    onkeydown="if(event.key==='Enter') processManualInput()">
-                                <button onclick="processManualInput()"
-                                    class="h-11 px-6 bg-[#003366] text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-blue-900 transition-all">
-                                    Proses
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -331,13 +317,6 @@
             // Play sound feedback
             playBeep();
             processScan(decodedText);
-        }
-
-        function processManualInput() {
-            const val = document.getElementById('manual-input').value.trim();
-            if (!val) return;
-            processScan(val);
-            document.getElementById('manual-input').value = '';
         }
 
         function processScan(raceEntryId) {
