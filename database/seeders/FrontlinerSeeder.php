@@ -14,11 +14,11 @@ class FrontlinerSeeder extends Seeder
     {
         for ($i = 1; $i <= 8; $i++) {
             \App\Models\User::updateOrCreate(
-                ['email' => "frontliner{$i}@gmail.com"],
+                ['email' => "frontliner{$i}@ipbrun2026.id"],
                 [
                     'name'     => "Frontliner {$i}",
                     'username' => "frontliner{$i}",
-                    'password' => \Illuminate\Support\Facades\Hash::make("frontliner{$i}@gmail.com"),
+                    'password' => \Illuminate\Support\Facades\Hash::make("frontliner{$i}@ipbrun2026.id"),
                     'role'     => 'frontliner',
                 ]
             );
