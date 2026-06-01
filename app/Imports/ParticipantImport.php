@@ -245,6 +245,9 @@ class ParticipantImport implements ToCollection, WithHeadingRow, SkipsEmptyRows,
                 Log::error("Gagal mengirim email laporan error import: " . $e->getMessage());
             }
 
+            // Simpan error ke session agar bisa di-download sebagai Excel
+            session()->flash('import_errors', $importErrors);
+
             $errorCount = count($importErrors);
             session()->flash('warning', "$successCount data berhasil diimport. $errorCount data gagal (Duplikat/Tidak Valid). List detail error telah dikirim ke email PIC ({$this->orderEmail}).");
         } else {

@@ -202,12 +202,27 @@
         @endif
 
         @if(session('warning'))
+            @if(session('import_errors') && in_array(auth()->user()->role, ['superadmin', 'admin']))
+            Swal.fire({
+                icon: 'warning',
+                title: 'Import Selesai dengan Error!',
+                html: `<p style="font-size:0.9rem;margin-bottom:1rem;">{{ session('warning') }}</p>
+                       <a href="{{ route('participants.import-errors') }}"
+                          style="display:inline-flex;align-items:center;gap:8px;background:#003366;color:#fff;padding:10px 22px;border-radius:8px;font-weight:800;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;text-decoration:none;">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                           Download Data Error (.xlsx)
+                       </a>`,
+                confirmButtonColor: '#003366',
+                confirmButtonText: 'Tutup'
+            });
+            @else
             Swal.fire({
                 icon: 'warning',
                 title: 'Peringatan!',
                 text: "{{ session('warning') }}",
                 confirmButtonColor: '#003366'
             });
+            @endif
         @endif
 
         @if(session('error'))

@@ -118,6 +118,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::get('/participants/export', [AdminDashboard::class, 'exportParticipants'])->name('participants.export');
         Route::get('/participants/import/template', [AdminDashboard::class, 'importTemplate'])->name('participants.import-template');
         Route::post('/participants/import', [AdminDashboard::class, 'importParticipants'])->name('participants.import');
+        Route::get('/participants/import/errors', [AdminDashboard::class, 'downloadImportErrors'])->name('participants.import-errors');
         Route::get('/participants/{participant}', [AdminDashboard::class, 'participantShow']);
         Route::post('/participants/{participant}/add-ticket', [AdminDashboard::class, 'addTicket'])->name('participants.add-ticket');
         Route::get('/participants/{participant}/resend-invoice', [AdminDashboard::class, 'resendInvoice'])->name('participants.resend-invoice');

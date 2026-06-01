@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ParticipantExport;
 use App\Exports\ParticipantImportTemplate;
+use App\Exports\ImportErrorExport;
 use App\Imports\ParticipantImport;
 
 class AdminController extends Controller
@@ -584,5 +585,17 @@ class AdminController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal import data: ' . $e->getMessage());
         }
+    }
+
+    public function downloadImportErrors(Request $request)
+    {
+        $errors = $request->session()->get('import_errors', []);
+
+        if (empty($errors)) {
+            return back()->with('error', 'Tidak ada data error yang bisa didownload. Silakan lakukan import terlebih dahulu.');
+        }
+
+        $filename = 'import_errors_' . now()->format('Ymd_His') . '.xlsx';
+        return Excel::download(new ImportErrorExport($errors), $filename);
     }
 }
