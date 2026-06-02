@@ -45,16 +45,6 @@ class BibImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                 continue;
             }
 
-            // Verify participant name if provided
-            if ($nama && $order->participant) {
-                $dbName = strtolower(trim($order->participant->name));
-                $excelName = strtolower(trim($nama));
-                if (!str_contains($dbName, $excelName) && !str_contains($excelName, $dbName)) {
-                    $this->errors[] = "Baris $lineNum: Nama di Excel ('$nama') tidak cocok dengan nama di sistem ('{$order->participant->name}') untuk ID '$orderCode'.";
-                    continue;
-                }
-            }
-
             // Find race entries
             $entries = $order->raceEntries;
             if ($entries->isEmpty()) {
