@@ -132,6 +132,9 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
 
         // Reset status RPC dari halaman Participants (Admin & Superadmin)
         Route::post('/participants/{participant}/race-entries/{raceEntry}/reset-rpc', [ScanController::class, 'resetFromParticipant'])->name('participants.reset-rpc');
+        
+        // Edit BIB Number (Admin & Superadmin)
+        Route::patch('/participants/{participant}/race-entries/{raceEntry}/bib', [AdminDashboard::class, 'updateBib'])->name('participants.update-bib');
       
         
         Route::get('/vouchers', [\App\Http\Controllers\Admin\VoucherController::class, 'index'])->name('admin.vouchers.index');

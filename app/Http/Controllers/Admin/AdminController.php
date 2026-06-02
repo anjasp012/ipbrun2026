@@ -275,7 +275,14 @@ class AdminController extends Controller
         $tickets = \App\Models\Ticket::whereHas('period', function ($q) {
             $q->where('is_active', true);
         })->with('category', 'period')->get();
-        
+
+        $participant->loadMissing([
+            'raceEntries.ticket.category',
+            'raceEntries.ticket.period',
+            'raceEntries.order',
+            'raceEntries.scanner',
+        ]);
+
         return view('pages.admin.participants.show', compact('participant', 'tickets'));
     }
 
@@ -345,6 +352,39 @@ class AdminController extends Controller
         }
 
         return back()->with('success', 'Data peserta berhasil diperbarui.');
+    }
+
+    public function updateBib(Request $request, Participant $participant, RaceEntry $raceEntry)
+    {
+        $request->validate([
+            'bib_number' => [
+                'nullable',
+                'string',
+                'max:20',
+                // Unique per race entry, tapi boleh sama participant ganti sendiri
+                function ($attribute, $value, $fail) use ($raceEntry) {
+                    if ($value) {
+                        $exists = RaceEntry::where('bib_number', $value)
+                            ->where('id', '!=', $raceEntry->id)
+                            ->exists();
+                        if ($exists) {
+                            $fail("BIB number {$value} sudah digunakan oleh peserta lain.");
+                        }
+                    }
+                },
+            ],
+        ]);
+
+        $oldBib = $raceEntry->bib_number;
+        $newBib  = $request->bib_number ?: null;
+
+        $raceEntry->update(['bib_number' => $newBib]);
+
+        $msg = $newBib
+            ? "BIB number berhasil diubah dari '{$oldBib}' menjadi '{$newBib}' untuk {$participant->name}."
+            : "BIB number untuk {$participant->name} telah dihapus.";
+
+        return back()->with('success', $msg);
     }
 
     public function addTicket(Request $request, Participant $participant)

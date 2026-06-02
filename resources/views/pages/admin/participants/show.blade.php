@@ -505,19 +505,74 @@
                                 </div>
                                 @foreach ($entries as $entry)
                                     <div
-                                        class="w-full bg-white border border-slate-100 rounded-3xl p-8 text-center relative overflow-hidden mb-6 last:mb-0 shadow-sm hover:border-blue-100 transition-colors">
+                                        class="w-full bg-white border border-slate-100 rounded-3xl p-8 text-center relative overflow-hidden mb-6 last:mb-0 shadow-sm hover:border-blue-100 transition-colors"
+                                        x-data="{ editingBib_{{ $entry->id }}: false, bibVal_{{ $entry->id }}: '{{ $entry->bib_number }}' }">
                                         <div
                                             class="text-sm font-black text-slate-400 uppercase tracking-[3px] mb-4 leading-none">
                                             {{ strtoupper($entry->ticket->category->name) }}
                                         </div>
-                                        @if ($entry->bib_number)
-                                            <div
-                                                class="text-5xl font-black text-[#003366] tracking-[8px] uppercase font-mono">
-                                                {{ $entry->bib_number }}</div>
+
+                                        {{-- BIB Display + Inline Edit (superadmin & admin only) --}}
+                                        @if (in_array(auth()->user()->role, ['superadmin', 'admin']))
+                                            {{-- Inline edit mode off: tampilkan BIB + tombol edit --}}
+                                            <div x-show="!editingBib_{{ $entry->id }}" class="relative inline-block">
+                                                @if ($entry->bib_number)
+                                                    <div class="text-5xl font-black text-[#003366] tracking-[8px] uppercase font-mono">
+                                                        {{ $entry->bib_number }}
+                                                    </div>
+                                                @else
+                                                    <div class="text-3xl font-black text-slate-200 tracking-widest uppercase italic opacity-60">
+                                                        NO BIB
+                                                    </div>
+                                                @endif
+                                                <button type="button"
+                                                    @click="editingBib_{{ $entry->id }} = true"
+                                                    title="Edit BIB Number"
+                                                    class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-100 transition-all">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                    </svg>
+                                                    {{ $entry->bib_number ? 'Edit BIB' : 'Set BIB' }}
+                                                </button>
+                                            </div>
+
+                                            {{-- Inline edit mode on --}}
+                                            <div x-show="editingBib_{{ $entry->id }}" x-cloak>
+                                                <form action="{{ route('participants.update-bib', [$participant->id, $entry->id]) }}" method="POST">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <div class="flex flex-col items-center gap-3">
+                                                        <input type="text"
+                                                            name="bib_number"
+                                                            x-model="bibVal_{{ $entry->id }}"
+                                                            placeholder="Nomor BIB (kosongkan untuk hapus)"
+                                                            class="w-full text-center text-3xl font-black font-mono text-[#003366] tracking-[6px] uppercase bg-blue-50 border-2 border-blue-300 focus:border-[#003366] rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#003366]/10"
+                                                            autofocus>
+                                                        <div class="flex gap-2">
+                                                            <button type="submit"
+                                                                class="px-5 py-2 bg-[#003366] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-900 transition-all">
+                                                                Simpan
+                                                            </button>
+                                                            <button type="button"
+                                                                @click="editingBib_{{ $entry->id }} = false; bibVal_{{ $entry->id }} = '{{ $entry->bib_number }}'"
+                                                                class="px-5 py-2 bg-slate-100 text-slate-500 hover:bg-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-200 transition-all">
+                                                                Batal
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
                                         @else
-                                            <div
-                                                class="text-3xl font-black text-slate-200 tracking-widest uppercase italic opacity-60">
-                                                NO BIB</div>
+                                            {{-- Non-admin: view only --}}
+                                            @if ($entry->bib_number)
+                                                <div class="text-5xl font-black text-[#003366] tracking-[8px] uppercase font-mono">
+                                                    {{ $entry->bib_number }}
+                                                </div>
+                                            @else
+                                                <div class="text-3xl font-black text-slate-200 tracking-widest uppercase italic opacity-60">
+                                                    NO BIB
+                                                </div>
+                                            @endif
                                         @endif
                                         <div
                                             class="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between">
