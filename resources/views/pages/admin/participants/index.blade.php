@@ -191,22 +191,24 @@
                                 <td class="px-8 py-8">
                                     <div class="space-y-2">
                                         @foreach ($p->raceEntries->where('status', 'paid') as $entry)
-                                            <div class="flex flex-col gap-1">
-                                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                                    {{ $entry->ticket->category->name }}
-                                                </span>
+                                            <div class="mb-2 last:mb-0">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-[11px] font-black text-slate-500 uppercase tracking-tight">
+                                                        {{ $entry->ticket->category->name }}
+                                                    </span>
+                                                    @if ($entry->scanned_at)
+                                                        <span class="inline-flex items-center px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[9px] font-bold uppercase rounded border border-emerald-100 whitespace-nowrap">
+                                                            Diambil
+                                                        </span>
+                                                    @else
+                                                        <span class="inline-flex items-center px-2 py-0.5 bg-slate-50 text-slate-400 text-[9px] font-bold uppercase rounded border border-slate-100 whitespace-nowrap">
+                                                            Belum
+                                                        </span>
+                                                    @endif
+                                                </div>
                                                 @if ($entry->scanned_at)
-                                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wide rounded-lg border border-emerald-100 whitespace-nowrap">
-                                                        <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                                                        Diambil
-                                                    </span>
-                                                    <span class="text-[9px] font-bold text-slate-300 block">
+                                                    <span class="text-[9px] font-medium text-slate-400 block mt-0.5">
                                                         {{ \Carbon\Carbon::parse($entry->scanned_at)->timezone('Asia/Jakarta')->format('d/m H:i') }}
-                                                    </span>
-                                                @else
-                                                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 text-slate-400 text-[10px] font-black uppercase tracking-wide rounded-lg border border-slate-100 whitespace-nowrap">
-                                                        <svg class="w-3 h-3 flex-shrink-0 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                        Belum
                                                     </span>
                                                 @endif
                                             </div>
