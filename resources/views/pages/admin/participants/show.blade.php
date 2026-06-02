@@ -73,18 +73,20 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    e.target.submit();
+                    document.getElementById('participant-form').requestSubmit();
                 }
             });
         }
     }">
-        <form action="{{ route('participants.update', $participant) }}" method="POST" @submit.prevent="confirmSave($event)">
+        {{-- Outer grid wrapper: form (kiri, 2 col) + race logistics (kanan, 1 col) --}}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
+
+        <form id="participant-form" action="{{ route('participants.update', $participant) }}" method="POST" @submit.prevent="confirmSave($event)" class="lg:col-span-2">
             @csrf
             @method('PUT')
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
                 <!-- Main Profile Info -->
-                <div class="lg:col-span-2 space-y-10">
+                <div class="space-y-10">
                     <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden p-10">
                         <div class="flex items-center justify-between gap-6 mb-12 pb-10 border-b border-slate-50">
                             <div class="flex items-center gap-10">
@@ -465,6 +467,12 @@
                             {{ $participant->updated_at->diffForHumans() }}</p>
                     </div>
                 </div>
+        </form>
+
+        {{-- ============================================================ --}}
+        {{-- Race Logistics Column (di LUAR form utama agar form BIB tidak nested) --}}
+        {{-- ============================================================ --}}
+        <div class="space-y-10 lg:col-span-1">
 
                 <!-- Logistics Card (Right Column) -->
                 <div class="space-y-10">
@@ -754,8 +762,11 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </form>
+        </div>
+        {{-- /Race Logistics Column --}}
+
+        </div>
+        {{-- /Outer grid wrapper --}}
 
         <!-- Add Ticket Modal -->
         <div x-show="showAddTicketModal"
