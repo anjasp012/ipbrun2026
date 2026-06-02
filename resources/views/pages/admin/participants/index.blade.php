@@ -171,6 +171,22 @@
                                     <div class="text-[11px] font-bold text-slate-400 mt-3 uppercase italic opacity-60">
                                         Jersey: {{ $p->jersey_size }}</div>
                                 </td>
+                                <td class="px-8 py-8 font-bold text-base text-slate-800">
+                                    Rp
+                                    {{ number_format($p->raceEntries->where('status', 'paid')->pluck('order')->unique('id')->sum('total_price'), 0, ',', '.') }}
+                                </td>
+                                <td class="px-8 py-8">
+                                    @php
+                                        $paidCount = $p->raceEntries->where('status', 'paid')->count();
+                                        $totalCount = $p->raceEntries->count();
+                                    @endphp
+                                    <div class="flex items-center gap-3">
+                                        <span
+                                            class="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[11px] font-black uppercase tracking-widest border border-blue-100">
+                                            {{ $paidCount }}/{{ $totalCount }} PAID
+                                        </span>
+                                    </div>
+                                </td>
                                 {{-- RPC Status Column --}}
                                 <td class="px-8 py-8">
                                     <div class="space-y-2">
@@ -198,22 +214,6 @@
                                         @if ($p->raceEntries->where('status', 'paid')->isEmpty())
                                             <span class="text-[10px] font-bold text-slate-200 uppercase tracking-widest italic">—</span>
                                         @endif
-                                    </div>
-                                </td>
-                                <td class="px-8 py-8 font-bold text-base text-slate-800">
-                                    Rp
-                                    {{ number_format($p->raceEntries->where('status', 'paid')->pluck('order')->unique('id')->sum('total_price'), 0, ',', '.') }}
-                                </td>
-                                <td class="px-8 py-8">
-                                    @php
-                                        $paidCount = $p->raceEntries->where('status', 'paid')->count();
-                                        $totalCount = $p->raceEntries->count();
-                                    @endphp
-                                    <div class="flex items-center gap-3">
-                                        <span
-                                            class="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-[11px] font-black uppercase tracking-widest border border-blue-100">
-                                            {{ $paidCount }}/{{ $totalCount }} PAID
-                                        </span>
                                     </div>
                                 </td>
                                 <td class="px-10 py-8">
