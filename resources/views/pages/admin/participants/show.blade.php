@@ -457,7 +457,8 @@
                                 @foreach ($entries as $entry)
                                     <div
                                         class="w-full bg-white border border-slate-100 rounded-3xl p-8 text-center relative overflow-hidden mb-6 last:mb-0 shadow-sm hover:border-blue-100 transition-colors"
-                                        x-data="{ editingBib_{{ $entry->id }}: false, bibVal_{{ $entry->id }}: '{{ $entry->bib_number }}' }">
+                                        @php $eKey = str_replace('-', '', $entry->id); @endphp
+                                        x-data="{ editingBib_{{ $eKey }}: false, bibVal_{{ $eKey }}: '{{ addslashes($entry->bib_number) }}' }">
                                         <div
                                             class="text-sm font-black text-slate-400 uppercase tracking-[3px] mb-4 leading-none">
                                             {{ strtoupper($entry->ticket->category->name) }}
@@ -466,7 +467,7 @@
                                         {{-- BIB Display + Inline Edit (superadmin & admin only) --}}
                                         @if (in_array(auth()->user()->role, ['superadmin', 'admin']))
                                             {{-- Inline edit mode off: tampilkan BIB + tombol edit --}}
-                                            <div x-show="!editingBib_{{ $entry->id }}" class="relative inline-block">
+                                            <div x-show="!editingBib_{{ $eKey }}" class="relative inline-block">
                                                 @if ($entry->bib_number)
                                                     <div class="text-5xl font-black text-[#003366] tracking-[8px] uppercase font-mono">
                                                         {{ $entry->bib_number }}
@@ -477,7 +478,7 @@
                                                     </div>
                                                 @endif
                                                 <button type="button"
-                                                    @click="editingBib_{{ $entry->id }} = true"
+                                                    @click="editingBib_{{ $eKey }} = true"
                                                     title="Edit BIB Number"
                                                     class="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-100 transition-all">
                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -488,14 +489,14 @@
                                             </div>
 
                                             {{-- Inline edit mode on --}}
-                                            <div x-show="editingBib_{{ $entry->id }}" x-cloak>
+                                            <div x-show="editingBib_{{ $eKey }}" x-cloak>
                                                 <form action="{{ route('participants.update-bib', [$participant->id, $entry->id]) }}" method="POST">
                                                     @csrf
                                                     @method('PATCH')
                                                     <div class="flex flex-col items-center gap-3">
                                                         <input type="text"
                                                             name="bib_number"
-                                                            x-model="bibVal_{{ $entry->id }}"
+                                                            x-model="bibVal_{{ $eKey }}"
                                                             placeholder="Nomor BIB (kosongkan untuk hapus)"
                                                             class="w-full text-center text-3xl font-black font-mono text-[#003366] tracking-[6px] uppercase bg-blue-50 border-2 border-blue-300 focus:border-[#003366] rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#003366]/10"
                                                             autofocus>
@@ -505,7 +506,7 @@
                                                                 Simpan
                                                             </button>
                                                             <button type="button"
-                                                                @click="editingBib_{{ $entry->id }} = false; bibVal_{{ $entry->id }} = '{{ $entry->bib_number }}'"
+                                                                @click="editingBib_{{ $eKey }} = false; bibVal_{{ $eKey }} = '{{ addslashes($entry->bib_number) }}'"
                                                                 class="px-5 py-2 bg-slate-100 text-slate-500 hover:bg-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-200 transition-all">
                                                                 Batal
                                                             </button>
