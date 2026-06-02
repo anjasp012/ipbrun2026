@@ -96,6 +96,9 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::put('/participants/{participant}/change-password', [AdminDashboard::class, 'changePassword'])->name('participants.change-password');
         Route::post('/scan-rpc/{raceEntry}/reset', [ScanController::class, 'reset'])->name('admin.scan-rpc.reset');
 
+        Route::get('/import-bib', [AdminDashboard::class, 'showImportBib'])->name('admin.import-bib');
+        Route::post('/import-bib', [AdminDashboard::class, 'importBib'])->name('admin.import-bib.process');
+
         Route::get('/tickets', [AdminTicket::class, 'index']);
         Route::post('/tickets', [AdminTicket::class, 'store'])->name('tickets.store');
         Route::put('/tickets/{ticket}', [AdminTicket::class, 'update'])->name('tickets.update');

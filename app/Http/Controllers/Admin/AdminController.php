@@ -16,6 +16,7 @@ use App\Exports\ParticipantExport;
 use App\Exports\ParticipantImportTemplate;
 use App\Exports\ImportErrorExport;
 use App\Imports\ParticipantImport;
+use App\Imports\BibImport;
 
 class AdminController extends Controller
 {
@@ -653,5 +654,36 @@ class AdminController extends Controller
 
         $filename = 'import_errors_' . now()->format('Ymd_His') . '.xlsx';
         return Excel::download(new ImportErrorExport($errors), $filename);
+    }
+
+    public function showImportBib()
+    {
+        return view('pages.admin.import-bib');
+    }
+
+    public function importBib(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls',
+        ]);
+
+        try {
+            $import = new BibImport();
+            Excel::import($import, $request->file('file'));
+
+            $successCount = $import->getSuccessCount();
+            $errors = $import->getErrors();
+
+            if (!empty($errors)) {
+                session()->flash('import_errors', $errors);
+                session()->flash('warning', "Berhasil mengupdate {$successCount} data BIB. Namun terdapat beberapa error. Silakan cek detail error.");
+            } else {
+                session()->flash('success', "Berhasil mengupdate {$successCount} data BIB tanpa ada error.");
+            }
+
+            return back();
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal memproses file Excel: ' . $e->getMessage());
+        }
     }
 }
