@@ -255,12 +255,14 @@ class ScanController extends Controller
         $notFoundEmails = [];
 
         foreach ($emailArray as $email) {
-            $participant = Participant::where('email', $email)->first();
+            $participants = Participant::where('email', $email)->get();
             
-            if ($participant) {
-                // Send email to participant using Queue
-                Mail::to($participant->email)->queue(new RpcBlastEmail($participant));
-                $sentCount++;
+            if ($participants->isNotEmpty()) {
+                foreach ($participants as $participant) {
+                    // Send email to participant using Queue
+                    Mail::to($participant->email)->queue(new RpcBlastEmail($participant));
+                    $sentCount++;
+                }
             } else {
                 $notFoundEmails[] = $email;
             }
