@@ -2,7 +2,7 @@
     <div x-data="{ 
         editing: false,
         showAddTicketModal: false,
-        initialEmail: '{{ $participant->email }}',
+        initialEmail: '{{ addslashes($participant->email) }}',
         formatBestTime(e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 6) value = value.slice(0, 6);
@@ -18,65 +18,8 @@
             }
             e.target.value = formattedValue;
         },
-        confirmResend() {
-            Swal.fire({
-                title: 'Resend Invoice?',
-                text: 'Sistem akan mengirim ulang E-Invoice ke {{ $participant->email }} tanpa mengubah password yang sudah ada.',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#003366',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'YA, KIRIM ULANG',
-                cancelButtonText: 'BATAL',
-                customClass: {
-                    popup: 'rounded-[2.5rem]',
-                    confirmButton: 'rounded-xl font-black px-8 py-4',
-                    cancelButton: 'rounded-xl font-black px-8 py-4'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Sending...',
-                        text: 'Mohon tunggu sebentar',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading()
-                        }
-                    });
-                    window.location.href = '{{ route('participants.resend-invoice', $participant) }}';
-                }
-            });
-        },
-        confirmSave(e) {
-            const currentEmail = document.getElementsByName('email')[0].value;
-            let message = 'Apakah Anda yakin ingin menyimpan perubahan data peserta ini?';
-            let icon = 'question';
-
-            if (currentEmail.toLowerCase() !== this.initialEmail.toLowerCase()) {
-                message = '<strong>PERHATIAN!</strong> Anda mengubah alamat email. <br><br> Sistem akan secara otomatis <strong>mereset password</strong> dan mengirimkan email kredensial baru ke: <br> <span class=\'text-blue-600 font-bold\'>' + currentEmail + '</span>';
-                icon = 'warning';
-            }
-
-            Swal.fire({
-                title: 'Simpan Perubahan?',
-                html: message,
-                icon: icon,
-                showCancelButton: true,
-                confirmButtonColor: '#00875a',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'YA, SIMPAN',
-                cancelButtonText: 'BATAL',
-                customClass: {
-                    popup: 'rounded-[2.5rem]',
-                    confirmButton: 'rounded-xl font-black px-8 py-4',
-                    cancelButton: 'rounded-xl font-black px-8 py-4'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('participant-form').requestSubmit();
-                }
-            });
-        }
+        confirmResend() { window.doConfirmResend(); },
+        confirmSave(e) { window.doConfirmSave(); }
     }">
         {{-- Outer grid wrapper: form (kiri, 2 col) + race logistics (kanan, 1 col) --}}
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
@@ -816,4 +759,72 @@
         </div>
 
     </div>
+
+    <script>
+        const _participantEmail = @json($participant->email);
+        const _resendInvoiceUrl = @json(route('participants.resend-invoice', $participant));
+
+        window.doConfirmResend = function () {
+            Swal.fire({
+                title: 'Resend Invoice?',
+                text: 'Sistem akan mengirim ulang E-Invoice ke ' + _participantEmail + ' tanpa mengubah password yang sudah ada.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#003366',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'YA, KIRIM ULANG',
+                cancelButtonText: 'BATAL',
+                customClass: {
+                    popup: 'rounded-[2.5rem]',
+                    confirmButton: 'rounded-xl font-black px-8 py-4',
+                    cancelButton: 'rounded-xl font-black px-8 py-4'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Sending...',
+                        text: 'Mohon tunggu sebentar',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+                    window.location.href = _resendInvoiceUrl;
+                }
+            });
+        };
+
+        window.doConfirmSave = function () {
+            const emailInput = document.querySelector('#participant-form [name="email"]');
+            const currentEmail = emailInput ? emailInput.value : '';
+            const initialEmail = _participantEmail;
+            let message = 'Apakah Anda yakin ingin menyimpan perubahan data peserta ini?';
+            let icon = 'question';
+
+            if (currentEmail.toLowerCase() !== initialEmail.toLowerCase()) {
+                message = '<strong>PERHATIAN!</strong> Anda mengubah alamat email. <br><br>'
+                    + 'Sistem akan secara otomatis <strong>mereset password</strong> dan mengirimkan email kredensial baru ke: <br>'
+                    + '<span style="color:#2563eb;font-weight:bold;">' + currentEmail + '</span>';
+                icon = 'warning';
+            }
+
+            Swal.fire({
+                title: 'Simpan Perubahan?',
+                html: message,
+                icon: icon,
+                showCancelButton: true,
+                confirmButtonColor: '#00875a',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'YA, SIMPAN',
+                cancelButtonText: 'BATAL',
+                customClass: {
+                    popup: 'rounded-[2.5rem]',
+                    confirmButton: 'rounded-xl font-black px-8 py-4',
+                    cancelButton: 'rounded-xl font-black px-8 py-4'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('participant-form').requestSubmit();
+                }
+            });
+        };
+    </script>
 </x-layouts.admin>
