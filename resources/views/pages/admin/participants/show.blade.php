@@ -823,7 +823,7 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    document.getElementById('participant-form').requestSubmit();
+                    document.getElementById('participant-form').submit();
                 }
             });
         };
