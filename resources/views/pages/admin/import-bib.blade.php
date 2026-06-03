@@ -17,14 +17,23 @@
             <form action="{{ route('admin.import-bib.process') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 <div class="space-y-3">
-                    <label class="text-[13px] font-black text-slate-400 uppercase tracking-widest ml-6">Pilih Kategori / Tipe Tiket</label>
-                    <select name="ticket_id" required class="w-full bg-slate-50 border-2 border-slate-100 rounded-[2rem] px-8 py-5 text-base font-bold text-[#003366] outline-none focus:border-[#E8630A] focus:bg-white transition-all">
-                        <option value="">-- Pilih Tiket --</option>
-                        @foreach($tickets as $t)
-                            <option value="{{ $t->id }}">
-                                {{ $t->category->name ?? 'Kategori' }} ({{ $t->type === 'ipb' ? 'IPB Family' : 'Public (Umum)' }}) - Periode: {{ $t->period->name ?? '-' }}
+                    <label class="text-[13px] font-black text-slate-400 uppercase tracking-widest ml-6">Kategori Tiket</label>
+                    <select name="category_id" required class="w-full bg-slate-50 border-2 border-slate-100 rounded-[2rem] px-8 py-5 text-base font-bold text-[#003366] outline-none focus:border-[#E8630A] focus:bg-white transition-all">
+                        <option value="">-- Pilih Kategori --</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}">
+                                {{ $cat->name }}
                             </option>
                         @endforeach
+                    </select>
+                </div>
+
+                <div class="space-y-3">
+                    <label class="text-[13px] font-black text-slate-400 uppercase tracking-widest ml-6">Tipe Tiket</label>
+                    <select name="ticket_type" required class="w-full bg-slate-50 border-2 border-slate-100 rounded-[2rem] px-8 py-5 text-base font-bold text-[#003366] outline-none focus:border-[#E8630A] focus:bg-white transition-all">
+                        <option value="">-- Pilih Tipe --</option>
+                        <option value="umum">Public (Umum)</option>
+                        <option value="ipb">IPB Family</option>
                     </select>
                 </div>
 

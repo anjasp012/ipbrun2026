@@ -658,24 +658,20 @@ class AdminController extends Controller
 
     public function showImportBib()
     {
-        $tickets = \App\Models\Ticket::with(['category', 'period'])
-            ->whereHas('period', function ($q) {
-                $q->where('is_active', true);
-            })
-            ->get();
-
-        return view('pages.admin.import-bib', compact('tickets'));
+        $categories = \App\Models\Category::orderBy('name')->get();
+        return view('pages.admin.import-bib', compact('categories'));
     }
 
     public function importBib(Request $request)
     {
         $request->validate([
-            'ticket_id' => 'required|exists:tickets,id',
+            'category_id' => 'required|exists:categories,id',
+            'ticket_type' => 'required|in:umum,ipb',
             'file' => 'required|file|mimes:xlsx,xls',
         ]);
 
         try {
-            $import = new BibImport($request->ticket_id);
+            $import = new BibImport($request->category_id, $request->ticket_type);
             Excel::import($import, $request->file('file'));
 
             $successCount = $import->getSuccessCount();

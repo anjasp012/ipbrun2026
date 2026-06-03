@@ -11,13 +11,15 @@ use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
 class BibImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
 {
-    protected $ticketId;
+    protected $categoryId;
+    protected $ticketType;
     protected $successCount = 0;
     protected $errors = [];
 
-    public function __construct($ticketId)
+    public function __construct($categoryId, $ticketType)
     {
-        $this->ticketId = $ticketId;
+        $this->categoryId = $categoryId;
+        $this->ticketType = $ticketType;
     }
 
     public function collection(Collection $rows)
@@ -49,10 +51,16 @@ class BibImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                 continue;
             }
 
-            // Find race entry for the selected ticket
-            $entry = $order->raceEntries()->where('ticket_id', $this->ticketId)->first();
+            // Find race entry for the selected category and ticket type
+            $entry = $order->raceEntries()
+                ->whereHas('ticket', function ($q) {
+                    $q->where('category_id', $this->categoryId)
+                      ->where('type', $this->ticketType);
+                })
+                ->first();
+
             if (!$entry) {
-                $this->errors[] = "Baris $lineNum: Order '$orderCode' tidak memiliki tiket/kategori yang dipilih.";
+                $this->errors[] = "Baris $lineNum: Order '$orderCode' tidak memiliki kategori/tipe tiket yang dipilih.";
                 continue;
             }
 
