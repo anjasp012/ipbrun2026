@@ -64,12 +64,14 @@ class BibImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                 $entry->update(['bib_number' => $bibNumber]);
                 $this->successCount++;
             } else {
-                // Match by category/ticket name in KET
+                // Match by both category name and ticket type in KET (e.g. "5k umum" or "5k ipb")
                 $matched = false;
                 foreach ($entries as $entry) {
                     $categoryName = strtolower($entry->ticket->category->name ?? '');
+                    $ticketType = strtolower($entry->ticket->type ?? '');
                     $ketVal = strtolower($ket ?? '');
-                    if ($categoryName && $ketVal && (str_contains($ketVal, $categoryName) || str_contains($categoryName, $ketVal))) {
+
+                    if (str_contains($ketVal, $categoryName) && str_contains($ketVal, $ticketType)) {
                         if ($existingBibEntry && $existingBibEntry->id !== $entry->id) {
                             $this->errors[] = "Baris $lineNum: BIB number '$bibNumber' sudah digunakan oleh peserta lain.";
                             $matched = true;
@@ -82,8 +84,27 @@ class BibImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                     }
                 }
 
+                // If not matched, try matching just the category name in KET
                 if (!$matched) {
-                    // Fallback to first race entry that has no bib_number
+                    foreach ($entries as $entry) {
+                        $categoryName = strtolower($entry->ticket->category->name ?? '');
+                        $ketVal = strtolower($ket ?? '');
+                        if ($categoryName && str_contains($ketVal, $categoryName)) {
+                            if ($existingBibEntry && $existingBibEntry->id !== $entry->id) {
+                                $this->errors[] = "Baris $lineNum: BIB number '$bibNumber' sudah digunakan oleh peserta lain.";
+                                $matched = true;
+                                break;
+                            }
+                            $entry->update(['bib_number' => $bibNumber]);
+                            $this->successCount++;
+                            $matched = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Fallback: assign to the first race entry that doesn't have a BIB yet
+                if (!$matched) {
                     $entry = $entries->whereNull('bib_number')->first() ?? $entries->first();
                     if ($entry) {
                         if ($existingBibEntry && $existingBibEntry->id !== $entry->id) {
