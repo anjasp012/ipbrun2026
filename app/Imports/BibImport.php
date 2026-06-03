@@ -11,8 +11,14 @@ use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 
 class BibImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
 {
+    protected $ticketId;
     protected $successCount = 0;
     protected $errors = [];
+
+    public function __construct($ticketId)
+    {
+        $this->ticketId = $ticketId;
+    }
 
     public function collection(Collection $rows)
     {
@@ -25,8 +31,6 @@ class BibImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
 
             $orderCode = isset($row['id']) ? trim((string)$row['id']) : null;
             $bibNumber = isset($row['bib']) ? trim((string)$row['bib']) : null;
-            $nama = isset($row['nama']) ? trim((string)$row['nama']) : null;
-            $ket = isset($row['ket']) ? trim((string)$row['ket']) : null;
 
             if (empty($orderCode)) {
                 $this->errors[] = "Baris $lineNum: Kolom ID (Order Code) kosong.";
@@ -45,77 +49,22 @@ class BibImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
                 continue;
             }
 
-            // Find race entries
-            $entries = $order->raceEntries;
-            if ($entries->isEmpty()) {
-                $this->errors[] = "Baris $lineNum: Order '$orderCode' tidak memiliki tiket/race entry.";
+            // Find race entry for the selected ticket
+            $entry = $order->raceEntries()->where('ticket_id', $this->ticketId)->first();
+            if (!$entry) {
+                $this->errors[] = "Baris $lineNum: Order '$orderCode' tidak memiliki tiket/kategori yang dipilih.";
                 continue;
             }
 
             // Unique check for BIB number
             $existingBibEntry = RaceEntry::where('bib_number', $bibNumber)->first();
-
-            if ($entries->count() === 1) {
-                $entry = $entries->first();
-                if ($existingBibEntry && $existingBibEntry->id !== $entry->id) {
-                    $this->errors[] = "Baris $lineNum: BIB number '$bibNumber' sudah digunakan oleh peserta lain.";
-                    continue;
-                }
-                $entry->update(['bib_number' => $bibNumber]);
-                $this->successCount++;
-            } else {
-                // Match by both category name and ticket type in KET (e.g. "5k umum" or "5k ipb")
-                $matched = false;
-                foreach ($entries as $entry) {
-                    $categoryName = strtolower($entry->ticket->category->name ?? '');
-                    $ticketType = strtolower($entry->ticket->type ?? '');
-                    $ketVal = strtolower($ket ?? '');
-
-                    if (str_contains($ketVal, $categoryName) && str_contains($ketVal, $ticketType)) {
-                        if ($existingBibEntry && $existingBibEntry->id !== $entry->id) {
-                            $this->errors[] = "Baris $lineNum: BIB number '$bibNumber' sudah digunakan oleh peserta lain.";
-                            $matched = true;
-                            break;
-                        }
-                        $entry->update(['bib_number' => $bibNumber]);
-                        $this->successCount++;
-                        $matched = true;
-                        break;
-                    }
-                }
-
-                // If not matched, try matching just the category name in KET
-                if (!$matched) {
-                    foreach ($entries as $entry) {
-                        $categoryName = strtolower($entry->ticket->category->name ?? '');
-                        $ketVal = strtolower($ket ?? '');
-                        if ($categoryName && str_contains($ketVal, $categoryName)) {
-                            if ($existingBibEntry && $existingBibEntry->id !== $entry->id) {
-                                $this->errors[] = "Baris $lineNum: BIB number '$bibNumber' sudah digunakan oleh peserta lain.";
-                                $matched = true;
-                                break;
-                            }
-                            $entry->update(['bib_number' => $bibNumber]);
-                            $this->successCount++;
-                            $matched = true;
-                            break;
-                        }
-                    }
-                }
-
-                // Fallback: assign to the first race entry that doesn't have a BIB yet
-                if (!$matched) {
-                    $entry = $entries->whereNull('bib_number')->first() ?? $entries->first();
-                    if ($entry) {
-                        if ($existingBibEntry && $existingBibEntry->id !== $entry->id) {
-                            $this->errors[] = "Baris $lineNum: BIB number '$bibNumber' sudah digunakan oleh peserta lain.";
-                            continue;
-                        }
-                        $entry->update(['bib_number' => $bibNumber]);
-                        $this->successCount++;
-                    }
-                }
+            if ($existingBibEntry && $existingBibEntry->id !== $entry->id) {
+                $this->errors[] = "Baris $lineNum: BIB number '$bibNumber' sudah digunakan oleh peserta lain.";
+                continue;
             }
+
+            $entry->update(['bib_number' => $bibNumber]);
+            $this->successCount++;
         }
     }
 

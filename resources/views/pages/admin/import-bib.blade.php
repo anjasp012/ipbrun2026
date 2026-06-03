@@ -17,6 +17,18 @@
             <form action="{{ route('admin.import-bib.process') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 <div class="space-y-3">
+                    <label class="text-[13px] font-black text-slate-400 uppercase tracking-widest ml-6">Pilih Kategori / Tipe Tiket</label>
+                    <select name="ticket_id" required class="w-full bg-slate-50 border-2 border-slate-100 rounded-[2rem] px-8 py-5 text-base font-bold text-[#003366] outline-none focus:border-[#E8630A] focus:bg-white transition-all">
+                        <option value="">-- Pilih Tiket --</option>
+                        @foreach($tickets as $t)
+                            <option value="{{ $t->id }}">
+                                {{ $t->category->name ?? 'Kategori' }} ({{ $t->type === 'ipb' ? 'IPB Family' : 'Public (Umum)' }}) - Periode: {{ $t->period->name ?? '-' }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="space-y-3">
                     <label class="text-[13px] font-black text-slate-400 uppercase tracking-widest ml-6">Excel Document (.xlsx, .xls)</label>
                     <div class="relative group">
                         <input type="file" name="file" required class="w-full bg-slate-50 border-2 border-slate-100 rounded-[2rem] px-8 py-5 text-sm font-bold text-[#003366] outline-none focus:border-[#E8630A] focus:bg-white transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer">
