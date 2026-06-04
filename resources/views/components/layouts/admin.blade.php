@@ -102,6 +102,10 @@
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
                         <span class="font-bold text-base tracking-wide">Voucher Management</span>
                     </a>
+                    <a href="{{ route('admin.import-bib') }}" class="flex items-center gap-4 p-4 rounded-lg sidebar-item {{ request()->is('admin/import-bib*') ? 'active' : '' }}">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span class="font-bold text-base tracking-wide">Update BIB Bulk</span>
+                    </a>
                 @endif
 
                 @if($isSuper)
@@ -112,10 +116,6 @@
                     <a href="{{ url('/admin/tickets') }}" class="flex items-center gap-4 p-4 rounded-lg sidebar-item {{ request()->is('admin/tickets*') ? 'active' : '' }}">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path></svg>
                         <span class="font-bold text-base tracking-wide">Periods & Tickets</span>
-                    </a>
-                    <a href="{{ route('admin.import-bib') }}" class="flex items-center gap-4 p-4 rounded-lg sidebar-item {{ request()->is('admin/import-bib*') ? 'active' : '' }}">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        <span class="font-bold text-base tracking-wide">Update BIB Bulk</span>
                     </a>
                     <a href="{{ route('admin.blast') }}" class="flex items-center gap-4 p-4 rounded-lg sidebar-item {{ request()->is('admin/blast*') ? 'active' : '' }}">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>

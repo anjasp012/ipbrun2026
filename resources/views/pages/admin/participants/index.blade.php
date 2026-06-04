@@ -246,8 +246,8 @@
                                                 </svg>
                                             </a>
 
-                                            {{-- Ganti Password (Superadmin) --}}
-                                            @if (auth()->user()->role === 'superadmin')
+                                            {{-- Ganti Password (Superadmin & Admin) --}}
+                                            @if (in_array(auth()->user()->role, ['superadmin', 'admin']))
                                                 <button @click="showPasswordModal = true; selectedParticipantId = '{{ $p->id }}'; selectedParticipantName = '{{ addslashes($p->name) }}'"
                                                     class="p-2 bg-red-50 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-md transition-all inline-flex items-center justify-center" title="Ganti Password">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,8 +256,8 @@
                                                 </button>
                                             @endif
 
-                                            {{-- Cancel/Nonaktifkan (Superadmin) --}}
-                                            @if (auth()->user()->role === 'superadmin')
+                                            {{-- Cancel/Nonaktifkan (Superadmin & Admin) --}}
+                                            @if (in_array(auth()->user()->role, ['superadmin', 'admin']))
                                                 <form action="{{ route('participants.cancel', $p->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin MENONAKTIFKAN peserta ini? Akun login akan dihapus dan semua pesanan akan menjadi FAILED.')">
                                                     @csrf
                                                     @method('DELETE')

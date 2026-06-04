@@ -93,11 +93,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     // Superadmin Only Routes
     Route::middleware(['role:superadmin'])->group(function () {
         Route::post('/toggle-running', [AdminDashboard::class, 'toggleRunning']);
-        Route::put('/participants/{participant}/change-password', [AdminDashboard::class, 'changePassword'])->name('participants.change-password');
         Route::post('/scan-rpc/{raceEntry}/reset', [ScanController::class, 'reset'])->name('admin.scan-rpc.reset');
-
-        Route::get('/import-bib', [AdminDashboard::class, 'showImportBib'])->name('admin.import-bib');
-        Route::post('/import-bib', [AdminDashboard::class, 'importBib'])->name('admin.import-bib.process');
 
         Route::get('/tickets', [AdminTicket::class, 'index']);
         Route::post('/tickets', [AdminTicket::class, 'store'])->name('tickets.store');
@@ -121,6 +117,10 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
 
     // Superadmin & Admin Only (PIC Restricted)
     Route::middleware(['role:superadmin,admin'])->group(function () {
+        Route::put('/participants/{participant}/change-password', [AdminDashboard::class, 'changePassword'])->name('participants.change-password');
+        Route::get('/import-bib', [AdminDashboard::class, 'showImportBib'])->name('admin.import-bib');
+        Route::post('/import-bib', [AdminDashboard::class, 'importBib'])->name('admin.import-bib.process');
+
         Route::get('/participants/export', [AdminDashboard::class, 'exportParticipants'])->name('participants.export');
         Route::get('/participants/import/template', [AdminDashboard::class, 'importTemplate'])->name('participants.import-template');
         Route::post('/participants/import', [AdminDashboard::class, 'importParticipants'])->name('participants.import');
