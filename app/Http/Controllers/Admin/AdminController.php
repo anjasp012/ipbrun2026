@@ -175,6 +175,7 @@ class AdminController extends Controller
         $ticketType = $request->ticket_type;
         $categoryId = $request->category_id;
         $periodId = $request->period_id;
+        $rpcStatus = $request->rpc_status;
         $search = $request->search;
         $selectedColumns = $request->columns ?? [];
         $participantType = $request->participant_type ?? 'all'; // all, regular, bundling
@@ -183,7 +184,7 @@ class AdminController extends Controller
         $query = Participant::query();
 
         // Constrain Relationship loading based on filters
-        $query->with(['raceEntries' => function ($q) use ($status, $ticketType, $categoryId, $periodId) {
+        $query->with(['raceEntries' => function ($q) use ($status, $ticketType, $categoryId, $periodId, $rpcStatus) {
             if ($status) {
                 $q->whereHas('order', function ($oq) use ($status) {
                     $oq->where('status', $status);
@@ -203,6 +204,13 @@ class AdminController extends Controller
                 $q->whereHas('ticket', function ($tq) use ($periodId) {
                     $tq->where('period_id', $periodId);
                 });
+            }
+            if ($rpcStatus) {
+                if ($rpcStatus === 'taken') {
+                    $q->where('status', 'paid')->whereNotNull('scanned_at');
+                } elseif ($rpcStatus === 'not_taken') {
+                    $q->where('status', 'paid')->whereNull('scanned_at');
+                }
             }
             $q->with(['ticket.category', 'ticket.period', 'order']);
         }]);
@@ -249,6 +257,20 @@ class AdminController extends Controller
             });
         }
 
+        if ($rpcStatus) {
+            if ($rpcStatus === 'taken') {
+                $query->whereHas('raceEntries', function ($rq) {
+                    $rq->where('status', 'paid')->whereNotNull('scanned_at');
+                });
+            } elseif ($rpcStatus === 'not_taken') {
+                $query->whereHas('raceEntries', function ($rq) {
+                    $rq->where('status', 'paid');
+                })->whereDoesntHave('raceEntries', function ($rq) {
+                    $rq->where('status', 'paid')->whereNotNull('scanned_at');
+                });
+            }
+        }
+
         // Filter Date Range
         if ($request->filled('start_date')) {
             $query->whereDate('created_at', '>=', $request->start_date);
@@ -268,7 +290,7 @@ class AdminController extends Controller
 
         $filename = "participants_export_" . date('Y-m-d_H-i-s') . ".xlsx";
 
-        return Excel::download(new ParticipantExport($participants, $status, $selectedColumns, $splitBundling), $filename);
+        return Excel::download(new ParticipantExport($participants, $status, $selectedColumns, $splitBundling, $rpcStatus), $filename);
     }
 
     public function participantShow(Participant $participant)

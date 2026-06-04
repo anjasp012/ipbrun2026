@@ -405,6 +405,19 @@
                             </div>
                         </div>
 
+                        <div class="grid grid-cols-1 gap-6 w-full">
+                            <div class="w-full">
+                                <label
+                                    class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-4">RPC Status</label>
+                                <select name="rpc_status"
+                                    class="w-full h-14 px-6 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-200 transition-all">
+                                    <option value="" {{ request('rpc_status') == '' ? 'selected' : '' }}>All RPC Status</option>
+                                    <option value="taken" {{ request('rpc_status') == 'taken' ? 'selected' : '' }}>Sudah Diambil</option>
+                                    <option value="not_taken" {{ request('rpc_status') == 'not_taken' ? 'selected' : '' }}>Belum Diambil</option>
+                                </select>
+                            </div>
+                        </div>
+
                         {{-- Selection Columns --}}
                         <div class="pt-6 border-t border-slate-50">
                             <label class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-6">Pilih Kolom Ekspor</label>
@@ -492,6 +505,8 @@
                                             $orderFields = [
                                                 'order_codes' => 'Order Codes',
                                                 'order_statuses' => 'Order Statuses',
+                                                'bib_number' => 'BIB Number',
+                                                'rpc_status' => 'Status RPC',
                                                 'voucher_codes' => 'Voucher Codes',
                                                 'ticket_details' => 'Ticket Details',
                                                 'paid_amount' => 'Paid Amount (Price)',

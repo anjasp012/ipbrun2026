@@ -15,12 +15,14 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
     protected $status;
     protected $selectedColumns;
     protected $splitBundling;
+    protected $rpcStatus;
 
-    public function __construct($participants, $status = null, $selectedColumns = [], $splitBundling = false)
+    public function __construct($participants, $status = null, $selectedColumns = [], $splitBundling = false, $rpcStatus = null)
     {
         $this->participants = $participants;
         $this->status = $status;
         $this->splitBundling = $splitBundling;
+        $this->rpcStatus = $rpcStatus;
         
         // If empty, assume all columns (fallback)
         if (empty($selectedColumns)) {
@@ -29,7 +31,7 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
                 'jersey_size', 'nim_nrp', 'nationality', 'address', 'running_community',
                 'medical_condition', 'shuttle_bus', 'best_time', 'previous_events',
                 'emergency_name', 'emergency_phone', 'emergency_relationship', 
-                'order_codes', 'order_statuses', 'ticket_details', 'paid_amount', 
+                'order_codes', 'order_statuses', 'bib_number', 'rpc_status', 'ticket_details', 'paid_amount', 
                 'donation_scholarship', 'donation_event', 'admin_fee', 'total_paid', 'created_at'
             ];
         } else {
@@ -44,7 +46,16 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
             foreach ($this->participants as $p) {
                 // Filter entries matching the criteria just like in map()
                 $entries = $p->raceEntries->filter(function($e) {
-                    return empty($this->status) || ($e->order->status ?? $e->status) === $this->status;
+                    $matchStatus = empty($this->status) || ($e->order->status ?? $e->status) === $this->status;
+                    $matchRpc = true;
+                    if ($this->rpcStatus) {
+                        if ($this->rpcStatus === 'taken') {
+                            $matchRpc = (($e->order->status ?? $e->status) === 'paid' && !empty($e->scanned_at));
+                        } elseif ($this->rpcStatus === 'not_taken') {
+                            $matchRpc = (($e->order->status ?? $e->status) === 'paid' && empty($e->scanned_at));
+                        }
+                    }
+                    return $matchStatus && $matchRpc;
                 });
 
                 if ($entries->isEmpty()) {
@@ -88,6 +99,8 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
             'emergency_relationship' => 'Emergency Relationship',
             'order_codes' => 'Order Code',
             'order_statuses' => 'Order Status',
+            'bib_number' => 'BIB Number',
+            'rpc_status' => 'Status RPC',
             'voucher_codes' => 'Voucher Codes',
             'ticket_details' => 'Ticket Detail',
             'paid_amount' => 'Paid Amount',
@@ -146,6 +159,8 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
                 'emergency_relationship' => $p->emergency_contact_relationship,
                 'order_codes' => $order->order_code ?? '-',
                 'order_statuses' => strtoupper($order->status ?? ($entry->status ?? 'unknown')),
+                'bib_number' => $entry->bib_number ?: '-',
+                'rpc_status' => $entry->scanned_at ? 'Sudah Diambil' : 'Belum Diambil',
                 'voucher_codes' => $order->voucher_code ?? '-',
                 'ticket_details' => $ticketDetail,
                 'paid_amount' => $paidAmount,
@@ -158,7 +173,16 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
         } else {
             // Pre-calculate common data for combined row
             $targetOrders = $p->raceEntries->filter(function($e) {
-                return empty($this->status) || ($e->order->status ?? $e->status) === $this->status;
+                $matchStatus = empty($this->status) || ($e->order->status ?? $e->status) === $this->status;
+                $matchRpc = true;
+                if ($this->rpcStatus) {
+                    if ($this->rpcStatus === 'taken') {
+                        $matchRpc = (($e->order->status ?? $e->status) === 'paid' && !empty($e->scanned_at));
+                    } elseif ($this->rpcStatus === 'not_taken') {
+                        $matchRpc = (($e->order->status ?? $e->status) === 'paid' && empty($e->scanned_at));
+                    }
+                }
+                return $matchStatus && $matchRpc;
             })->map(fn($e) => $e->order)->unique('id')->filter();
 
             $totalPaid = $targetOrders->sum('total_price');
@@ -189,6 +213,8 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Sh
                 'emergency_relationship' => $p->emergency_contact_relationship,
                 'order_codes' => $p->raceEntries->map(fn($e) => $e->order->order_code ?? '-')->unique()->filter()->implode(' | '),
                 'order_statuses' => $p->raceEntries->map(fn($e) => strtoupper($e->order->status ?? ($e->status ?? 'unknown')))->unique()->implode(' | '),
+                'bib_number' => $p->raceEntries->map(fn($e) => $e->bib_number ?: '-')->implode(' | '),
+                'rpc_status' => $p->raceEntries->map(fn($e) => $e->scanned_at ? 'Sudah Diambil' : 'Belum Diambil')->implode(' | '),
                 'voucher_codes' => $p->raceEntries->map(fn($e) => $e->order->voucher_code ?? '-')->unique()->filter()->implode(' | '),
                 'ticket_details' => $p->raceEntries->map(function($e) {
                     $cat = $e->ticket->category->name ?? '-';
