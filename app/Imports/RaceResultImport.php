@@ -19,7 +19,19 @@ class RaceResultImport implements ToModel, WithHeadingRow, WithBatchInserts, Wit
         $item      = $row['item'] ?? null;
         $bib       = $row['bib'] ?? null;
         $name      = $row['name'] ?? null;
-        $gender    = $row['gender'] ?? null;
+        $genderVal = $row['gender'] ?? $row['sex'] ?? $row['jenis_kelamin'] ?? $row['jenis_kelamin'] ?? $row['jenis kelamin'] ?? $row['jk'] ?? $row['gender_l_p'] ?? null;
+        $gender    = ($genderVal !== null && trim((string) $genderVal) !== '') ? trim((string) $genderVal) : null;
+
+        // Smart Fallback: Parse from item/category name if gender is empty
+        if ($gender === null && $item !== null) {
+            $itemLower = strtolower((string) $item);
+            if (str_contains($itemLower, 'female') || str_contains($itemLower, 'wanita') || str_contains($itemLower, 'perempuan') || str_contains($itemLower, ' w ')) {
+                $gender = 'Female';
+            } elseif (str_contains($itemLower, 'male') || str_contains($itemLower, 'pria') || str_contains($itemLower, 'laki') || str_contains($itemLower, ' m ')) {
+                $gender = 'Male';
+            }
+        }
+
         $gunTime   = $row['gun_time'] ?? $row['gun time'] ?? null;
         $netTime   = $row['net_time'] ?? $row['net time'] ?? null;
         $startTime = $row['start_time'] ?? $row['start time'] ?? null;

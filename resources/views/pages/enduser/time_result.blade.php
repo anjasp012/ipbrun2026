@@ -19,8 +19,11 @@
             <!-- Search & Filter Card -->
             <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-6 md:p-8 mb-8 shadow-xl">
                 <form action="{{ route('time-result') }}" method="GET" class="flex flex-col md:flex-row gap-4 items-center">
-                    @if($activeCategory)
-                        <input type="hidden" name="category" value="{{ $activeCategory }}">
+                    @if($activeItem)
+                        <input type="hidden" name="item" value="{{ $activeItem }}">
+                    @endif
+                    @if($activeGender)
+                        <input type="hidden" name="gender" value="{{ $activeGender }}">
                     @endif
                     <div class="relative w-full flex-1">
                         <span class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-white/50">
@@ -31,7 +34,7 @@
                         <input type="text" name="search" value="{{ $search }}" placeholder="Cari berdasarkan Nomor BIB atau Nama Pelari..." class="w-full h-16 pl-14 pr-12 bg-white/10 border border-white/25 rounded-2xl text-white placeholder-white/50 font-bold focus:outline-none focus:ring-2 focus:ring-[#FF7A21] focus:border-[#FF7A21] transition-all">
                         
                         @if($search)
-                            <a href="{{ route('time-result', ['category' => $activeCategory]) }}" class="absolute inset-y-0 right-0 pr-5 flex items-center text-white/50 hover:text-[#FF7A21] transition-colors">
+                            <a href="{{ route('time-result', ['item' => $activeItem, 'gender' => $activeGender]) }}" class="absolute inset-y-0 right-0 pr-5 flex items-center text-white/50 hover:text-[#FF7A21] transition-colors">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
@@ -48,9 +51,15 @@
             @if($categories->isNotEmpty())
                 <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-6 -mx-4 px-4 scrollbar-none">
                     @foreach($categories as $category)
-                        <a href="{{ route('time-result', array_merge(request()->query(), ['category' => $category])) }}" 
-                           class="flex-shrink-0 px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all {{ $activeCategory === $category ? 'bg-white text-[#003366] shadow-lg' : 'bg-white/10 hover:bg-white/20 text-white border border-white/10' }}">
-                            {{ $category }}
+                        @php
+                            $tabParams = array_merge(request()->query(), [
+                                'item' => $category->item,
+                                'gender' => $category->gender
+                            ]);
+                        @endphp
+                        <a href="{{ route('time-result', $tabParams) }}" 
+                           class="flex-shrink-0 px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all {{ $activeItem === $category->item && $activeGender === $category->gender ? 'bg-white text-[#003366] shadow-lg' : 'bg-white/10 hover:bg-white/20 text-white border border-white/10' }}">
+                            {{ $category->display_name }}
                         </a>
                     @endforeach
                 </div>

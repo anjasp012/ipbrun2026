@@ -12,22 +12,49 @@ class TimeResultController extends Controller
     {
         $search = $request->input('search');
         
-        // Get all unique categories (items)
-        $categories = RaceResult::select('item')
-            ->distinct()
+        // Get unique combinations of item (category) and gender
+        $rawCategories = RaceResult::select('item', 'gender')
+            ->groupBy('item', 'gender')
             ->orderBy('item')
-            ->pluck('item');
+            ->orderBy('gender')
+            ->get();
 
-        $activeCategory = $request->input('category');
+        $categories = $rawCategories->map(function ($row) {
+            $item = $row->item;
+            $gender = $row->gender;
+            
+            // Format display name nicely (avoid duplicating gender if it's already in the category name)
+            $displayName = $item;
+            if ($gender) {
+                $itemLower = strtolower($item);
+                $genderLower = strtolower($gender);
+                if (!str_contains($itemLower, $genderLower)) {
+                    // Capitalize gender for presentation (Male / Female)
+                    $genderDisplay = ucfirst($genderLower);
+                    $displayName = $item . ' ' . $genderDisplay;
+                }
+            }
+            
+            return (object) [
+                'item' => $item,
+                'gender' => $gender,
+                'display_name' => $displayName,
+            ];
+        });
+
+        $activeItem = $request->input('item');
+        $activeGender = $request->input('gender');
         
-        // Default to the first category if none is selected
-        if (empty($activeCategory) && $categories->isNotEmpty()) {
-            $activeCategory = $categories->first();
+        // Default to the first category combination if none is selected
+        if (empty($activeItem) && $categories->isNotEmpty()) {
+            $first = $categories->first();
+            $activeItem = $first->item;
+            $activeGender = $first->gender;
         }
 
         $query = RaceResult::query();
 
-        // If searching, search by BIB or Name
+        // Search by BIB or Name
         if ($request->filled('search')) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -35,9 +62,20 @@ class TimeResultController extends Controller
             });
         }
 
-        // If there's an active category, filter by it (or search globally if category is set to 'all', but tabs are better)
-        if ($activeCategory) {
-            $query->where('item', $activeCategory);
+        // Filter by the selected item and gender combination
+        if ($activeItem !== null) {
+            $query->where('item', $activeItem);
+        }
+        
+        if ($activeGender !== null && $activeGender !== '') {
+            $query->where('gender', $activeGender);
+        } else if ($activeItem !== null) {
+            // If the selected category has some rows with null gender, filter by null
+            // otherwise don't restrict if gender wasn't in the DB group
+            $hasNullGender = RaceResult::where('item', $activeItem)->whereNull('gender')->exists();
+            if ($hasNullGender) {
+                $query->whereNull('gender');
+            }
         }
 
         // Order by net_time as plain text, pushing empty values to the end
@@ -46,6 +84,6 @@ class TimeResultController extends Controller
             ->paginate(50)
             ->withQueryString();
 
-        return view('pages.enduser.time_result', compact('categories', 'activeCategory', 'results', 'search'));
+        return view('pages.enduser.time_result', compact('categories', 'activeItem', 'activeGender', 'results', 'search'));
     }
 }
