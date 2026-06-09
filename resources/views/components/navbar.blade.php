@@ -29,6 +29,11 @@
                     Cek Status
                 </a>
 
+                <a href="{{ route('time-result') }}"
+                    class="px-5 py-2 rounded-xl text-[13px] font-black uppercase tracking-widest hover:text-[#003366] hover:bg-slate-50 transition-all {{ request()->routeIs('time-result') ? 'text-[#003366] bg-slate-50' : 'text-slate-500' }}">
+                    Time Result
+                </a>
+
                 <!-- Dropdown Race Info -->
                 <div class="relative" @mouseenter="desktopDropdownOpen = true"
                     @mouseleave="desktopDropdownOpen = false">
@@ -215,6 +220,17 @@
                                 </path>
                             </svg>
                             Cek Status
+                        </a>
+
+                        <a href="{{ route('time-result') }}"
+                            class="flex items-center gap-4 px-4 py-3.5 rounded-2xl text-[13px] font-black uppercase tracking-widest {{ request()->routeIs('time-result') ? 'bg-blue-50 text-[#003366]' : 'text-slate-600 hover:bg-slate-50/80' }} transition-all">
+                            <svg class="w-5 h-5 opacity-40 {{ request()->routeIs('time-result') ? 'text-[#003366]' : 'text-slate-500' }}" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
+                                </path>
+                            </svg>
+                            Time Result
                         </a>
 
                         <div x-data="{ open: false }">

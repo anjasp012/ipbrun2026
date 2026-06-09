@@ -21,6 +21,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Enduser Routes
 Route::get('/', [EnduserTicket::class, 'home']);
+Route::get('/time-result', [\App\Http\Controllers\Enduser\TimeResultController::class, 'index'])->name('time-result');
 Route::get('/check-order', [EnduserTicket::class, 'checkOrder'])->name('check.order');
 // Route::get('/start', [ToolController::class, 'startPage'])->name('start.tool');
 Route::post('/trigger-start', [ToolController::class, 'triggerStart'])->name('trigger.start');
@@ -144,6 +145,11 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         Route::post('/vouchers', [\App\Http\Controllers\Admin\VoucherController::class, 'store'])->name('admin.vouchers.store');
         Route::delete('/vouchers/{voucher}', [\App\Http\Controllers\Admin\VoucherController::class, 'destroy'])->name('admin.vouchers.destroy');
         Route::patch('/vouchers/{voucher}/toggle', [\App\Http\Controllers\Admin\VoucherController::class, 'toggleActive'])->name('admin.vouchers.toggle');
+
+        // Time Result Routes
+        Route::get('/time-result', [\App\Http\Controllers\Admin\RaceResultController::class, 'index'])->name('admin.time-result.index');
+        Route::post('/time-result/import', [\App\Http\Controllers\Admin\RaceResultController::class, 'import'])->name('admin.time-result.import');
+        Route::delete('/time-result', [\App\Http\Controllers\Admin\RaceResultController::class, 'destroy'])->name('admin.time-result.destroy');
     });
 });
 
