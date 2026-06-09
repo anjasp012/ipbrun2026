@@ -29,7 +29,7 @@
                             </svg>
                         </span>
                         <input type="text" name="search" value="{{ $search }}" placeholder="Cari berdasarkan Nomor BIB atau Nama Pelari..." class="w-full h-16 pl-14 pr-12 bg-white/10 border border-white/25 rounded-2xl text-white placeholder-white/50 font-bold focus:outline-none focus:ring-2 focus:ring-[#FF7A21] focus:border-[#FF7A21] transition-all">
-                        
+
                         @if($search)
                             <a href="{{ route('time-result', ['tab' => $activeTab]) }}" class="absolute inset-y-0 right-0 pr-5 flex items-center text-white/50 hover:text-[#FF7A21] transition-colors">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,19 +46,71 @@
 
             <!-- Categories Tabs -->
             <div class="flex flex-wrap items-center gap-3 mb-6">
-                <a href="{{ route('time-result', ['tab' => 'SEMUA', 'search' => $search]) }}" 
+                <a href="{{ route('time-result', ['tab' => 'SEMUA', 'search' => $search]) }}"
                    class="px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all {{ $activeTab === 'SEMUA' ? 'bg-white text-[#003366] shadow-lg' : 'bg-white/10 hover:bg-white/20 text-white border border-white/10' }}">
                     SEMUA
                 </a>
                 @if($categories->isNotEmpty())
                     @foreach($categories as $category)
-                        <a href="{{ route('time-result', ['tab' => $category, 'search' => $search]) }}" 
+                        <a href="{{ route('time-result', ['tab' => $category, 'search' => $search]) }}"
                            class="px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all {{ $activeTab === $category ? 'bg-white text-[#003366] shadow-lg' : 'bg-white/10 hover:bg-white/20 text-white border border-white/10' }}">
                             {{ $category }}
                         </a>
                     @endforeach
                 @endif
             </div>
+
+            @php
+                // Determine which checkpoints to show based on active tab
+                $tabUpper = strtoupper($activeTab ?? '');
+                $isFM  = str_contains($tabUpper, 'FM') || str_contains($tabUpper, 'FULL');
+                $isHM  = str_contains($tabUpper, 'HM') || str_contains($tabUpper, 'HALF');
+                $is10K = str_contains($tabUpper, '10K') || str_contains($tabUpper, '10KM');
+                $is5K  = (str_contains($tabUpper, '5K') || str_contains($tabUpper, '5KM')) && !$is10K;
+
+                // Checkpoints to display per category:
+                // FM:   3K, 8.9K, 16.1K, 19K, 26.1K, 29K, 36K, 38.5K
+                // HM:   3K, 6.4K, 8.9K, 16.1K, 19K
+                // 10K:  3K, 8.9K
+                // 5K:   3K
+                // SEMUA: no CP columns (keeps table clean across mixed categories)
+                $checkpoints = [];
+                if ($isFM) {
+                    $checkpoints = [
+                        ['field' => 'cp_3km',    'label' => '3KM'],
+                        ['field' => 'cp_8_9km',  'label' => '8.9KM'],
+                        ['field' => 'cp_16_1km', 'label' => '16.1KM'],
+                        ['field' => 'cp_19km',   'label' => '19KM'],
+                        ['field' => 'cp_26_1km', 'label' => '26.1KM'],
+                        ['field' => 'cp_29km',   'label' => '29KM'],
+                        ['field' => 'cp_36km',   'label' => '36KM'],
+                        ['field' => 'cp_38_5km', 'label' => '38.5KM'],
+                    ];
+                } elseif ($isHM) {
+                    $checkpoints = [
+                        ['field' => 'cp_3km',    'label' => '3KM'],
+                        ['field' => 'cp_6_4km',  'label' => '6.4KM'],
+                        ['field' => 'cp_8_9km',  'label' => '8.9KM'],
+                        ['field' => 'cp_16_1km', 'label' => '16.1KM'],
+                        ['field' => 'cp_19km',   'label' => '19KM'],
+                    ];
+                } elseif ($is10K) {
+                    $checkpoints = [
+                        ['field' => 'cp_3km',   'label' => '3KM'],
+                        ['field' => 'cp_8_9km', 'label' => '8.9KM'],
+                    ];
+                } elseif ($is5K) {
+                    $checkpoints = [
+                        ['field' => 'cp_3km', 'label' => '3KM'],
+                    ];
+                }
+
+                // Total column count for empty-state colspan
+                $colCount = 6; // BIB, Nama, Kategori, Gender, Net Time, Gun Time
+                if ($activeTab !== 'SEMUA') $colCount++; // + Rank
+                $colCount += count($checkpoints);         // + CPs
+                $colCount++;                              // + Status
+            @endphp
 
             <!-- Main Results Table -->
             <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
@@ -75,8 +127,11 @@
                                 <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center hidden md:table-cell">Gender</th>
                                 <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center">Net Time</th>
                                 <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center hidden sm:table-cell">Gun Time</th>
-                                <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center hidden lg:table-cell">CP 1</th>
-                                <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center hidden lg:table-cell">CP 2</th>
+                                @foreach($checkpoints as $cp)
+                                    <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center hidden lg:table-cell whitespace-nowrap">
+                                        {{ $cp['label'] }}
+                                    </th>
+                                @endforeach
                                 <th class="py-5 pr-8 text-[11px] font-black uppercase tracking-widest text-right">Status</th>
                             </tr>
                         </thead>
@@ -100,45 +155,44 @@
                                             @endif
                                         </td>
                                     @endif
-                                    
+
                                     <!-- BIB -->
                                     <td class="py-5 {{ $activeTab === 'SEMUA' ? 'pl-8' : '' }} font-black text-[#003366]">{{ $res->bib }}</td>
-                                    
+
                                     <!-- Name -->
                                     <td class="py-5 font-black text-[#003366] text-base">
                                         {{ $res->name }}
                                     </td>
-                                    
+
                                     <!-- Category -->
                                     <td class="py-5 hidden md:table-cell">
                                         <span class="px-3 py-1 bg-blue-50 text-blue-800 rounded-full text-[10px] font-black uppercase tracking-wider">
                                             {{ $res->item }}
                                         </span>
                                     </td>
-                                    
+
                                     <!-- Gender -->
                                     <td class="py-5 text-center hidden md:table-cell">
                                         <span class="text-slate-500">{{ $res->gender ?: '-' }}</span>
                                     </td>
-                                    
+
                                     <!-- Net Time (Primary Highlight) -->
                                     <td class="py-5 text-center text-base font-black text-[#E8630A] font-mono">
                                         {{ $res->net_time ?: '-' }}
                                     </td>
-                                    
+
                                     <!-- Gun Time -->
                                     <td class="py-5 text-center font-mono hidden sm:table-cell text-slate-500">
                                         {{ $res->gun_time ?: '-' }}
                                     </td>
-                                    
-                                    <!-- CP1 & CP2 -->
-                                    <td class="py-5 text-center font-mono hidden lg:table-cell text-slate-400 text-xs">
-                                        {{ $res->cp1 ?: '-' }}
-                                    </td>
-                                    <td class="py-5 text-center font-mono hidden lg:table-cell text-slate-400 text-xs">
-                                        {{ $res->cp2 ?: '-' }}
-                                    </td>
-                                    
+
+                                    <!-- Dynamic Checkpoints -->
+                                    @foreach($checkpoints as $cp)
+                                        <td class="py-5 text-center font-mono hidden lg:table-cell text-slate-400 text-xs">
+                                            {{ $res->{$cp['field']} ?: '-' }}
+                                        </td>
+                                    @endforeach
+
                                     <!-- Status -->
                                     <td class="py-5 pr-8 text-right">
                                         @if($res->status)
@@ -152,7 +206,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="{{ $activeTab === 'SEMUA' ? 9 : 10 }}" class="py-20 text-center">
+                                    <td colspan="{{ $colCount }}" class="py-20 text-center">
                                         <div class="flex flex-col items-center justify-center">
                                             <svg class="w-16 h-16 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -174,7 +228,7 @@
                     </div>
                 @endif
             </div>
-            
+
             <!-- Disclaimer / Back link -->
             <div class="mt-8 text-center pb-20">
                 <a href="{{ url('/') }}" class="inline-flex items-center gap-3 px-8 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white rounded-2xl font-[800] text-sm uppercase tracking-widest transition-all active:scale-95 border border-white/30">

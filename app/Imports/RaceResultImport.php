@@ -25,7 +25,7 @@ class RaceResultImport implements ToModel, WithHeadingRow, WithBatchInserts, Wit
         $item      = $row['item'] ?? null;
         $bib       = $row['bib'] ?? null;
         $name      = $row['name'] ?? null;
-        $genderVal = $row['gender'] ?? $row['sex'] ?? $row['jenis_kelamin'] ?? $row['jenis_kelamin'] ?? $row['jenis kelamin'] ?? $row['jk'] ?? $row['gender_l_p'] ?? null;
+        $genderVal = $row['gender'] ?? $row['sex'] ?? $row['jenis_kelamin'] ?? $row['jenis kelamin'] ?? $row['jk'] ?? $row['gender_l_p'] ?? null;
         $gender    = ($genderVal !== null && trim((string) $genderVal) !== '') ? trim((string) $genderVal) : null;
 
         // Standardize gender values to uppercase MALE/FEMALE
@@ -57,6 +57,20 @@ class RaceResultImport implements ToModel, WithHeadingRow, WithBatchInserts, Wit
         $cp2       = $row['cp2'] ?? null;
         $status    = $row['status'] ?? null;
 
+        // Named checkpoint columns — try multiple possible header variations
+        // Laravel Excel normalizes headers: spaces→underscore, comma/dot stripped or → underscore
+        // "3KM" → "3km", "8,9KM" → "8_9km" or "89km", "6.4KM" → "6_4km" or "64km"
+        $cp3km    = $row['3km']    ?? $row['cp_3km']    ?? $row['3_km']    ?? null;
+        $cp6_4km  = $row['6_4km']  ?? $row['cp_6_4km']  ?? $row['64km']    ?? $row['6km']    ?? null;
+        $cp8_9km  = $row['8_9km']  ?? $row['cp_8_9km']  ?? $row['89km']    ?? $row['8km']    ?? null;
+        $cp10km   = $row['10km']   ?? $row['cp_10km']   ?? $row['10_km']   ?? null;
+        $cp16_1km = $row['16_1km'] ?? $row['cp_16_1km'] ?? $row['161km']   ?? $row['16km']   ?? null;
+        $cp19km   = $row['19km']   ?? $row['cp_19km']   ?? $row['19_km']   ?? null;
+        $cp26_1km = $row['26_1km'] ?? $row['cp_26_1km'] ?? $row['261km']   ?? $row['26km']   ?? null;
+        $cp29km   = $row['29km']   ?? $row['cp_29km']   ?? $row['29_km']   ?? null;
+        $cp36km   = $row['36km']   ?? $row['cp_36km']   ?? $row['36_km']   ?? null;
+        $cp38_5km = $row['38_5km'] ?? $row['cp_38_5km'] ?? $row['385km']   ?? $row['38km']   ?? null;
+
         // Clean and uppercase values
         $bibStr  = $bib !== null ? trim((string) $bib) : null;
         $itemStr = $item !== null ? strtoupper(trim((string) $item)) : null;
@@ -67,38 +81,48 @@ class RaceResultImport implements ToModel, WithHeadingRow, WithBatchInserts, Wit
         $startTimeStr = $this->formatTimeValue($startTime);
         $cp1Str       = $this->formatTimeValue($cp1);
         $cp2Str       = $this->formatTimeValue($cp2);
+        $cp3kmStr     = $this->formatTimeValue($cp3km);
+        $cp6_4kmStr   = $this->formatTimeValue($cp6_4km);
+        $cp8_9kmStr   = $this->formatTimeValue($cp8_9km);
+        $cp10kmStr    = $this->formatTimeValue($cp10km);
+        $cp16_1kmStr  = $this->formatTimeValue($cp16_1km);
+        $cp19kmStr    = $this->formatTimeValue($cp19km);
+        $cp26_1kmStr  = $this->formatTimeValue($cp26_1km);
+        $cp29kmStr    = $this->formatTimeValue($cp29km);
+        $cp36kmStr    = $this->formatTimeValue($cp36km);
+        $cp38_5kmStr  = $this->formatTimeValue($cp38_5km);
+
+        $data = [
+            'item'       => $itemStr,
+            'name'       => $nameStr,
+            'gender'     => $gender !== null ? strtoupper(trim((string) $gender)) : null,
+            'gun_time'   => $gunTimeStr,
+            'net_time'   => $netTimeStr,
+            'start_time' => $startTimeStr,
+            'cp1'        => $cp1Str,
+            'cp2'        => $cp2Str,
+            'cp_3km'     => $cp3kmStr,
+            'cp_6_4km'   => $cp6_4kmStr,
+            'cp_8_9km'   => $cp8_9kmStr,
+            'cp_10km'    => $cp10kmStr,
+            'cp_16_1km'  => $cp16_1kmStr,
+            'cp_19km'    => $cp19kmStr,
+            'cp_26_1km'  => $cp26_1kmStr,
+            'cp_29km'    => $cp29kmStr,
+            'cp_36km'    => $cp36kmStr,
+            'cp_38_5km'  => $cp38_5kmStr,
+            'status'     => $status !== null ? strtoupper(trim((string) $status)) : null,
+        ];
 
         if ($bibStr !== null && $bibStr !== '') {
             // Upsert: update if bib+tab exists, else create
             RaceResult::updateOrCreate(
                 ['bib' => $bibStr, 'tab' => $this->tabName],
-                [
-                    'item'       => $itemStr,
-                    'name'       => $nameStr,
-                    'gender'     => $gender !== null ? strtoupper(trim((string) $gender)) : null,
-                    'gun_time'   => $gunTimeStr,
-                    'net_time'   => $netTimeStr,
-                    'start_time' => $startTimeStr,
-                    'cp1'        => $cp1Str,
-                    'cp2'        => $cp2Str,
-                    'status'     => $status !== null ? strtoupper(trim((string) $status)) : null,
-                ]
+                $data
             );
         } else {
-            // If bib is missing, we create a new record since we can't safely upsert
-            RaceResult::create([
-                'bib'        => $bibStr,
-                'tab'        => $this->tabName,
-                'item'       => $itemStr,
-                'name'       => $nameStr,
-                'gender'     => $gender !== null ? strtoupper(trim((string) $gender)) : null,
-                'gun_time'   => $gunTimeStr,
-                'net_time'   => $netTimeStr,
-                'start_time' => $startTimeStr,
-                'cp1'        => $cp1Str,
-                'cp2'        => $cp2Str,
-                'status'     => $status !== null ? strtoupper(trim((string) $status)) : null,
-            ]);
+            // If bib is missing, create a new record
+            RaceResult::create(array_merge($data, ['bib' => $bibStr, 'tab' => $this->tabName]));
         }
 
         $this->successCount++;
