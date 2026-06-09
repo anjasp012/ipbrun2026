@@ -66,8 +66,10 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-[#003366] text-white">
-                                <th class="py-5 pl-8 text-[11px] font-black uppercase tracking-widest w-20">Rank</th>
-                                <th class="py-5 text-[11px] font-black uppercase tracking-widest w-24">BIB</th>
+                                @if($activeTab !== 'SEMUA')
+                                    <th class="py-5 pl-8 text-[11px] font-black uppercase tracking-widest w-20">Rank</th>
+                                @endif
+                                <th class="py-5 {{ $activeTab === 'SEMUA' ? 'pl-8' : '' }} text-[11px] font-black uppercase tracking-widest w-24">BIB</th>
                                 <th class="py-5 text-[11px] font-black uppercase tracking-widest">Nama Pelari</th>
                                 <th class="py-5 text-[11px] font-black uppercase tracking-widest hidden md:table-cell">Kategori</th>
                                 <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center hidden md:table-cell">Gender</th>
@@ -85,8 +87,8 @@
                                 @endphp
                                 <tr class="hover:bg-slate-50/70 transition-all font-bold text-sm text-slate-600">
                                     <!-- Rank with premium style badge -->
-                                    <td class="py-5 pl-8">
-                                        @if($activeTab !== 'SEMUA')
+                                    @if($activeTab !== 'SEMUA')
+                                        <td class="py-5 pl-8">
                                             @if($rank === 1)
                                                 <span class="w-7 h-7 rounded-full bg-yellow-400 text-yellow-950 flex items-center justify-center text-xs font-black shadow-md shadow-yellow-400/20">1</span>
                                             @elseif($rank === 2)
@@ -96,13 +98,11 @@
                                             @else
                                                 <span class="text-slate-400 font-bold text-xs pl-2">{{ $rank }}</span>
                                             @endif
-                                        @else
-                                            <span class="text-slate-400 font-bold text-xs pl-2">-</span>
-                                        @endif
-                                    </td>
+                                        </td>
+                                    @endif
                                     
                                     <!-- BIB -->
-                                    <td class="py-5 font-black text-[#003366]">{{ $res->bib }}</td>
+                                    <td class="py-5 {{ $activeTab === 'SEMUA' ? 'pl-8' : '' }} font-black text-[#003366]">{{ $res->bib }}</td>
                                     
                                     <!-- Name -->
                                     <td class="py-5 font-black text-[#003366] text-base">
@@ -152,7 +152,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="10" class="py-20 text-center">
+                                    <td colspan="{{ $activeTab === 'SEMUA' ? 9 : 10 }}" class="py-20 text-center">
                                         <div class="flex flex-col items-center justify-center">
                                             <svg class="w-16 h-16 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
