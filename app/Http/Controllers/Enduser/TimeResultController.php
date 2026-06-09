@@ -23,16 +23,26 @@ class TimeResultController extends Controller
             $item = $row->item;
             $gender = $row->gender;
             
-            // Format display name nicely (avoid duplicating gender if it's already in the category name)
-            $displayName = $item;
+            $itemUpper = strtoupper($item);
+            
             if ($gender) {
-                $itemLower = strtolower($item);
-                $genderLower = strtolower($gender);
-                if (!str_contains($itemLower, $genderLower)) {
-                    // Capitalize gender for presentation (Male / Female)
-                    $genderDisplay = ucfirst($genderLower);
-                    $displayName = $item . ' ' . $genderDisplay;
+                $genderUpper = strtoupper($gender); // "MALE" or "FEMALE"
+                
+                // If the item name already contains MALE or FEMALE, just use it capitalized
+                if (str_contains($itemUpper, 'MALE') || str_contains($itemUpper, 'FEMALE')) {
+                    $displayName = $itemUpper;
+                } else {
+                    // Split the item to insert gender after the first word (usually "10K" or "5K")
+                    $words = explode(' ', $itemUpper);
+                    if (count($words) > 1) {
+                        array_splice($words, 1, 0, $genderUpper);
+                        $displayName = implode(' ', $words);
+                    } else {
+                        $displayName = $itemUpper . ' ' . $genderUpper;
+                    }
                 }
+            } else {
+                $displayName = $itemUpper;
             }
             
             return (object) [
