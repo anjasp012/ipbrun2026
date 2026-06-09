@@ -29,8 +29,8 @@ class RaceResultController extends Controller
         }
 
         $results = $query->orderBy('item')
-            ->orderByRaw('CAST(bib AS UNSIGNED) ASC')
-            ->orderBy('bib')
+            ->orderByRaw("CASE WHEN net_time IS NULL OR net_time = '' THEN 1 ELSE 0 END")
+            ->orderBy('net_time', 'asc')
             ->paginate(50);
 
         // Get unique items/categories for filter dropdown
