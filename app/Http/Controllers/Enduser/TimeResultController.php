@@ -26,7 +26,13 @@ class TimeResultController extends Controller
             $itemUpper = strtoupper($item);
             
             if ($gender) {
-                $genderUpper = strtoupper($gender); // "MALE" or "FEMALE"
+                $genderClean = strtoupper(trim($gender));
+                $genderUpper = $genderClean;
+                if ($genderClean === 'M' || $genderClean === 'L' || $genderClean === 'MALE' || $genderClean === 'LAKI') {
+                    $genderUpper = 'MALE';
+                } elseif ($genderClean === 'F' || $genderClean === 'P' || $genderClean === 'FEMALE' || $genderClean === 'PEREMPUAN') {
+                    $genderUpper = 'FEMALE';
+                }
                 
                 // If the item name already contains MALE or FEMALE, just use it capitalized
                 if (str_contains($itemUpper, 'MALE') || str_contains($itemUpper, 'FEMALE')) {
