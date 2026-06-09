@@ -22,6 +22,16 @@ class RaceResultImport implements ToModel, WithHeadingRow, WithBatchInserts, Wit
         $genderVal = $row['gender'] ?? $row['sex'] ?? $row['jenis_kelamin'] ?? $row['jenis_kelamin'] ?? $row['jenis kelamin'] ?? $row['jk'] ?? $row['gender_l_p'] ?? null;
         $gender    = ($genderVal !== null && trim((string) $genderVal) !== '') ? trim((string) $genderVal) : null;
 
+        // Standardize gender values (M/F/L/P -> Male/Female)
+        if ($gender !== null) {
+            $gClean = strtoupper($gender);
+            if ($gClean === 'M' || $gClean === 'L' || $gClean === 'MALE' || $gClean === 'LAKI-LAKI' || $gClean === 'LAKI') {
+                $gender = 'Male';
+            } elseif ($gClean === 'F' || $gClean === 'P' || $gClean === 'FEMALE' || $gClean === 'PEREMPUAN' || $gClean === 'WANITA') {
+                $gender = 'Female';
+            }
+        }
+
         // Smart Fallback: Parse from item/category name if gender is empty
         if ($gender === null && $item !== null) {
             $itemLower = strtolower((string) $item);
