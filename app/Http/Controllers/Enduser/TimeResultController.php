@@ -94,9 +94,8 @@ class TimeResultController extends Controller
             }
         }
 
-        // Order by net_time as plain text, pushing empty values to the end
-        $results = $query->orderByRaw("CASE WHEN net_time IS NULL OR net_time = '' THEN 1 ELSE 0 END")
-            ->orderBy('net_time', 'asc')
+        // Order by id (order of excel import / data entry)
+        $results = $query->orderBy('id', 'asc')
             ->paginate(50)
             ->withQueryString();
 

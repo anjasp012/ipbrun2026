@@ -28,9 +28,7 @@ class RaceResultController extends Controller
             $query->where('item', $request->item);
         }
 
-        $results = $query->orderBy('item')
-            ->orderByRaw("CASE WHEN net_time IS NULL OR net_time = '' THEN 1 ELSE 0 END")
-            ->orderBy('net_time', 'asc')
+        $results = $query->orderBy('id', 'asc')
             ->paginate(50);
 
         // Get unique items/categories for filter dropdown
