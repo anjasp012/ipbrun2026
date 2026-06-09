@@ -17,5 +17,6 @@ class RaceResult extends Model
         'cp1',
         'cp2',
         'status',
+        'tab',
     ];
 }

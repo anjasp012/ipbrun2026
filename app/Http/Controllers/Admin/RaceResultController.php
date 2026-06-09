@@ -23,18 +23,18 @@ class RaceResultController extends Controller
             });
         }
 
-        // Filter by Item (Category)
-        if ($request->filled('item')) {
-            $query->where('item', $request->item);
+        // Filter by Tab (Source File Name)
+        if ($request->filled('tab')) {
+            $query->where('tab', $request->tab);
         }
 
         $results = $query->orderBy('id', 'asc')
             ->paginate(50);
 
-        // Get unique items/categories for filter dropdown
-        $items = RaceResult::select('item')->distinct()->pluck('item');
+        // Get unique tabs for filter dropdown
+        $tabs = RaceResult::select('tab')->distinct()->whereNotNull('tab')->pluck('tab');
 
-        return view('pages.admin.time-result.index', compact('results', 'items'));
+        return view('pages.admin.time-result.index', compact('results', 'tabs'));
     }
 
     public function import(Request $request)
@@ -44,8 +44,12 @@ class RaceResultController extends Controller
         ]);
 
         try {
-            $import = new RaceResultImport();
-            Excel::import($import, $request->file('file'));
+            $file = $request->file('file');
+            $filenameWithExt = $file->getClientOriginalName();
+            $tabName = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+
+            $import = new RaceResultImport($tabName);
+            Excel::import($import, $file);
 
             $successCount = $import->getSuccessCount();
             $errors = $import->getErrors();

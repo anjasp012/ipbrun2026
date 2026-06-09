@@ -12,6 +12,12 @@ class RaceResultImport implements ToModel, WithHeadingRow, WithBatchInserts, Wit
 {
     private int $successCount = 0;
     private array $errors = [];
+    private string $tabName;
+
+    public function __construct(string $tabName)
+    {
+        $this->tabName = strtoupper(trim($tabName));
+    }
 
     public function model(array $row)
     {
@@ -22,13 +28,25 @@ class RaceResultImport implements ToModel, WithHeadingRow, WithBatchInserts, Wit
         $genderVal = $row['gender'] ?? $row['sex'] ?? $row['jenis_kelamin'] ?? $row['jenis_kelamin'] ?? $row['jenis kelamin'] ?? $row['jk'] ?? $row['gender_l_p'] ?? null;
         $gender    = ($genderVal !== null && trim((string) $genderVal) !== '') ? trim((string) $genderVal) : null;
 
+        // Standardize gender values to uppercase MALE/FEMALE
+        if ($gender !== null) {
+            $gClean = strtoupper($gender);
+            if ($gClean === 'M' || $gClean === 'L' || $gClean === 'MALE' || $gClean === 'LAKI-LAKI' || $gClean === 'LAKI') {
+                $gender = 'MALE';
+            } elseif ($gClean === 'F' || $gClean === 'P' || $gClean === 'FEMALE' || $gClean === 'PEREMPUAN' || $gClean === 'WANITA') {
+                $gender = 'FEMALE';
+            } else {
+                $gender = $gClean;
+            }
+        }
+
         // Smart Fallback: Parse from item/category name if gender is empty
         if ($gender === null && $item !== null) {
             $itemLower = strtolower((string) $item);
             if (str_contains($itemLower, 'female') || str_contains($itemLower, 'wanita') || str_contains($itemLower, 'perempuan') || str_contains($itemLower, ' w ')) {
-                $gender = 'Female';
+                $gender = 'FEMALE';
             } elseif (str_contains($itemLower, 'male') || str_contains($itemLower, 'pria') || str_contains($itemLower, 'laki') || str_contains($itemLower, ' m ')) {
-                $gender = 'Male';
+                $gender = 'MALE';
             }
         }
 
@@ -39,10 +57,10 @@ class RaceResultImport implements ToModel, WithHeadingRow, WithBatchInserts, Wit
         $cp2       = $row['cp2'] ?? null;
         $status    = $row['status'] ?? null;
 
-        // Clean values
+        // Clean and uppercase values
         $bibStr  = $bib !== null ? trim((string) $bib) : null;
-        $itemStr = $item !== null ? trim((string) $item) : null;
-        $nameStr = $name !== null ? trim((string) $name) : null;
+        $itemStr = $item !== null ? strtoupper(trim((string) $item)) : null;
+        $nameStr = $name !== null ? strtoupper(trim((string) $name)) : null;
 
         $gunTimeStr   = $this->formatTimeValue($gunTime);
         $netTimeStr   = $this->formatTimeValue($netTime);
@@ -50,34 +68,36 @@ class RaceResultImport implements ToModel, WithHeadingRow, WithBatchInserts, Wit
         $cp1Str       = $this->formatTimeValue($cp1);
         $cp2Str       = $this->formatTimeValue($cp2);
 
-        if ($bibStr !== null && $bibStr !== '' && $itemStr !== null && $itemStr !== '') {
-            // Upsert: update if bib+item exists, else create
+        if ($bibStr !== null && $bibStr !== '') {
+            // Upsert: update if bib+tab exists, else create
             RaceResult::updateOrCreate(
-                ['bib' => $bibStr, 'item' => $itemStr],
+                ['bib' => $bibStr, 'tab' => $this->tabName],
                 [
+                    'item'       => $itemStr,
                     'name'       => $nameStr,
-                    'gender'     => $gender !== null ? trim((string) $gender) : null,
+                    'gender'     => $gender !== null ? strtoupper(trim((string) $gender)) : null,
                     'gun_time'   => $gunTimeStr,
                     'net_time'   => $netTimeStr,
                     'start_time' => $startTimeStr,
                     'cp1'        => $cp1Str,
                     'cp2'        => $cp2Str,
-                    'status'     => $status !== null ? trim((string) $status) : null,
+                    'status'     => $status !== null ? strtoupper(trim((string) $status)) : null,
                 ]
             );
         } else {
-            // If bib or item is missing, we create a new record since we can't safely upsert
+            // If bib is missing, we create a new record since we can't safely upsert
             RaceResult::create([
                 'bib'        => $bibStr,
+                'tab'        => $this->tabName,
                 'item'       => $itemStr,
                 'name'       => $nameStr,
-                'gender'     => $gender !== null ? trim((string) $gender) : null,
+                'gender'     => $gender !== null ? strtoupper(trim((string) $gender)) : null,
                 'gun_time'   => $gunTimeStr,
                 'net_time'   => $netTimeStr,
                 'start_time' => $startTimeStr,
                 'cp1'        => $cp1Str,
                 'cp2'        => $cp2Str,
-                'status'     => $status !== null ? trim((string) $status) : null,
+                'status'     => $status !== null ? strtoupper(trim((string) $status)) : null,
             ]);
         }
 

@@ -56,7 +56,7 @@
                         <div>• status (Finished/DNF/DNS)</div>
                     </div>
                     <p class="text-xs font-bold leading-relaxed opacity-50">
-                        * Data akan di-upsert (dibuat baru atau diupdate jika sudah ada) berdasarkan kombinasi <strong>bib + item</strong>.
+                        * Data akan di-upsert (dibuat baru atau diupdate jika sudah ada) berdasarkan kombinasi <strong>bib + nama file Excel</strong>.
                     </p>
                 </div>
             </div>
@@ -104,16 +104,16 @@
             <!-- Search and Filter Form -->
             <form action="{{ route('admin.time-result.index') }}" method="GET" class="flex flex-wrap items-center gap-4">
                 <div>
-                    <select name="item" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-[#003366] outline-none focus:border-[#E8630A] transition-all">
-                        <option value="">-- All Categories --</option>
-                        @foreach($items as $i)
-                            <option value="{{ $i }}" {{ request('item') == $i ? 'selected' : '' }}>{{ $i }}</option>
+                    <select name="tab" class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-bold text-[#003366] outline-none focus:border-[#E8630A] transition-all">
+                        <option value="">-- All Excel Tabs --</option>
+                        @foreach($tabs as $t)
+                            <option value="{{ $t }}" {{ request('tab') == $t ? 'selected' : '' }}>{{ $t }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="relative">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search BIB / Name..." class="bg-slate-50 border border-slate-200 rounded-xl px-5 py-3 pr-10 text-sm font-bold text-[#003366] placeholder:text-slate-400 outline-none focus:border-[#E8630A] transition-all">
-                    @if(request()->filled('search') || request()->filled('item'))
+                    @if(request()->filled('search') || request()->filled('tab'))
                         <a href="{{ route('admin.time-result.index') }}" class="absolute right-3 top-3.5 text-slate-400 hover:text-[#E8630A]">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -134,12 +134,13 @@
                         <th class="pb-4 text-xs font-black text-slate-400 uppercase tracking-widest pl-4">BIB</th>
                         <th class="pb-4 text-xs font-black text-slate-400 uppercase tracking-widest">Name</th>
                         <th class="pb-4 text-xs font-black text-slate-400 uppercase tracking-widest">Category</th>
+                        <th class="pb-4 text-xs font-black text-slate-400 uppercase tracking-widest">Tab (Source)</th>
                         <th class="pb-4 text-xs font-black text-slate-400 uppercase tracking-widest">Gender</th>
                         <th class="pb-4 text-xs font-black text-slate-400 uppercase tracking-widest">Gun Time</th>
                         <th class="pb-4 text-xs font-black text-slate-400 uppercase tracking-widest">Net Time</th>
                         <th class="pb-4 text-xs font-black text-slate-400 uppercase tracking-widest">CP1</th>
                         <th class="pb-4 text-xs font-black text-slate-400 uppercase tracking-widest">CP2</th>
-                        <th class="pb-4 text-xs font-black text-slate-400 uppercase tracking-widestpr-4">Status</th>
+                        <th class="pb-4 text-xs font-black text-slate-400 uppercase tracking-widest pr-4">Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50">
@@ -148,6 +149,7 @@
                             <td class="py-4 pl-4 font-black text-[#003366]">{{ $res->bib }}</td>
                             <td class="py-4 text-[#003366]">{{ $res->name }}</td>
                             <td class="py-4"><span class="px-3 py-1 bg-blue-50 text-blue-800 rounded-full text-xs font-black">{{ $res->item }}</span></td>
+                            <td class="py-4"><span class="px-3 py-1 bg-orange-50 text-orange-800 rounded-full text-xs font-black">{{ $res->tab }}</span></td>
                             <td class="py-4">{{ $res->gender ?: '-' }}</td>
                             <td class="py-4 font-mono">{{ $res->gun_time ?: '-' }}</td>
                             <td class="py-4 font-mono text-[#E8630A]">{{ $res->net_time ?: '-' }}</td>
@@ -161,7 +163,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="py-12 text-center text-sm text-slate-400">
+                            <td colspan="10" class="py-12 text-center text-sm text-slate-400">
                                 No race results found.
                             </td>
                         </tr>

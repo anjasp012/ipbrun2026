@@ -20,10 +20,11 @@ return new class extends Migration
             $table->string('cp1')->nullable();
             $table->string('cp2')->nullable();
             $table->string('status')->nullable(); // Finished, DNF, etc.
+            $table->string('tab')->nullable();           // Tab group name (from excel filename)
             $table->timestamps();
 
-            $table->unique(['bib', 'item']); // prevent duplicates on re-import
-            $table->index('item');
+            $table->unique(['bib', 'tab']); // prevent duplicates on re-import of same file
+            $table->index('tab');
         });
     }
 
