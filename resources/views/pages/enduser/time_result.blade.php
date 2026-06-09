@@ -45,15 +45,15 @@
             </div>
 
             <!-- Categories Tabs -->
-            <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-6 -mx-4 px-4 scrollbar-none">
+            <div class="flex flex-wrap items-center gap-3 mb-6">
                 <a href="{{ route('time-result', ['tab' => 'SEMUA', 'search' => $search]) }}" 
-                   class="flex-shrink-0 px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all {{ $activeTab === 'SEMUA' ? 'bg-white text-[#003366] shadow-lg' : 'bg-white/10 hover:bg-white/20 text-white border border-white/10' }}">
+                   class="px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all {{ $activeTab === 'SEMUA' ? 'bg-white text-[#003366] shadow-lg' : 'bg-white/10 hover:bg-white/20 text-white border border-white/10' }}">
                     SEMUA
                 </a>
                 @if($categories->isNotEmpty())
                     @foreach($categories as $category)
                         <a href="{{ route('time-result', ['tab' => $category, 'search' => $search]) }}" 
-                           class="flex-shrink-0 px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all {{ $activeTab === $category ? 'bg-white text-[#003366] shadow-lg' : 'bg-white/10 hover:bg-white/20 text-white border border-white/10' }}">
+                           class="px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest transition-all {{ $activeTab === $category ? 'bg-white text-[#003366] shadow-lg' : 'bg-white/10 hover:bg-white/20 text-white border border-white/10' }}">
                             {{ $category }}
                         </a>
                     @endforeach
@@ -141,9 +141,13 @@
                                     
                                     <!-- Status -->
                                     <td class="py-5 pr-8 text-right">
-                                        <span class="inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider {{ $res->status === 'Finished' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100' }}">
-                                            {{ $res->status }}
-                                        </span>
+                                        @if($res->status)
+                                            <span class="inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider {{ trim(strtoupper($res->status)) === 'FINISHED' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100' }}">
+                                                {{ $res->status }}
+                                            </span>
+                                        @else
+                                            <span class="text-slate-400 font-bold text-xs">-</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty

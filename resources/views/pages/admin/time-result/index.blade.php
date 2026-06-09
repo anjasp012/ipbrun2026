@@ -156,9 +156,13 @@
                             <td class="py-4 font-mono">{{ $res->cp1 ?: '-' }}</td>
                             <td class="py-4 font-mono">{{ $res->cp2 ?: '-' }}</td>
                             <td class="py-4 pr-4">
-                                <span class="px-3 py-1 rounded-full text-xs font-black {{ $res->status === 'Finished' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' }}">
-                                    {{ $res->status }}
-                                </span>
+                                @if($res->status)
+                                    <span class="px-3 py-1 rounded-full text-xs font-black {{ trim(strtoupper($res->status)) === 'FINISHED' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700' }}">
+                                        {{ $res->status }}
+                                    </span>
+                                @else
+                                    <span class="text-slate-400">-</span>
+                                @endif
                             </td>
                         </tr>
                     @empty
