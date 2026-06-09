@@ -86,7 +86,7 @@
                                 <tr class="hover:bg-slate-50/70 transition-all font-bold text-sm text-slate-600">
                                     <!-- Rank with premium style badge -->
                                     <td class="py-5 pl-8">
-                                        @if($res->status === 'Finished')
+                                        @if($activeTab !== 'SEMUA')
                                             @if($rank === 1)
                                                 <span class="w-7 h-7 rounded-full bg-yellow-400 text-yellow-950 flex items-center justify-center text-xs font-black shadow-md shadow-yellow-400/20">1</span>
                                             @elseif($rank === 2)
