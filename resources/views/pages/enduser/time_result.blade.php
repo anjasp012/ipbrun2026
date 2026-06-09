@@ -10,7 +10,7 @@
             <h1 class="text-4xl md:text-5xl font-[900] text-white uppercase tracking-tight mb-4 drop-shadow-md">
                 Race <span class="text-[#FF7A21]">Time Results</span>
             </h1>
-            <p class="mt-2 text-white/40 text-[10px] uppercase tracking-widest font-semibold">unofficial</p>
+            <p class="mb-2 text-white/40 text-[10px] uppercase tracking-widest font-semibold">unofficial</p>
             <p class="text-white/80 font-bold uppercase tracking-[3px] text-xs md:text-sm">
                 Cek Catatan Waktu Resmi Pelari IPB RUN 2026
             </p>
