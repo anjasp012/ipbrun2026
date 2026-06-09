@@ -69,11 +69,11 @@
                 $is5K  = (str_contains($tabUpper, '5K') || str_contains($tabUpper, '5KM')) && !$is10K;
 
                 // Checkpoints to display per category:
-                // FM:   3K, 8.9K, 16.1K, 19K, 26.1K, 29K, 36K, 38.5K
-                // HM:   3K, 6.4K, 8.9K, 16.1K, 19K
-                // 10K:  3K, 8.9K
-                // 5K:   3K
-                // SEMUA: no CP columns (keeps table clean across mixed categories)
+                // 5K:    — (no CP columns)
+                // 10K:   cp1, cp2
+                // HM:    3KM, 6.4KM, 8.9KM, 16.1KM, 19KM
+                // FM:    3KM, 8.9KM, 16.1KM, 19KM, 26.1KM, 29KM, 36KM, 38.5KM
+                // SEMUA: — (no CP columns, tabel tetap bersih)
                 $checkpoints = [];
                 if ($isFM) {
                     $checkpoints = [
@@ -96,14 +96,11 @@
                     ];
                 } elseif ($is10K) {
                     $checkpoints = [
-                        ['field' => 'cp_3km',   'label' => '3KM'],
-                        ['field' => 'cp_8_9km', 'label' => '8.9KM'],
-                    ];
-                } elseif ($is5K) {
-                    $checkpoints = [
-                        ['field' => 'cp_3km', 'label' => '3KM'],
+                        ['field' => 'cp1', 'label' => 'CP 1'],
+                        ['field' => 'cp2', 'label' => 'CP 2'],
                     ];
                 }
+                // 5K dan SEMUA → $checkpoints tetap kosong (tidak tampil kolom CP)
 
                 // Total column count for empty-state colspan
                 $colCount = 6; // BIB, Nama, Kategori, Gender, Net Time, Gun Time
@@ -111,6 +108,7 @@
                 $colCount += count($checkpoints);         // + CPs
                 $colCount++;                              // + Status
             @endphp
+
 
             <!-- Main Results Table -->
             <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
