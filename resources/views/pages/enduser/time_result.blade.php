@@ -13,6 +13,7 @@
             <p class="text-white/80 font-bold uppercase tracking-[3px] text-xs md:text-sm">
                 Cek Catatan Waktu Resmi Pelari IPB RUN 2026
             </p>
+            <p class="mt-2 text-white/40 text-[10px] uppercase tracking-widest font-semibold">unofficial</p>
         </div>
 
         <div class="max-w-7xl w-full px-2 md:px-0">
@@ -137,7 +138,11 @@
                             @forelse($results as $res)
                                 @php
                                     $rank = ($results->currentPage() - 1) * $results->perPage() + $loop->iteration;
+                                    $isFinished = trim(strtoupper($res->status ?? '')) === 'FINISHED';
                                 @endphp
+                                @if(!$isFinished)
+                                    @continue
+                                @endif
                                 <tr class="hover:bg-slate-50/70 transition-all font-bold text-sm text-slate-600">
                                     <!-- Rank with premium style badge -->
                                     @if($activeTab !== 'SEMUA')
