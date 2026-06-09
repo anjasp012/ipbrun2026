@@ -40,10 +40,9 @@ class TimeResultController extends Controller
             $query->where('item', $activeCategory);
         }
 
-        // Order by net_time or gun_time (handling empty values)
+        // Order by net_time as plain text, pushing empty values to the end
         $results = $query->orderByRaw("CASE WHEN net_time IS NULL OR net_time = '' THEN 1 ELSE 0 END")
-            ->orderByRaw("CASE WHEN net_time REGEXP '^[0-9]+:[0-9]+:[0-9]+$' THEN 0 ELSE 1 END")
-            ->orderBy('net_time')
+            ->orderBy('net_time', 'asc')
             ->paginate(50)
             ->withQueryString();
 

@@ -32,6 +32,12 @@ class RaceResultImport implements ToModel, WithHeadingRow, WithBatchInserts, Wit
         $itemStr = $item !== null ? trim((string) $item) : null;
         $nameStr = $name !== null ? trim((string) $name) : null;
 
+        $gunTimeStr   = $this->formatTimeValue($gunTime);
+        $netTimeStr   = $this->formatTimeValue($netTime);
+        $startTimeStr = $this->formatTimeValue($startTime);
+        $cp1Str       = $this->formatTimeValue($cp1);
+        $cp2Str       = $this->formatTimeValue($cp2);
+
         if ($bibStr !== null && $bibStr !== '' && $itemStr !== null && $itemStr !== '') {
             // Upsert: update if bib+item exists, else create
             RaceResult::updateOrCreate(
@@ -39,11 +45,11 @@ class RaceResultImport implements ToModel, WithHeadingRow, WithBatchInserts, Wit
                 [
                     'name'       => $nameStr,
                     'gender'     => $gender !== null ? trim((string) $gender) : null,
-                    'gun_time'   => $gunTime !== null ? trim((string) $gunTime) : null,
-                    'net_time'   => $netTime !== null ? trim((string) $netTime) : null,
-                    'start_time' => $startTime !== null ? trim((string) $startTime) : null,
-                    'cp1'        => $cp1 !== null ? trim((string) $cp1) : null,
-                    'cp2'        => $cp2 !== null ? trim((string) $cp2) : null,
+                    'gun_time'   => $gunTimeStr,
+                    'net_time'   => $netTimeStr,
+                    'start_time' => $startTimeStr,
+                    'cp1'        => $cp1Str,
+                    'cp2'        => $cp2Str,
                     'status'     => $status !== null ? trim((string) $status) : null,
                 ]
             );
@@ -54,11 +60,11 @@ class RaceResultImport implements ToModel, WithHeadingRow, WithBatchInserts, Wit
                 'item'       => $itemStr,
                 'name'       => $nameStr,
                 'gender'     => $gender !== null ? trim((string) $gender) : null,
-                'gun_time'   => $gunTime !== null ? trim((string) $gunTime) : null,
-                'net_time'   => $netTime !== null ? trim((string) $netTime) : null,
-                'start_time' => $startTime !== null ? trim((string) $startTime) : null,
-                'cp1'        => $cp1 !== null ? trim((string) $cp1) : null,
-                'cp2'        => $cp2 !== null ? trim((string) $cp2) : null,
+                'gun_time'   => $gunTimeStr,
+                'net_time'   => $netTimeStr,
+                'start_time' => $startTimeStr,
+                'cp1'        => $cp1Str,
+                'cp2'        => $cp2Str,
                 'status'     => $status !== null ? trim((string) $status) : null,
             ]);
         }
@@ -66,6 +72,26 @@ class RaceResultImport implements ToModel, WithHeadingRow, WithBatchInserts, Wit
         $this->successCount++;
 
         return null; // We save database records manually
+    }
+
+    private function formatTimeValue($value)
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        // If it's numeric (Excel internal representation of time/date)
+        if (is_numeric($value)) {
+            try {
+                // excelToDateTimeObject converts fraction/float into a DateTime object
+                $dateTime = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value);
+                return $dateTime->format('H:i:s');
+            } catch (\Exception $e) {
+                return (string) $value;
+            }
+        }
+
+        return trim((string) $value);
     }
 
     public function batchSize(): int
