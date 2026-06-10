@@ -39,8 +39,9 @@ class TimeResultController extends Controller
             $query->whereNotNull('gun_time')->where('gun_time', '!=', '');
         }
 
-        // Order by id (order of excel import / data entry)
-        $results = $query->orderBy('id', 'asc')
+        // Order by gun_time ascending (fastest first), nulls last
+        $results = $query->orderByRaw('CASE WHEN gun_time IS NULL OR gun_time = \'\' THEN 1 ELSE 0 END ASC')
+            ->orderBy('gun_time', 'asc')
             ->paginate(50)
             ->withQueryString();
 
