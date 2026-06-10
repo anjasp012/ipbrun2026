@@ -62,51 +62,9 @@
             </div>
 
             @php
-                // Determine which checkpoints to show based on active tab
-                $tabUpper = strtoupper($activeTab ?? '');
-                $isFM  = str_contains($tabUpper, 'FM') || str_contains($tabUpper, 'FULL');
-                $isHM  = str_contains($tabUpper, 'HM') || str_contains($tabUpper, 'HALF');
-                $is10K = str_contains($tabUpper, '10K') || str_contains($tabUpper, '10KM');
-                $is5K  = (str_contains($tabUpper, '5K') || str_contains($tabUpper, '5KM')) && !$is10K;
-
-                // Checkpoints to display per category:
-                // 5K:    — (no CP columns)
-                // 10K:   cp1, cp2
-                // HM:    3KM, 6.4KM, 8.9KM, 16.1KM, 19KM
-                // FM:    3KM, 8.9KM, 16.1KM, 19KM, 26.1KM, 29KM, 36KM, 38.5KM
-                // SEMUA: — (no CP columns, tabel tetap bersih)
-                $checkpoints = [];
-                if ($isFM) {
-                    $checkpoints = [
-                        ['field' => 'cp_3km',    'label' => '3KM'],
-                        ['field' => 'cp_8_9km',  'label' => '8.9KM'],
-                        ['field' => 'cp_16_1km', 'label' => '16.1KM'],
-                        ['field' => 'cp_19km',   'label' => '19KM'],
-                        ['field' => 'cp_26_1km', 'label' => '26.1KM'],
-                        ['field' => 'cp_29km',   'label' => '29KM'],
-                        ['field' => 'cp_36km',   'label' => '36KM'],
-                        ['field' => 'cp_38_5km', 'label' => '38.5KM'],
-                    ];
-                } elseif ($isHM) {
-                    $checkpoints = [
-                        ['field' => 'cp_3km',    'label' => '3KM'],
-                        ['field' => 'cp_6_4km',  'label' => '6.4KM'],
-                        ['field' => 'cp_8_9km',  'label' => '8.9KM'],
-                        ['field' => 'cp_16_1km', 'label' => '16.1KM'],
-                        ['field' => 'cp_19km',   'label' => '19KM'],
-                    ];
-                } elseif ($is10K) {
-                    $checkpoints = [
-                        ['field' => 'cp1', 'label' => 'CP 1'],
-                        ['field' => 'cp2', 'label' => 'CP 2'],
-                    ];
-                }
-                // 5K dan SEMUA → $checkpoints tetap kosong (tidak tampil kolom CP)
-
                 // Total column count for empty-state colspan
                 $colCount = 5; // BIB, Nama, Kategori, Gender, Gun Time
                 if ($activeTab !== 'SEMUA') $colCount++; // + Rank
-                $colCount += count($checkpoints);         // + CPs
                 $colCount++;                              // + Status
             @endphp
 
@@ -125,11 +83,6 @@
                                 <th class="py-5 text-[11px] font-black uppercase tracking-widest hidden md:table-cell">Kategori</th>
                                 <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center hidden md:table-cell">Gender</th>
                                 <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center">Gun Time</th>
-                                @foreach($checkpoints as $cp)
-                                    <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center hidden lg:table-cell whitespace-nowrap">
-                                        {{ $cp['label'] }}
-                                    </th>
-                                @endforeach
                                 <th class="py-5 pr-8 text-[11px] font-black uppercase tracking-widest text-right">Status</th>
                             </tr>
                         </thead>
@@ -182,13 +135,6 @@
                                     <td class="py-5 text-center text-base font-black text-[#E8630A] font-mono">
                                         {{ $res->gun_time ?: '-' }}
                                     </td>
-
-                                    <!-- Dynamic Checkpoints -->
-                                    @foreach($checkpoints as $cp)
-                                        <td class="py-5 text-center font-mono hidden lg:table-cell text-slate-400 text-xs">
-                                            {{ $res->{$cp['field']} ?: '-' }}
-                                        </td>
-                                    @endforeach
 
                                     <!-- Status -->
                                     <td class="py-5 pr-8 text-right">
