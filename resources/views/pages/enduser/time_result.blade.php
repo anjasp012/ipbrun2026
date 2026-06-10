@@ -104,7 +104,7 @@
                 // 5K dan SEMUA → $checkpoints tetap kosong (tidak tampil kolom CP)
 
                 // Total column count for empty-state colspan
-                $colCount = 6; // BIB, Nama, Kategori, Gender, Net Time, Gun Time
+                $colCount = 5; // BIB, Nama, Kategori, Gender, Gun Time
                 if ($activeTab !== 'SEMUA') $colCount++; // + Rank
                 $colCount += count($checkpoints);         // + CPs
                 $colCount++;                              // + Status
@@ -124,8 +124,7 @@
                                 <th class="py-5 text-[11px] font-black uppercase tracking-widest">Nama Pelari</th>
                                 <th class="py-5 text-[11px] font-black uppercase tracking-widest hidden md:table-cell">Kategori</th>
                                 <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center hidden md:table-cell">Gender</th>
-                                <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center">Net Time</th>
-                                <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center hidden sm:table-cell">Gun Time</th>
+                                <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center">Gun Time</th>
                                 @foreach($checkpoints as $cp)
                                     <th class="py-5 text-[11px] font-black uppercase tracking-widest text-center hidden lg:table-cell whitespace-nowrap">
                                         {{ $cp['label'] }}
@@ -179,13 +178,8 @@
                                         <span class="text-slate-500">{{ $res->gender ?: '-' }}</span>
                                     </td>
 
-                                    <!-- Net Time (Primary Highlight) -->
+                                    <!-- Gun Time (Primary Highlight) -->
                                     <td class="py-5 text-center text-base font-black text-[#E8630A] font-mono">
-                                        {{ $res->net_time ?: '-' }}
-                                    </td>
-
-                                    <!-- Gun Time -->
-                                    <td class="py-5 text-center font-mono hidden sm:table-cell text-slate-500">
                                         {{ $res->gun_time ?: '-' }}
                                     </td>
 

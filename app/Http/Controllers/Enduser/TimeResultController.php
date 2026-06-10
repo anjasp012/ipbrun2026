@@ -35,8 +35,8 @@ class TimeResultController extends Controller
         if ($activeTab !== null && $activeTab !== 'SEMUA') {
             $query->where('tab', $activeTab);
         } elseif ($activeTab === 'SEMUA') {
-            // Show all rows that have a recorded net time (finished runners)
-            $query->whereNotNull('net_time')->where('net_time', '!=', '');
+            // Show all rows that have a recorded gun time (finished runners)
+            $query->whereNotNull('gun_time')->where('gun_time', '!=', '');
         }
 
         // Order by id (order of excel import / data entry)
